@@ -1,0 +1,32 @@
+{
+  "description": "Template MCP server configuration for Team Skills Platform and ECC harness skeleton.",
+  "servers": [
+    {
+      "name": "github",
+      "enabled": false,
+      "transport": "stdio",
+      "_comment": "Setup: npx @modelcontextprotocol/server-github. Requires GITHUB_PERSONAL_ACCESS_TOKEN in env.",
+      "command": "echo",
+      "args": ["Not configured - set up via: npx @modelcontextprotocol/server-github"],
+      "env": {}
+    },
+    {
+      "name": "vercel",
+      "enabled": false,
+      "transport": "stdio",
+      "_comment": "Setup: npx @vercel/mcp. Requires VERCEL_TOKEN in env.",
+      "command": "echo",
+      "args": ["Not configured - set up via: npx @vercel/mcp"],
+      "env": {}
+    },
+    {
+      "name": "database",
+      "enabled": false,
+      "transport": "stdio",
+      "_comment": "Setup: npx @modelcontextprotocol/server-postgres or equivalent. Requires DATABASE_URL in env.",
+      "command": "echo",
+      "args": ["Not configured - set up via: npx @modelcontextprotocol/server-postgres"],
+      "env": {}
+    }
+  ]
+}

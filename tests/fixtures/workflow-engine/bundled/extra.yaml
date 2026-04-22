@@ -1,0 +1,6 @@
+version: ecc.workflow.v1
+name: extra
+description: Another bundled workflow.
+nodes:
+  - id: extra-step
+    prompt: Extra workflow.

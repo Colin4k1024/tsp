@@ -1,0 +1,65 @@
+name: Team Skills Platform CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate_platform:
+    name: Build, Validate, and Install Smoke
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Scan for leaked private keys
+        run: node scripts/scan-leaked-keys.js
+
+      - name: Generate artifacts
+        run: node scripts/build-platform-artifacts.js
+
+      - name: Validate library
+        run: node scripts/validate-library.js
+
+      - name: Validate file references
+        run: node scripts/validate-file-references.js --strict
+
+      - name: Validate doc freshness
+        run: node scripts/validate-doc-freshness.js
+
+      - name: Run tests
+        run: node tests/run-all.js
+
+      - name: Public target install-plan smoke
+        run: |
+          for target in cursor antigravity gemini opencode codebuddy copilot windsurf augment; do
+            node scripts/install-plan.js --profile team --target "$target"
+          done
+
+      - name: Codex install smoke
+        run: CODEX_HOME_DIR=/tmp/team-skills-codex AGENTS_HOME_DIR=/tmp/team-skills-agents ./scripts/install-codex.sh
+
+      - name: Claude install smoke
+        run: HOME=/tmp/team-skills-home CLAUDE_HOME_DIR=/tmp/team-skills-home/.claude ./scripts/install-claude.sh
+
+      - name: Claude platform smoke
+        run: HOME=/tmp/team-skills-home RUN_INSTALL_SMOKE_TESTS=1 node tests/test_platform_smoke.js
+
+      - name: Re-check generated artifacts
+        run: node scripts/build-platform-artifacts.js --check

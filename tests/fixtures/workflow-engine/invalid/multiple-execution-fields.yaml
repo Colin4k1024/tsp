@@ -1,0 +1,7 @@
+version: ecc.workflow.v1
+name: multiple-execution-fields
+description: Node cannot declare multiple execution fields.
+nodes:
+  - id: invalid
+    prompt: Create a plan.
+    bash: npm test

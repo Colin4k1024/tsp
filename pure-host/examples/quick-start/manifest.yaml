@@ -1,0 +1,55 @@
+# Quick Start Example — Analyze project health using pure-host
+# Run with: node pure-host/pure-host.js --manifest pure-host/examples/quick-start
+
+model: sonnet
+tasks:
+  - taskId: health-check
+    description: Run project health audit
+    prompt: |
+      Run a project health audit on this codebase.
+
+      Check:
+      1. Count TypeScript/JavaScript files and identify any obvious issues
+      2. Check for missing README files in key directories
+      3. Verify package.json exists and has required scripts
+      4. Look for any TODO/FIXME comments that indicate pending work
+
+      Output a summary of findings in markdown format.
+    dependsOn: []
+    timeout: 120000
+    verifyCommand: echo "Health check passed"  # Optional custom verification
+
+  - taskId: install-check
+    description: Verify CLI commands are registered
+    prompt: |
+      Check if all documented CLI commands in the commands/ directory
+      have corresponding implementation files.
+
+      List any missing implementations and report back.
+    dependsOn: []
+    timeout: 60000
+
+  - taskId: skill-manifest
+    description: Validate skills structure
+    prompt: |
+      Verify the skills/ directory has proper structure:
+      - Each skill should have a SKILL.md file
+      - Check for any orphaned directories without SKILL.md
+
+      Report any structural issues found.
+    dependsOn: []
+    timeout: 60000
+
+  - taskId: generate-report
+    description: Compile health report
+    prompt: |
+      Compile the results from previous tasks into a final
+      health report. Output as markdown with sections for:
+      - Summary
+      - Issues Found
+      - Recommendations
+    dependsOn:
+      - health-check
+      - install-check
+      - skill-manifest
+    timeout: 60000

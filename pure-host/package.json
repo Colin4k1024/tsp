@@ -1,0 +1,37 @@
+{
+  "name": "pure-host",
+  "version": "1.0.0",
+  "description": "AI-augmented task execution engine with dependency management, auto-fix retry, git revert points, and Markdown reporting",
+  "main": "pure-host.js",
+  "bin": {
+    "pure-host": "./pure-host.js"
+  },
+  "scripts": {
+    "start": "node pure-host.js",
+    "test": "node --test tests/*.test.js",
+    "test:watch": "node --test tests/*.test.js --watch"
+  },
+  "keywords": [
+    "claude",
+    "task-execution",
+    "ai",
+    "automation",
+    "pipeline",
+    "dependency-management"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@iarna/toml": "^2.2.5"
+  },
+  "peerDependencies": {
+    "claude-code": ">=1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Colin4k1024/harness-engineering",
+    "directory": "pure-host"
+  }
+}

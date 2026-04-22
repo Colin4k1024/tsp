@@ -1,0 +1,8 @@
+version: ecc.workflow.v1
+name: loop-var-test
+description: Workflow fixture with variables in loop fields.
+nodes:
+  - id: retry-task
+    loop:
+      prompt: Check status of {{resourceId}}
+      until: Retry until {{maxRetries}}

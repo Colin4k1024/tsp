@@ -1,0 +1,12 @@
+version: ecc.workflow.v1
+name: bugfix
+description: Investigate a defect and propose or apply a focused fix.
+nodes:
+  - id: investigate
+    prompt: Identify the root cause and the smallest safe fix.
+  - id: fix
+    depends_on: [investigate]
+    bash: npm test
+  - id: summarize
+    depends_on: [fix]
+    command: /handoff

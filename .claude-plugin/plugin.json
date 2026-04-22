@@ -1,0 +1,23 @@
+{
+  "name": "team-skills-platform",
+  "version": "2.3.0",
+  "description": "Role-based Team Skills platform with an ECC-style harness skeleton, specialist agents, layered rules, commands, hooks skeleton, and frontend governance.",
+  "author": {
+    "name": "Engineering Team",
+    "url": "https://github.com/affaan-m/everything-claude-code"
+  },
+  "homepage": "https://github.com/affaan-m/everything-claude-code",
+  "repository": "https://github.com/affaan-m/everything-claude-code",
+  "license": "MIT",
+  "keywords": [
+    "team-skills",
+    "agents",
+    "skills",
+    "commands",
+    "hooks",
+    "workflow",
+    "frontend",
+    "code-review",
+    "verification"
+  ]
+}

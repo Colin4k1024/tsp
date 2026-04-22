@@ -1,0 +1,35 @@
+# Cross.toml — configuration for `cross` (cross-compilation tool)
+#
+# Placed in the crate root so `cross` picks it up automatically when run from
+# crates/oris-claude-bridge/.
+#
+# musl targets need bundled SQLite because musl libc ships without an sqlite3
+# shared library.  Setting LIBSQLITE3_SYS_USE_PKG_CONFIG=0 and
+# SQLITE3_STATIC=1 tells libsqlite3-sys to compile SQLite from source.
+
+[build.env]
+passthrough = [
+  "LIBSQLITE3_SYS_USE_PKG_CONFIG",
+  "SQLITE3_STATIC",
+  "CROSS_NO_WARNINGS",
+  "CARGO_NET_RETRY",
+  "RUST_BACKTRACE",
+]
+
+[target.x86_64-unknown-linux-musl]
+image = "ghcr.io/cross-rs/x86_64-unknown-linux-musl:main"
+
+[target.x86_64-unknown-linux-musl.env]
+passthrough = [
+  "LIBSQLITE3_SYS_USE_PKG_CONFIG",
+  "SQLITE3_STATIC",
+]
+
+[target.aarch64-unknown-linux-musl]
+image = "ghcr.io/cross-rs/aarch64-unknown-linux-musl:main"
+
+[target.aarch64-unknown-linux-musl.env]
+passthrough = [
+  "LIBSQLITE3_SYS_USE_PKG_CONFIG",
+  "SQLITE3_STATIC",
+]

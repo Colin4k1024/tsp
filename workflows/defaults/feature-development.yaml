@@ -1,0 +1,12 @@
+version: ecc.workflow.v1
+name: feature-development
+description: Plan and implement a feature with a review pass.
+nodes:
+  - id: plan
+    prompt: Explore the codebase and create a short implementation plan.
+  - id: implement
+    depends_on: [plan]
+    prompt: Read the plan and implement the feature incrementally.
+  - id: review
+    depends_on: [implement]
+    prompt: Review the changes against the plan and list any fixes.

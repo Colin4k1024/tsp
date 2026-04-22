@@ -1,0 +1,9 @@
+version: ecc.workflow.v1
+name: team-execute-readiness
+description: Validate whether an artifact task directory is ready to enter the execute phase.
+nodes:
+  - id: validate-readiness
+    bash: node scripts/validate-workflow-state.js {{taskDir}} --target-phase {{targetPhase}}
+  - id: summarize-gate
+    depends_on: [validate-readiness]
+    prompt: Summarize the readiness result for {{taskDir}} entering {{targetPhase}}.

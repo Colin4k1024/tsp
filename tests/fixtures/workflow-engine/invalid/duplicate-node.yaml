@@ -1,0 +1,8 @@
+version: ecc.workflow.v1
+name: duplicate-node
+description: Duplicate node ids are not allowed.
+nodes:
+  - id: plan
+    prompt: Create a plan.
+  - id: plan
+    bash: npm test

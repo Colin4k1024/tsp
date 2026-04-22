@@ -1,0 +1,686 @@
+# Team Skills Platform
+
+面向团队协作与平台治理的开源 Team Skills Platform，用于把单代理执行模式升级成“`Tech Lead` 编排 + 专业角色协作”的虚拟研发团队工作模型，并叠加 ECC 风格的 harness layer、specialist 命令与运行时增强能力。当前平台同时支持 `team mode` 与 `solo mode`，前者强调多人交接，后者强调单人闭环但保留同样的关键门禁。
+
+> English: Team Skills Platform (TSP) is an open-source framework for role-based AI delivery workflows. It packages role prompts, shared skills, commands, rules, hooks, examples, and install tooling for Claude Code, Codex, Cursor, and similar environments. Private enterprise extensions are optional and distributed separately through `--overlay enterprise`; the public repository ships only public capabilities.
+
+## Quick Start / 最小安装
+
+适合第一次体验公开能力的最短路径：
+
+```bash
+node scripts/build-platform-artifacts.js
+node scripts/install-apply.js --profile team --target claude
+node scripts/install-apply.js --profile full --target codex
+```
+
+如果你的任务确实依赖私有流程、权限或内部发布集成，再额外叠加：
+
+```bash
+node scripts/install-apply.js --profile team --target claude --overlay enterprise
+```
+
+## Who It's For / 适合谁
+
+- 想把 AI 编码从“单代理乱跑”升级成“角色分工 + 明确 handoff + 明确 gate”的团队
+- 需要一套可安装、可验证、可迁移的 prompts、skills、commands、rules 与 hooks 底座
+- 想在公开能力之上，为私有企业扩展预留清晰 overlay 边界的团队
+
+## Community / 社区协作
+
+- 贡献方式：见 [CONTRIBUTING.md](CONTRIBUTING.md)
+- 行为准则：见 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+- 安全报告：见 [SECURITY.md](SECURITY.md)
+- 支持边界：见 [SUPPORT.md](SUPPORT.md)
+
+## 平台目标
+
+- 用角色边界替代单线流程技能，统一产品、架构、研发、测试、运维的协作方式。
+- 在仓库内维护平台无关的 canonical 定义，并自动生成 Codex / Claude 需要的角色技能、agent prompt、命令面和插件清单。
+- 提供可安装、可校验、可迁移的团队能力底座，而不是一次性的项目脚手架。
+- 内置 React/Next 优先的前端工程规范与 UI/UX 治理能力，用统一规则承接页面、交互和体验质量。
+- 内置 ECC 风格的 specialist agents、快捷 commands、rules packs、runtime hooks、contexts 与 examples，提升整体可用性。
+- npm 安装包内置 `crates/oris-claude-bridge` 与多平台预构建二进制，安装时按用户操作系统自动选择 bridge，无需本机 Rust 工具链。
+
+## 框架说明
+
+### 平台架构
+
+TSP 采用 **角色 + 技能 + Agent + 规则 + Hooks + Workflow 引擎** 六层架构：
+
+| 层 | 目录 | 职责 |
+|---|---|---|
+| 角色定义 | `roles/` | 8 个专业角色的 canonical YAML 定义（tech-lead 编排） |
+| 技能层 | `skills/` | 195+ 平铺技能，覆盖调试、编排、学习、前端、后端、安全等 |
+| Agent 层 | `agents/specialists/` | 27 个 specialist agents（规划、review、build-fix、语言专项） |
+| 规则层 | `rules/` | common 规则 + 13 语言规则包（TS/Python/Go/Java/Kotlin/Rust/Swift/C++/C#/PHP/Perl + 中文） |
+| Hooks 层 | `hooks/` + `scripts/hooks/` | 37 个运行时 hook（prompt guard、context monitor、memory persistence 等） |
+| 命令面 | `commands/` | 80+ 命令（团队主链 8 个 + specialist + 工具链） |
+| Workflow 引擎 | `workflows/` + `scripts/workflow-*.js` | YAML DAG 工作流，支持依赖解析、状态持久化、失败恢复 |
+
+安装工具链支持 **10 个目标平台**：Claude、Cursor、Antigravity、Codex、Gemini、OpenCode、CodeBuddy、Copilot、Windsurf、Augment。
+
+发布为 npm 包 `@colin4k1024/tsp-create`，内置 Rust bridge 预构建二进制，安装零依赖。
+
+### 集成的开源框架与方法论
+
+TSP 整合了多个社区开源框架的精华能力，而非从零构建：
+
+| 框架 | 来源 | 集成的核心能力 |
+|------|------|--------------|
+| **ECC** (Everything Claude Code) | 社区 | 125+ specialist skills、27 specialist agents、language rules packs、runtime hooks、安装工具链 |
+| **BMAD** | 方法来源（已吸收） | 单入口主链（`/team-help`）、Requirement Challenge、Design Review、Implementation Readiness、Story Slice、`artifact:persist` 落盘、Release→Closeout 收口 |
+| **Graphify** | 社区（`safishamsi/graphify`） | 可选知识图谱能力（brownfield 结构扫描、依赖路径分析、架构问答证据），以 runbook + 本地 skill 接入，不替换 workflow-engine |
+| **GSD** (Getting Shit Done) | 社区 | Quality Gates 分类法（4 类 gate）、wave-execution、session-continuity、discuss-phase、quick-execution、context-engineering、workflow-forensics |
+| **gstack** | 社区 | brainstorming 苏格拉底式创意探索、cross-model-review 跨模型交叉审查、multi-perspective-review 多视角评审（CEO/Design/Eng/DevEx） |
+| **Superpowers** | 社区 | session-continuity 会话暂停/恢复、subagent-driven-development 子 agent 驱动开发、git-worktree-isolation 任务隔离 |
+| **Oris bridge runtime** | 项目内组件 | evolution-core 相关运行时资产、`oris-claude-bridge` Rust bridge |
+| **rtk** (Rust Token Killer) | 社区 | CLI 代理透明命令重写，60-90% token 节约，100+ 命令支持（git/gh/cargo/npm/docker/kubectl/aws） |
+| 社区贡献 | 多方 | UI/UX Pro Max 设计系统、vertical workflow examples、Santa Method 对抗验证、Ralph RFC Pipeline |
+
+### 核心依赖
+
+| 依赖 | 用途 |
+|------|------|
+| `sql.js` | Workflow 引擎 SQLite 状态存储 |
+| `ajv` | JSON Schema 校验（workflow 定义、状态校验） |
+| `js-yaml` | YAML 解析（workflow、manifest、role 定义） |
+| `@iarna/toml` | TOML 配置解析 |
+| `@inquirer/prompts` | 交互式 CLI 安装向导 |
+| `vitepress` | 文档静态站点生成 |
+| `eslint` + `markdownlint-cli` | 代码与文档质量门禁 |
+
+## 目录结构
+
+```text
+.
+├── .claude-plugin/            # Claude plugin 与 marketplace manifests
+├── roles/                     # 唯一事实源：每个角色一个 role.yaml
+├── skills/                    # 当前正式技能目录（统一平铺）
+│   └── roles/                 # 生成产物：角色型 skills
+├── agents/
+│   ├── roles/                 # 生成产物：角色 agent prompt
+│   └── specialists/           # ECC 风格 specialist agents
+├── commands/                  # 团队命令面 + ECC 快捷命令
+├── rules/                     # 团队工作规则 + common/language packs
+├── hooks/                     # hooks 配置入口
+├── contexts/                  # 动态上下文模板
+├── examples/                  # 项目/用户配置样例
+├── mcp-configs/               # MCP 服务器配置模板
+├── templates/                 # 标准交付物模板 + 生成模板
+├── tests/                     # skeleton 与目录回归校验
+├── scripts/                   # JS 主导的 build / validate / install / runtime 工具
+├── .codex-plugin/plugin.json  # Codex 插件入口
+├── marketplace.json           # Claude marketplace config
+├── .agents/plugins/marketplace.json
+└── docs/                      # 平台使用与迁移说明
+```
+
+## 角色清单
+
+| 角色 ID | 说明 |
+|---------|------|
+| `tech-lead` | 统一 intake、拆解、分派、冲突决策与最终收口 |
+| `product-manager` | 需求澄清、PRD、用户故事、验收标准 |
+| `project-manager` | 排期、依赖、风险、里程碑推进 |
+| `architect` | 方案设计、接口契约、数据边界 |
+| `frontend-engineer` | 前端实现与自测 |
+| `backend-engineer` | 后端实现与自测 |
+| `qa-engineer` | 测试计划、回归验证、放行建议 |
+| `devops-engineer` | 发布、监控、回滚与运行保障 |
+
+## 命令面
+
+- 主链：`/team-help`、`/team-intake`、`/team-plan`、`/handoff`、`/team-execute`、`/team-review`、`/team-release`、`/team-closeout`
+- Specialist：`/plan`、`/tdd`、`/code-review`、`/build-fix`、`/verify`、`/multi-frontend`、`/multi-backend`
+- 快捷执行：`/quick`、`/pause`、`/resume`
+- 进阶能力：`/pua`、`/model-route`、`/evolve`、`/learn`、`/agent-dev`
+
+> 以上为核心命令，完整 80+ 命令列表见 `commands/` 目录。
+
+`/team-help` 是新的单入口导航命令，用于根据当前阶段、已有 artifacts 和阻塞项推荐下一步，支持 brownfield 补齐建议与 story-sized execution 提示，优先减少“现在该跑哪个命令”的判断成本。
+
+## ECC Harness Layer
+
+- `agents/specialists/` 提供规划、review、build-fix、验证、文档和语言专项能力。
+- `skills/` 当前承载 195+ 技能，覆盖六大类：
+	- 调试与验证：browser-smoke-testing、pairwise-test-design、testcontainers-integration-testing、systematic-debugging、eval-harness 等
+  - 高能动性与压力协议：pua、pua-p7、pua-p9、pua-pro、pua-loop、pua-yes、pua-mama
+	- 编排与效率：parallel-execution、wave-execution、strategic-compact、cost-aware-llm-pipeline、subagent-driven-development
+	- 学习与记忆：continuous-learning-v2、error-experience-library、evolution-core
+	- 上下文工程：context-engineering、git-worktree-isolation、workflow-forensics、session-continuity
+	- 设计与协作：brainstorming、discuss-phase、multi-perspective-review、cross-model-review、quick-execution、karpathy-guidelines
+	- 语言与框架：springboot-patterns、django-patterns、golang-patterns、kotlin-patterns、rust-patterns、swiftui-patterns 等
+- `karpathy-guidelines` 已默认进入 TSP 主流程的推荐行为层：`/team-help` 到 `/team-release` 会优先用它来暴露假设、收敛最小范围、限制改动边界并锁定成功标准，但它不是新的硬门禁。
+- 公开 `skills/` 只承载通用能力；私有企业扩展通过 optional `enterprise` overlay 交付。
+- GitLab 手动流水线、Langfuse 追踪、前端公司样式 profile、业务服务设计 toolkit 等配套能力改由 `docs/runbooks/`、`docs/toolkits/` 与 `scripts/` 承接。
+- `rules/common/` 与语言规则目录为 specialists 提供统一判断标准。
+- `hooks/`、`contexts/`、`examples/`、`mcp-configs/` 作为可扩展运行时入口；当前仓库已提供 session persistence、tool observation、cost tracking、context budget、instinct learning、context compaction 与 archive 相关脚本。
+
+## 当前能力地图
+
+### 公开命令
+
+- 主链：`/team-help`、`/team-intake`、`/team-plan`、`/handoff`、`/team-execute`、`/team-review`、`/team-release`、`/team-closeout`
+- specialist：`/plan`、`/tdd`、`/code-review`、`/build-fix`、`/verify`、`/multi-frontend`、`/multi-backend`
+- 快捷执行：`/quick`、`/pause`、`/resume`
+- 进阶能力：`/pua`、`/model-route`、`/evolve`、`/learn`、`/agent-dev`
+- 平台体检：`/harness-audit`
+
+### 运行时增强
+
+- 会话持久化：`hooks/memory-persistence/`（会话摘要、待办与决策回存）
+- 上下文管理：`hooks/strategic-compact/`（budget、compact、archive 与 trigger-based 重组）
+- Prompt 防护：`hooks/harness-prompt-guard.js`
+- 上下文监控：`hooks/harness-context-monitor.js`
+- 持续学习：`skills/continuous-learning-v2/`（instinct 观察与模式提取）
+- 成本感知：`skills/cost-aware-llm-pipeline/`（任务复杂度分级与模型路由）
+
+完整矩阵见 [docs/runbooks/command-and-capability-matrix.md](docs/runbooks/command-and-capability-matrix.md) 和 [docs/runbooks/runtime-capabilities-overview.md](docs/runbooks/runtime-capabilities-overview.md)。
+
+## BMAD 方法论（当前口径）
+
+当前仓库对 BMAD 的使用不是并行命令体系，而是吸收到 `/team-*` 主链中的执行方法。主链口径统一为：`/team-help -> challenge -> design -> readiness -> story-slice execute -> release -> closeout`。
+
+1. 单入口：任何正式任务先从 `/team-help` 判定阶段与入口，避免跳步骤。
+2. 先挑战再设计：`/team-plan` 内先完成 Requirement Challenge，再进入 Design Review 收口。
+3. 先就绪再执行：`/team-execute` 必须消费 readiness proof，不满足就回退补证据。
+4. 小切片交付：实现按 story-sized execution units 拆分，确保可独立验收与 handoff。
+5. 证据落盘：主链产出统一通过 `artifact:persist` 写入 `docs/artifacts/`、`docs/adr/`、`docs/memory/`。
+6. 发布后收口：必须经过 `/team-release -> /team-closeout`，完成观察窗口、残余风险和 backlog 回写。
+
+文档治理也按同一方法约束：
+
+- 入口权威层固定为 `README + AGENTS + runbooks(quick-start/onboarding/usage/troubleshooting)`。
+- `docs/guides/*` 为薄入口，避免与 runbooks 双写漂移。
+- 文档生命周期字段用于明确责任与新鲜度：`doc_tier`、`owner`、`updated`、`last_verified`、`source_of_truth`。
+- 历史资料通过 `doc_tier: historical` 分层，避免与现行操作手册并列误用。
+
+## 可选知识图谱能力（Graphify）
+
+- 定位：Graphify 作为可选能力用于 brownfield 结构认知，不替代 workflow-engine 或 `/team-*` 主链。
+- 入口：先执行 `npm run graphify:doctor` 做依赖检查，再按 [docs/runbooks/graphify-knowledge-graph-usage.md](docs/runbooks/graphify-knowledge-graph-usage.md) 执行 `build/query/path/explain`。
+- 分发：通过安装模块 `knowledge-graph` 与组件 `capability:knowledge-graph` 提供；仅默认纳入 `research` 与 `full` profile。
+- 治理边界：不在本仓库执行 `graphify codex install` 或 `graphify claude install`，避免改写 AGENTS/hooks 契约。
+
+## 近期新增功能（v2.0.0 → v2.3.0）
+
+### Karpathy Main-Flow Defaults & Release Hardening（v2.3.0）
+
+- 新增本地 skill：`karpathy-guidelines`，并纳入 `workflow-quality` 安装基线。
+- `/team-help`、`/team-intake`、`/team-plan`、`/team-execute`、`/team-review`、`/team-release` 现在会默认带上这层行为护栏，但它仍然不是新的阻塞 gate。
+- `tech-lead`、`architect`、`frontend-engineer`、`backend-engineer`、`qa-engineer`、`devops-engineer` 角色默认推荐 `karpathy-guidelines`，而 `product-manager` 与 `project-manager` 保持不变。
+- `post-install-bridge` 恢复 prebuilt hydrate fallback：当包内 bridge 缺失时，会先尝试回填当前平台二进制，再决定是否降级到 source mode。
+- workflow CLI / readiness CLI 测试改为使用临时 HOME，避免被本机 `~/.claude/ecc/state.db` 或本地权限状态污染。
+- `v2.3.0` 发布包已按本地 tarball 校验通过，包含 5 个平台的 `bin/prebuilt/` bridge 二进制。
+
+### BMAD Source Adoption v2.2（v2.2.0）
+
+- `/team-help` 改为优先消费构建产物 `scripts/lib/workflow-help-catalog.json`，并在 `--json` 输出中新增稳定字段：`routerSource`、`decisionEvidence`、`nextCommandCandidates`
+- `/team-help` 把 `docs/memory/project-context.md` 提升为硬依赖输入：若缺少“当前活跃任务 / 当前阶段 / 关键依赖 / 活跃风险 / 下一步建议”任一段，会优先提示补齐 `artifact:persist write-project-context`
+- `install-apply` 扩展为子命令：`plan|status|doctor|repair|uninstall`，其中 `repair/uninstall` 默认 dry-run，仅在 `--apply` 时真正落盘
+- 安装流程新增 machine-readable `install-manifest`（SHA-256），`doctor` 会联合 `install-state + install-manifest` 检测声明与实际漂移
+- 新增独立校验器：`scripts/validate-file-references.js`（跨文件引用）、`scripts/validate-skill-structure.js`（skill 结构）与 `scripts/validate-doc-freshness.js`（入口文档新鲜度）；并接入提交流程
+- 入口文档层完成 BMAD 收口：`README + AGENTS + runbooks` 作为权威层，`docs/guides/*` 退化为薄入口
+- 文档生命周期与历史分层落地：`doc_tier`、`last_verified`、`source_of_truth` 字段生效，历史文档显式标记 `historical`
+- 历史遗留风险说明：`install-plan --profile full --target codex` 曾出现 `commands-core` selective-install 缺口；该缺口已在 2026-04-21 收口
+
+BMAD Source Adoption v2.2 的回归与验收证据：
+
+```bash
+node scripts/build-platform-artifacts.js
+node scripts/validate-library.js
+node scripts/validate-doc-freshness.js
+node tests/test_workflow_readiness.js
+node tests/test_session_start.js
+node tests/test_team_command_persistence.js
+node tests/test_workflow_help_catalog.js
+node tests/test_install_apply_lifecycle.js
+node tests/test_install_manifest_hash.js
+node tests/test_validation_scripts.js
+node scripts/install-platform.js claude --claude-home /tmp/claude-smoke-bmad-v2
+node scripts/install-plan.js --profile full --target codex
+```
+
+安装生命周期子命令速查：
+
+```bash
+node scripts/install-apply.js --profile team --target claude
+node scripts/install-apply.js --profile team --target claude --overlay enterprise
+node scripts/install-apply.js status --target claude
+node scripts/install-apply.js doctor --target claude
+node scripts/install-apply.js repair --target claude          # dry-run 默认
+node scripts/install-apply.js repair --target claude --apply  # 实际修复
+node scripts/install-apply.js uninstall --target claude        # dry-run 默认
+node scripts/install-apply.js uninstall --target claude --apply
+```
+
+### BMAD Absorption v2（v2.1.12）
+
+- `/team-help` 继续收口为 `/team-*` 唯一公开入口，不新增 `/bmad-*` 并行命令面
+- `team-plan` 与 `team-execute` 的 readiness 叙述进一步统一：先 challenge/design 收口，再消费 readiness proof 进入实现
+- Claude legacy 安装链路已对齐当前 JS runtime，移除对旧 `.py` hooks 的公开契约
+- active docs 完成 JS runtime / `artifact:persist` / `/team-help` 一致性收口
+- 历史说明：Codex selective-install 的 `commands-core` manifest 缺口曾作为已知风险记录，后续已在 2026-04-21 修复
+
+BMAD Absorption v2 的回归与验收证据：
+
+```bash
+node scripts/build-platform-artifacts.js
+node scripts/validate-library.js
+node scripts/validate-doc-freshness.js
+node tests/test_workflow_readiness.js
+node tests/test_session_start.js
+node tests/test_team_command_persistence.js
+node tests/test_install_platform_regression.js
+node tests/test_active_surface_docs.js
+node scripts/install-platform.js claude --claude-home /tmp/claude-smoke-bmad-v2
+node scripts/install-plan.js --profile full --target codex
+```
+
+其中 Claude smoke 的验收点是：`settings.json` 不再出现 `.py` hooks，并且注册项明确指向 JS 入口（`session-start-bootstrap.js`、`governance-capture.js`、`session-end.js`、`cost-tracker.js`）。
+
+### Tarball Gate & Install Hydration（v2.1.5）
+
+- 发布工作流现在会在 `npm pack` 后校验最终 tgz，确保 `bin/prebuilt/` 的 5 个平台二进制都已进入包体。
+- npm 发布时的 prebuilt source of truth 是 workflow/release staging 和最终 npm tarball，不是 Git 仓库里被长期跟踪的 `bin/prebuilt/` 目录。
+- 本地 `npm pack` / `prepublishOnly` 当前只会校验 `bin/prebuilt/` 是否齐全；若工作区还没有这些二进制，需要先显式执行 `npm run prebuilt:sync`，再继续 pack/publish。
+- `tsp-create` 安装时若未命中 bundled prebuilt，会先尝试同步当前平台 bridge，再回退到本地 Rust 构建。
+- bridge provisioning 改为完整等待异步步骤结束，避免安装进程提前退出。
+
+### Artifact Persistence & Prebuilt Sync（v2.1.4）
+
+- 新增 `artifact:persist` CLI，统一创建 task、artifact、handoff、memory 和 session summary。
+- `/team-intake` 到 `/team-closeout` 的命令文档已切换为通过 `artifact:persist` 落盘，而不是只描述手工步骤。
+- 本地发布前若工作区缺少 prebuilt bridge，需要先显式执行 `npm run prebuilt:sync`，随后 `prepublishOnly` 只负责校验 `bin/prebuilt/`。
+
+### BMAD Absorption MVP（v2.1.3）
+
+- 新增 `/team-help` 作为主链单入口，用于根据当前阶段、brownfield 现状和现有 artifacts 推荐下一步。
+- execute gate 现在显式要求 implementation-readiness、readiness proof、`docs/memory/project-context.md` 与 `Story Slice Plan`。
+- 既有项目（brownfield）场景已纳入 `/team-plan`、`/update-codemaps`、`doc-architecture` 与 onboarding 文档。
+- `readiness_status` 已改为按阶段取值：`execute -> handoff-ready`、`review -> ready-for-review`、`release -> release-ready`、`closeout -> accepted`。
+
+### PUA 高压闭环（v2.1.2）
+
+- 新增 `/pua` 命令，支持核心模式与 `p7 / p9 / p10 / pro / yes / mama / loop` 七种子模式
+- 失败升级、成功重置、PreCompact 快照、Stop journal 已接入 hooks 链
+- `SessionStart` 支持恢复 `~/.claude/pua/` 的 Always-On 状态
+- 新增 `tests/test_pua_hooks.js`，覆盖 PUA 运行时行为回归
+
+### Workflow 执行引擎
+
+YAML 驱动的 DAG 工作流执行 CLI，内置于 npm 包：
+
+- 命令：`workflow:list`、`workflow:run`、`workflow:readiness`、`workflow:runs`、`workflow:validate`
+- SQLite 状态存储（基于 sql.js），支持 run 历史查询与失败恢复（`--resume-run-id`）
+- 团队阶段 Readiness Gate：execute / review / release / closeout
+- 模板注入（`--var key=value`）、bash 节点超时（`timeout_ms`）
+- 安全防护：模板注入与路径穿越保护
+
+### Pure-Host CLI
+
+独立任务执行引擎，无需 AI 平台即可运行任务编排：
+
+- YAML manifest 驱动、依赖图解析、重试处理
+- Git 管理的执行状态（自动 commit / revert）
+- 命令：`--manifest`、`--resume`、`--revert`、`--status`、`--report`
+
+### Phase 1-3 — Superpowers / gstack / GSD 集成
+
+- 新增 8 个技能：brainstorming、cross-model-review、discuss-phase、multi-perspective-review、quick-execution、session-continuity、subagent-driven-development、wave-execution
+- Model Profiles：任务类型自动识别 + 模型路由（`manifests/model-profiles.json`）
+- Quality Gates Taxonomy：4 类门禁统一语言（`rules/common/quality-gates-taxonomy.md`）
+- 新增命令：`/pause`、`/resume`、`/quick`、`/pua`
+
+### Phase 4 — 上下文工程与隔离
+
+- `context-engineering`：4 层文档（PROJECT / REQUIREMENTS / ROADMAP / STATE）+ token 预算
+- `git-worktree-isolation`：一任务一 worktree 隔离
+- `workflow-forensics`：失败分析与时间线重建
+- 安装目标扩展到 10 个（新增 Augment、Copilot/Windsurf）
+
+### Bridge 打包（v2.1.1）
+
+- npm 包内置 `oris-claude-bridge` 源码 + 5 平台预构建二进制（darwin-arm64、darwin-x64、linux-x64、linux-arm64、win32-x64）
+- 安装时按 OS 自动选择，不可用时回退到本地 Rust 编译
+
+### Python → JavaScript 迁移（v2.1.0）
+
+- `scripts/` 目录 100% JavaScript 化，34 个 Python 脚本完成迁移/删除
+- 新增 JS smoke tests 和统一测试 runner（`tests/run-all.js`）
+- 全量测试 97 个用例通过
+
+### VitePress 文档站
+
+- 支持 `npm run docs:dev` / `docs:build` / `docs:preview`
+- 配置位于 `docs/.vitepress/config.mts`
+
+### rtk Token Optimization
+
+- 集成 [rtk](https://github.com/rtk-ai/rtk)（Rust Token Killer）— CLI 代理透明重写 Bash 命令，降低 60-90% token 消耗
+- 适配版 PreToolUse hook（`hooks/rtk-rewrite.sh`），兼容现有安全 hooks 链
+- 注册为 `rtk-optimization` install module，加入 `full` 和 `team` profiles
+- 前置依赖：`brew install rtk` + `jq`；未安装时 hook 静默跳过
+
+## 前端能力包
+
+- `frontend-engineering`：React/Next 优先的前端工程规范，覆盖组件结构、状态分层、语义化、可访问性与性能。
+- `frontend-ui-ux-system`：系统化 UI/UX 设计知识库，覆盖产品类型、视觉方向、设计 token、交互、响应式与交付门禁。
+- `rules/frontend-quality-gates.md`：把前端需求纳入 `/team-intake -> /team-plan -> /team-execute -> /team-review -> /team-release` 的强制门禁。- **DESIGN.md 设计执行层**：项目根目录内置默认 `DESIGN.md`（Notion 风格，含完整 color / typography / component / spacing / elevation token），前端 agent 读取后直接生成视觉一致的 UI。支持通过 `npx getdesign@latest add <brand>` 覆盖为 69+ 品牌风格（来源：[awesome-design-md](https://github.com/VoltAgent/awesome-design-md)）。
+## 核心工作流
+
+1. `product-manager` 产出 PRD 与验收标准。
+2. `project-manager` 输出排期、依赖与风险。
+3. `architect` 产出 ADR、接口/数据契约。
+4. `frontend-engineer` / `backend-engineer` 实施并自测。
+5. `qa-engineer` 回归验证并输出放行建议。
+6. `devops-engineer` 执行发布准备与运行保障。
+7. `tech-lead` 收口交付、仲裁冲突并决定是否放行。
+8. 发布后由 `/team-closeout` 结束观察窗口、确认最终验收状态并回写 backlog。
+
+## 常用命令
+
+### 开源发布收尾
+
+- 统一检查公开发布面：`npm run release:health`
+- 若已执行 `npm pack --json | tee .npm-pack.json`，可带 tarball 校验一起跑：`npm run release:health -- --pack-json .npm-pack.json`
+- 人工发布清单见 [docs/runbooks/open-source-release-checklist.md](docs/runbooks/open-source-release-checklist.md)
+
+### Bridge 预构建制品
+
+- `oris-claude-bridge` 的 crate 源码随 npm 包一起分发：`crates/oris-claude-bridge/`
+- 预构建二进制位于 `bin/prebuilt/<platform>/`
+- 发布工作流会先构建 `darwin-arm64`、`darwin-x64`、`linux-x64`、`linux-arm64`、`win32-x64` 的 bridge，再组装并发布 npm 包
+- `bin/prebuilt/` 是打包时的 staging 目录，不作为 Git 仓库中的长期 source of truth 回写
+- 可手工校验预构建目录：`npm run validate:prebuilt`
+- 若本地 `npm pack` / `npm publish` 前工作区没有这些二进制，可先执行 `npm run prebuilt:sync` 从 GitHub 仓库回填 `bin/prebuilt/`
+- `prepack` 与 `prepublishOnly` 当前只运行 `npm run validate:prebuilt`，不会自动同步 prebuilt
+- 如需指定同步来源 ref，可用 `TSP_PREBUILT_REF=v2.1.5 npm run prebuilt:sync`；若主 ref 缺失，可再配合 `TSP_PREBUILT_FALLBACK_REF=main`
+
+### Workflow CLI
+
+- 列出当前可发现的 workflow：`npm run workflow:list`
+- 按名称查看单个 workflow：`npm run workflow:list -- --name team-release-readiness`
+- 用主链包装入口检查 readiness：`npm run workflow:readiness -- --phase release --task-dir docs/artifacts/foo --json`
+- phase 支持别名：`exec` / `rev` / `rel` / `close`
+- 校验当前 workflow 定义：`npm run workflow:validate -- --json`
+- 运行默认 readiness gate workflow：`npm run workflow:run -- --name team-execute-readiness --var taskDir=tests/fixtures/workflow-valid --var targetPhase=execute --json`
+- 运行 review readiness workflow：`npm run workflow:run -- --name team-review-readiness --var taskDir=/path/to/task-dir --var targetPhase=review --json`
+- 运行 release readiness workflow：`npm run workflow:run -- --name team-release-readiness --var taskDir=/path/to/task-dir --var targetPhase=release --json`
+- 运行 closeout readiness workflow：`npm run workflow:run -- --name team-closeout-readiness --var taskDir=/path/to/task-dir --var targetPhase=closeout --json`
+- 查看最近 workflow runs：`npm run workflow:runs -- --limit 5 --json`
+- 按 workflow 名称筛选 runs：`npm run workflow:runs -- --workflow-name team-release-readiness --limit 5 --json`
+- 按状态筛选 runs：`npm run workflow:runs -- --status failed --limit 10 --json`
+- 查看单个 run 详情：`npm run workflow:runs -- --run-id <run_id> --json`
+- 预览 workflow 渲染结果而不执行：`npm run workflow:run -- --name team-release-readiness --preview --var taskDir=docs/artifacts/foo --var targetPhase=release --json`
+- 对 bash 节点可声明超时：`timeout_ms: 300000`
+- 用 readiness wrapper 代替手写 `--name` + `--var`：`npm run workflow:readiness -- --phase closeout --task-dir docs/artifacts/foo --preview --json`
+- 批量检查多个任务目录：`npm run workflow:readiness -- --phase close --task-dir docs/artifacts/foo --task-dir docs/artifacts/bar --json`
+
+`workflow:run` 同时支持：
+
+- `--file <path>` 直接执行某个 workflow 文件
+- `--resume-run-id <id>` 从失败 run 恢复
+- `--var key=value` 给 workflow 节点模板注入运行时变量
+- `--help` 查看完整参数说明
+
+典型输出示例：
+
+```text
+$ npm run workflow:list
+Workflows:
+- team-execute-readiness [bundled] (2 nodes)
+  Validate whether an artifact task directory is ready to enter the execute phase.
+  Required vars: targetPhase, taskDir
+- team-closeout-readiness [bundled] (2 nodes)
+  Validate whether an artifact task directory is ready to enter the closeout phase.
+  Required vars: targetPhase, taskDir
+```
+
+```text
+$ npm run workflow:list -- --name team-release-readiness
+Workflows:
+- team-release-readiness [bundled] (2 nodes)
+  Validate whether an artifact task directory is ready to enter the release phase.
+  Required vars: targetPhase, taskDir
+```
+
+```text
+$ npm run workflow:run -- --name team-release-readiness --json
+Error: Workflow "team-release-readiness" is missing required variables: targetPhase, taskDir.
+Provide them with --var key=value. Required vars for this workflow: targetPhase, taskDir.
+Tip: run "npm run workflow:list" to inspect workflow requirements.
+```
+
+```text
+$ npm run workflow:run -- --name team-release-readiness --preview --var taskDir=docs/artifacts/workflow-valid --var targetPhase=release
+Workflow preview: team-release-readiness [bundled]
+File: workflows/defaults/team-release-readiness.yaml
+Required vars: targetPhase, taskDir
+Input context: targetPhase=release, taskDir=docs/artifacts/workflow-valid
+Nodes:
+- validate-readiness [bash] dependsOn=none
+- summarize-gate [prompt] dependsOn=validate-readiness
+```
+
+```text
+$ npm run workflow:readiness -- --phase release --task-dir docs/artifacts/workflow-valid --preview
+Workflow preview: team-release-readiness [bundled]
+File: /.../workflows/defaults/team-release-readiness.yaml
+Required vars: targetPhase, taskDir
+Input context: targetPhase=release, taskDir=/.../docs/artifacts/workflow-valid
+Nodes:
+- validate-readiness [bash] dependsOn=none
+- summarize-gate [prompt] dependsOn=validate-readiness
+```
+
+```text
+$ npm run workflow:readiness -- --phase close --task-dir docs/artifacts/foo --task-dir docs/artifacts/bar
+Workflow readiness batch:
+- /.../docs/artifacts/foo [succeeded]
+- /.../docs/artifacts/bar [succeeded]
+```
+
+```yaml
+version: ecc.workflow.v1
+name: timeout-example
+description: Fail a bash node if it hangs too long.
+nodes:
+  - id: slow-bash
+    bash: node -e "setTimeout(() => process.stdout.write('done'), 1000)"
+    timeout_ms: 250
+```
+
+```text
+$ npm run workflow:runs -- --limit 2
+Workflow runs:
+- cli-closeout-vars-1 team-closeout-readiness [succeeded] vars=targetPhase=closeout, taskDir=/tmp/workflow-closeout-valid started=2026-04-12T03:10:00.000Z source=bundled
+- resume-run-2 resume-smoke [succeeded] vars=none started=2026-04-12T03:15:00.000Z resumedFrom=resume-run-1 source=file
+```
+
+```text
+$ npm run workflow:runs -- --workflow-name resume-smoke --status succeeded --limit 5
+Workflow runs:
+- resume-run-2 resume-smoke [succeeded] vars=none resumedFrom=resume-run-1 source=file
+```
+
+```bash
+# 生成角色 skills、agents、commands 与插件清单
+node scripts/build-platform-artifacts.js
+
+# 校验 canonical 定义、链接和生成产物是否一致
+node scripts/validate-library.js
+node scripts/validate-doc-freshness.js
+
+# 安装到 Codex（可通过环境变量覆盖目标目录）
+CODEX_HOME_DIR=/tmp/codex AGENTS_HOME_DIR=/tmp/agents ./scripts/install-codex.sh
+
+# 安装到 Claude（可通过环境变量覆盖目标目录）
+CLAUDE_HOME_DIR=/tmp/claude ./scripts/install-claude.sh
+
+# 安装到 Cursor（可通过环境变量覆盖目标目录）
+CURSOR_HOME_DIR=/tmp/cursor ./scripts/install-cursor.sh
+
+# 安装到 OpenCode（可通过环境变量覆盖目标目录）
+OPENCODE_CONFIG_DIR=/tmp/opencode ./scripts/install-opencode.sh
+```
+
+## 使用 npx 安装（推荐）
+
+无需克隆仓库，直接通过 npx 一键安装到目标平台。npm 包已包含所有平台（macOS/Linux/Windows）的预编译二进制文件，无需 Rust 工具链，无需 GitHub 访问：
+
+- `tsp-create` 当前公开支持的 targets：`claude`、`cursor`、`antigravity`、`codex`、`gemini`、`opencode`、`codebuddy`、`copilot`、`windsurf`、`augment`
+- 当前公开支持的 profiles：`core`、`developer`、`security`、`research`、`team`、`full`
+- 私有企业能力通过 optional overlay 交付，不作为公开 `tsp-create` profile 暴露
+
+支持深度不是所有 target 都完全一致，当前建议按下面理解：
+
+| Support level | Targets | `team` profile depth | Notes |
+|------|---------|----------------------|-------|
+| Recommended | `claude`, `cursor` | 14 / 14 modules | 完整公开 workflow 链路、最强回归覆盖、文档最全 |
+| Strong | `codex`, `opencode` | 10 / 14, 11 / 14 modules | 核心命令和大部分 workflow 可用，但仍有少量 target-specific gap |
+| Partial | `antigravity`, `codebuddy` | 8 / 14, 11 / 14 modules | 安装适配器可用，但 workflow parity / shared-skills 覆盖不完整 |
+| Baseline | `gemini`, `copilot`, `windsurf`, `augment` | 1-2 / 14 modules | 仅提供基础兼容入口和平台配置，不承诺完整 `/team-*` 对齐 |
+
+当前公开 quick-start / recipes / examples 主要覆盖 `claude`、`cursor`、`codex`、`opencode`。其他 targets 已进入公开 install surface，但应按上表理解为 partial 或 baseline 支持，而不是 full parity。
+
+```bash
+# 交互式向导（推荐首次使用）
+npx @colin4k1024/tsp-create
+
+# 非交互式，直接指定目标和 profile
+npx @colin4k1024/tsp-create --target claude --profile full
+npx @colin4k1024/tsp-create --target cursor --profile team
+npx @colin4k1024/tsp-create --target codex --profile full
+npx @colin4k1024/tsp-create --target opencode --profile full
+
+# 预览安装计划（不写入文件）
+npx @colin4k1024/tsp-create --dry-run
+
+# 从源码安装（开发者模式，需要 git）
+npx @colin4k1024/tsp-create --from-source
+```
+
+安装时会自动完成：
+- 根据操作系统选择对应的 prebuilt 二进制文件（darwin-arm64/x64, linux-arm64/x64, win32-x64）
+- 部署 oris-claude-bridge 到目标目录
+- 初始化 claude-mem 插件（仅 claude target）
+- 配置 self-evolution hooks（仅 claude target）
+- 安装后项目根目录内置默认 `DESIGN.md`（Notion 风格），可通过 `npx getdesign@latest add <brand>` 覆盖为其他品牌风格
+
+## 5 分钟上手
+
+如果你是第一次使用这个平台，建议按下面的顺序进入：
+
+1. 运行 `node scripts/build-platform-artifacts.js` 生成最新产物。
+2. 根据使用端执行对应的安装脚本：`./scripts/install-claude.sh`、`./scripts/install-codex.sh`、`./scripts/install-cursor.sh` 或 `./scripts/install-opencode.sh`。
+3. 打开你的项目仓库，在对话中先跑一次 `/team-help` 判断入口，再按建议进入 `/team-intake`、`/team-plan`、`/team-execute`、`/team-review`、`/team-release` 或 `/team-closeout`。
+4. specialist 命令只负责给出专项结论，最终决策回到 `/handoff` 或 `/team-*` 主链。
+
+## 按你的情况选
+
+- 第一次安装，准备在 Claude 中试跑：看 [docs/runbooks/claude-quick-start.md](docs/runbooks/claude-quick-start.md)
+- 第一次安装，准备在 Codex 中试跑：看 [docs/runbooks/codex-quick-start.md](docs/runbooks/codex-quick-start.md)
+- 想在 Cursor 中上手：看 [docs/runbooks/cursor-quick-start.md](docs/runbooks/cursor-quick-start.md)
+- 想在 OpenCode 中上手：看 [docs/runbooks/opencode-quick-start.md](docs/runbooks/opencode-quick-start.md)
+- 想按场景查 Claude 怎么用：看 [docs/runbooks/claude-usage-scenarios.md](docs/runbooks/claude-usage-scenarios.md)
+- 想按场景查 Codex 怎么用：看 [docs/runbooks/codex-usage-scenarios.md](docs/runbooks/codex-usage-scenarios.md)
+- 想直接复制高频提示与并行说法：看 [docs/runbooks/claude-conversation-prompt-recipes.md](docs/runbooks/claude-conversation-prompt-recipes.md) 和 [docs/runbooks/codex-parallel-prompt-recipes.md](docs/runbooks/codex-parallel-prompt-recipes.md)
+- 想按角色直接复制常用说法：看 [docs/runbooks/role-prompt-recipes.md](docs/runbooks/role-prompt-recipes.md)
+- 想快速判断私有企业扩展怎么接：看 [docs/runbooks/enterprise-extension-quick-start.md](docs/runbooks/enterprise-extension-quick-start.md)
+- 想按任务类型快速抄一页速查：看 [docs/runbooks/frontend-bugfix-one-page.md](docs/runbooks/frontend-bugfix-one-page.md)、[docs/runbooks/backend-api-delivery-one-page.md](docs/runbooks/backend-api-delivery-one-page.md)、[docs/runbooks/release-closure-one-page.md](docs/runbooks/release-closure-one-page.md)
+- 想直接看成品对话示例：看 [docs/runbooks/claude-end-to-end-conversation-example.md](docs/runbooks/claude-end-to-end-conversation-example.md) 和 [docs/runbooks/codex-end-to-end-conversation-example.md](docs/runbooks/codex-end-to-end-conversation-example.md)
+- 想按角色看成品交接对话：看 [docs/runbooks/qa-review-conversation-example.md](docs/runbooks/qa-review-conversation-example.md)、[docs/runbooks/devops-release-conversation-example.md](docs/runbooks/devops-release-conversation-example.md)、[docs/runbooks/tech-lead-closure-conversation-example.md](docs/runbooks/tech-lead-closure-conversation-example.md)
+- 想看上游角色怎么澄清、排期和出方案：看 [docs/runbooks/product-manager-clarification-conversation-example.md](docs/runbooks/product-manager-clarification-conversation-example.md)、[docs/runbooks/project-manager-planning-conversation-example.md](docs/runbooks/project-manager-planning-conversation-example.md)、[docs/runbooks/architect-design-conversation-example.md](docs/runbooks/architect-design-conversation-example.md)
+- 已安装，准备长期接入一个新项目：看 [docs/runbooks/project-onboarding.md](docs/runbooks/project-onboarding.md)
+- 一人开发，想看最短闭环：看 [docs/runbooks/solo-delivery-mode.md](docs/runbooks/solo-delivery-mode.md) 和 [docs/runbooks/solo-delivery-one-page.md](docs/runbooks/solo-delivery-one-page.md)
+- 想直接完整走一遍主链演练：看 [docs/runbooks/first-team-workflow-walkthrough.md](docs/runbooks/first-team-workflow-walkthrough.md)
+- 想看完整命令和结构规范：看 [docs/runbooks/team-skills-usage.md](docs/runbooks/team-skills-usage.md)
+
+快速导航：
+
+- 初次试跑：看 [docs/runbooks/claude-quick-start.md](docs/runbooks/claude-quick-start.md) 或 [docs/runbooks/codex-quick-start.md](docs/runbooks/codex-quick-start.md)
+- 按任务场景选择：看 [docs/runbooks/claude-usage-scenarios.md](docs/runbooks/claude-usage-scenarios.md) 和 [docs/runbooks/codex-usage-scenarios.md](docs/runbooks/codex-usage-scenarios.md)
+- 正式接入项目：看 [docs/runbooks/project-onboarding.md](docs/runbooks/project-onboarding.md)
+- 想完整走一遍主链：看 [docs/runbooks/first-team-workflow-walkthrough.md](docs/runbooks/first-team-workflow-walkthrough.md)
+- 安装或使用异常：看 [docs/runbooks/troubleshooting.md](docs/runbooks/troubleshooting.md)
+- 想快速看完这轮都优化了什么：看 [docs/runbooks/batch-optimization-completion-checklist.md](docs/runbooks/batch-optimization-completion-checklist.md)
+- 想直接转发一版团队交付说明：看 [docs/runbooks/team-delivery-brief-2026-03-29.md](docs/runbooks/team-delivery-brief-2026-03-29.md)
+- 想看正式版本收口记录：看 [docs/runbooks/version-closure-2026-03-29.md](docs/runbooks/version-closure-2026-03-29.md)
+- 想看 ECC 运行时能力、记忆持久化和并行执行：看 [docs/runbooks/ecc-harness-usage.md](docs/runbooks/ecc-harness-usage.md)、[docs/runbooks/error-experience-usage.md](docs/runbooks/error-experience-usage.md)、[docs/runbooks/parallel-execution-usage.md](docs/runbooks/parallel-execution-usage.md)
+- 想先搞清楚现在到底有哪些命令、skills 和 runtime：看 [docs/runbooks/command-and-capability-matrix.md](docs/runbooks/command-and-capability-matrix.md) 和 [docs/runbooks/runtime-capabilities-overview.md](docs/runbooks/runtime-capabilities-overview.md)
+- 想直接查本地 audit jsonl：运行 `node scripts/query-audit-logs.js --summary-only`
+- 想把 audit 查询结果导出成文件：运行 `node scripts/query-audit-logs.js --session-id <session_id> --export-json audit.json --export-md audit.md`
+- 想导出适合周报/复盘的 Markdown 表格：运行 `node scripts/query-audit-logs.js --component script --export-md audit.md`
+- 想看完整演示场景与执行记录：看 [docs/runbooks/demo-scenario.md](docs/runbooks/demo-scenario.md) 和 [docs/runbooks/demo-execution-log.md](docs/runbooks/demo-execution-log.md)
+- 想看汇报材料与生成脚本：看 [docs/presentation/README.md](docs/presentation/README.md)
+- 示例怎么选：看 [examples/INDEX.md](examples/INDEX.md)
+- 想直接复制 examples 里的会话脚本：看 [examples/claude-conversation-script.md](examples/claude-conversation-script.md)、[examples/codex-conversation-script.md](examples/codex-conversation-script.md)、[examples/role-conversation-scripts.md](examples/role-conversation-scripts.md)
+- 想按任务类型直接复制示例：看 [examples/claude-scenario-playbook.md](examples/claude-scenario-playbook.md) 和 [examples/codex-scenario-playbook.md](examples/codex-scenario-playbook.md)
+- 想给私有 enterprise overlay 留安装位：看 [docs/runbooks/enterprise-overlay.md](docs/runbooks/enterprise-overlay.md)
+
+## 文档入口
+
+**入门与场景**
+
+- [CLAUDE.md](CLAUDE.md)
+- [docs/runbooks/claude-usage-scenarios.md](docs/runbooks/claude-usage-scenarios.md)
+- [docs/runbooks/codex-usage-scenarios.md](docs/runbooks/codex-usage-scenarios.md)
+- [docs/runbooks/project-onboarding.md](docs/runbooks/project-onboarding.md)
+- [docs/runbooks/first-team-workflow-walkthrough.md](docs/runbooks/first-team-workflow-walkthrough.md)
+- [docs/runbooks/team-skills-usage.md](docs/runbooks/team-skills-usage.md)
+
+**协作与样例**
+
+- [examples/INDEX.md](examples/INDEX.md)
+- [examples/user-CLAUDE.md](examples/user-CLAUDE.md)
+- [examples/project-CLAUDE.md](examples/project-CLAUDE.md)
+- [examples/claude-scenario-playbook.md](examples/claude-scenario-playbook.md)
+- [examples/codex-scenario-playbook.md](examples/codex-scenario-playbook.md)
+- [docs/runbooks/project-claude-design-rationale.md](docs/runbooks/project-claude-design-rationale.md)
+- [docs/runbooks/handoff-filling-guide-with-examples.md](docs/runbooks/handoff-filling-guide-with-examples.md)
+
+**工程规范与门禁**
+
+- [docs/runbooks/team-command-output-contracts.md](docs/runbooks/team-command-output-contracts.md)
+- [docs/runbooks/git-pr-workflow.md](docs/runbooks/git-pr-workflow.md)
+- [docs/runbooks/frontend-governance.md](docs/runbooks/frontend-governance.md)
+- [docs/runbooks/karpathy-guidelines-usage.md](docs/runbooks/karpathy-guidelines-usage.md)
+- [docs/runbooks/api-breaking-change-gates.md](docs/runbooks/api-breaking-change-gates.md)
+- [docs/runbooks/api-lint-gates.md](docs/runbooks/api-lint-gates.md)
+- [docs/runbooks/contract-testing-playbook.md](docs/runbooks/contract-testing-playbook.md)
+
+**安全与发布门禁**
+
+- [docs/runbooks/reviewdog-pr-gates.md](docs/runbooks/reviewdog-pr-gates.md)
+- [docs/runbooks/codeql-pr-security-gates.md](docs/runbooks/codeql-pr-security-gates.md)
+- [docs/runbooks/secret-scanning-gates.md](docs/runbooks/secret-scanning-gates.md)
+- [docs/runbooks/checkov-iac-gates.md](docs/runbooks/checkov-iac-gates.md)
+- [docs/runbooks/trivy-security-gates.md](docs/runbooks/trivy-security-gates.md)
+- [docs/runbooks/sbom-generation-gates.md](docs/runbooks/sbom-generation-gates.md)
+- [docs/runbooks/artifact-attestation-gates.md](docs/runbooks/artifact-attestation-gates.md)
+
+**运维与进阶**
+
+- [docs/runbooks/enterprise-overlay.md](docs/runbooks/enterprise-overlay.md)
+- [docs/runbooks/external-capability-intake.md](docs/runbooks/external-capability-intake.md)
+- [docs/runbooks/command-and-capability-matrix.md](docs/runbooks/command-and-capability-matrix.md)
+- [docs/runbooks/ecc-harness-usage.md](docs/runbooks/ecc-harness-usage.md)
+- [docs/runbooks/error-experience-usage.md](docs/runbooks/error-experience-usage.md)
+- [docs/runbooks/parallel-execution-usage.md](docs/runbooks/parallel-execution-usage.md)
+- [docs/runbooks/runtime-capabilities-overview.md](docs/runbooks/runtime-capabilities-overview.md)
+- [docs/plans/team-skills-platform-migration.md](docs/plans/team-skills-platform-migration.md)
+
+**演示与材料**
+
+- [docs/runbooks/team-delivery-brief-2026-03-29.md](docs/runbooks/team-delivery-brief-2026-03-29.md)
+- [docs/runbooks/version-closure-2026-03-29.md](docs/runbooks/version-closure-2026-03-29.md)
+- [docs/runbooks/demo-scenario.md](docs/runbooks/demo-scenario.md)
+- [docs/runbooks/demo-execution-log.md](docs/runbooks/demo-execution-log.md)
+- [docs/presentation/README.md](docs/presentation/README.md)
+
+**排障与台账**
+
+- [docs/runbooks/troubleshooting.md](docs/runbooks/troubleshooting.md)
+- [docs/runbooks/document-execution-audit.md](docs/runbooks/document-execution-audit.md)

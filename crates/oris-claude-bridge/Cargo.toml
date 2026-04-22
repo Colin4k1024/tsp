@@ -1,0 +1,36 @@
+[package]
+name = "oris-claude-bridge"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.80"
+description = "Claude Code evolution hook bridge — drop-in Rust replacement for Python evolution scripts"
+license = "MIT"
+
+[[bin]]
+name = "oris-claude-bridge"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = { version = "0.4", features = ["serde"] }
+anyhow = "1.0"
+regex-lite = "0.1"
+sha2 = "0.10"
+hex = "0.4"
+async-trait = "0.1"
+tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros"] }
+
+# oris 开源框架：提供 StateGraph / Store / Checkpointer / Persistence 能力
+oris-runtime = { version = "0.61.0", default-features = false, features = ["sqlite-persistence"] }
+
+# musl static builds: OpenSSL must be compiled from source (no system libssl on musl)
+[target.'cfg(target_env = "musl")'.dependencies]
+openssl = { version = "0.10", features = ["vendored"] }
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true
+codegen-units = 1

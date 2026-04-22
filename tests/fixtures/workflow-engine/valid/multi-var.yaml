@@ -1,0 +1,12 @@
+version: ecc.workflow.v1
+name: multi-var-test
+description: Workflow fixture with variables spread across multiple nodes.
+nodes:
+  - id: step-1
+    bash: echo {{var1}}
+  - id: step-2
+    depends_on: [step-1]
+    bash: echo {{var2}}
+  - id: step-3
+    depends_on: [step-2]
+    prompt: Summarize {{var3}}.

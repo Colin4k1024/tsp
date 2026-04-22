@@ -1,0 +1,9 @@
+version: ecc.workflow.v1
+name: basic-valid
+description: A minimal valid workflow.
+nodes:
+  - id: plan
+    prompt: Create a plan.
+  - id: implement
+    depends_on: [plan]
+    bash: npm test

@@ -1,0 +1,119 @@
+name: Build Prebuilt Binaries
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+    paths:
+      - 'crates/oris-claude-bridge/**'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # macOS Apple Silicon (existing, rebuild to keep fresh)
+          - target: aarch64-apple-darwin
+            runner: macos-latest
+            platform: darwin-arm64
+            use_cross: false
+
+          # macOS Intel
+          - target: x86_64-apple-darwin
+            runner: macos-15-intel
+            platform: darwin-x64
+            use_cross: false
+
+          # Linux x86-64 — musl static, no glibc dependency
+          - target: x86_64-unknown-linux-musl
+            runner: ubuntu-latest
+            platform: linux-x64
+            use_cross: true
+
+          # Linux ARM64 — musl static
+          - target: aarch64-unknown-linux-musl
+            runner: ubuntu-latest
+            platform: linux-arm64
+            use_cross: true
+
+          # Windows x86-64
+          - target: x86_64-pc-windows-msvc
+            runner: windows-latest
+            platform: win32-x64
+            use_cross: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      # cross needs Docker, which is pre-installed on ubuntu-latest
+      - name: Install cross (Linux targets only)
+        if: matrix.use_cross == true
+        shell: bash
+        run: cargo install cross --locked
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ matrix.target }}-cargo-${{ hashFiles('crates/oris-claude-bridge/Cargo.lock') }}
+          restore-keys: |
+            ${{ matrix.target }}-cargo-
+
+      # ---------- Build ----------
+      - name: Build (native)
+        if: matrix.use_cross == false
+        shell: bash
+        working-directory: crates/oris-claude-bridge
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Build (cross)
+        if: matrix.use_cross == true
+        shell: bash
+        working-directory: crates/oris-claude-bridge
+        env:
+          CROSS_NO_WARNINGS: "1"
+          # Tell libsqlite3-sys to bundle SQLite (required for cross musl builds)
+          LIBSQLITE3_SYS_USE_PKG_CONFIG: "0"
+        run: cross build --release --target ${{ matrix.target }}
+
+      # ---------- Collect binary ----------
+      - name: Collect binary (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p dist/${{ matrix.platform }}
+          cp crates/oris-claude-bridge/target/${{ matrix.target }}/release/oris-claude-bridge \
+             dist/${{ matrix.platform }}/oris-claude-bridge
+          chmod 755 dist/${{ matrix.platform }}/oris-claude-bridge
+
+      - name: Collect binary (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p dist/${{ matrix.platform }}
+          cp crates/oris-claude-bridge/target/${{ matrix.target }}/release/oris-claude-bridge.exe \
+             dist/${{ matrix.platform }}/oris-claude-bridge.exe
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: prebuilt-${{ matrix.platform }}
+          path: dist/${{ matrix.platform }}/
+          if-no-files-found: error
+          retention-days: 1

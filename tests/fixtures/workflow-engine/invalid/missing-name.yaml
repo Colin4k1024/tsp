@@ -1,0 +1,5 @@
+version: ecc.workflow.v1
+description: Missing name field.
+nodes:
+  - id: only
+    prompt: Test.

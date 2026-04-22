@@ -1,0 +1,41 @@
+{
+  "name": "team-skills-platform",
+  "version": "2.3.0",
+  "description": "开源角色化 Team Skills 平台，含 ECC harness skeleton、前端工程与 UI/UX 治理能力（OpenCode 版）",
+  "platform": "opencode",
+  "agents_dir": "./agents/",
+  "skills_dir": "./skills/",
+  "commands_dir": "./commands/",
+  "rules_dir": "./rules/",
+  "interface": {
+    "displayName": "Team Skills Platform",
+    "shortDescription": "角色化团队平台 + ECC harness 增强层",
+    "longDescription": "通过 Tech Lead 编排与专业角色分工统一需求、方案、研发、测试和发布协作，提供 ECC 风格 specialist agents、commands 与前端治理能力。",
+    "developerName": "Engineering Team",
+    "category": "Engineering",
+    "capabilities": [
+      "Read",
+      "Write",
+      "Interactive"
+    ],
+    "brandColor": "#0F766E"
+  },
+  "author": {
+    "name": "Engineering Team",
+    "url": "https://github.com/affaan-m/everything-claude-code"
+  },
+  "homepage": "https://github.com/affaan-m/everything-claude-code",
+  "repository": "https://github.com/affaan-m/everything-claude-code",
+  "license": "MIT",
+  "keywords": [
+    "team-skills",
+    "agents",
+    "skills",
+    "commands",
+    "hooks",
+    "workflow",
+    "frontend",
+    "code-review",
+    "verification"
+  ]
+}

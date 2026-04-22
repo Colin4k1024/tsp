@@ -1,0 +1,1318 @@
+{
+  "plugin": {
+    "name": "team-skills-platform",
+    "version": "2.3.0",
+    "category": "Engineering",
+    "authorName": "Engineering Team",
+    "authorUrl": "https://github.com/affaan-m/everything-claude-code",
+    "homepage": "https://github.com/affaan-m/everything-claude-code",
+    "repository": "https://github.com/affaan-m/everything-claude-code",
+    "license": "MIT",
+    "keywords": [
+      "team-skills",
+      "agents",
+      "skills",
+      "commands",
+      "hooks",
+      "workflow",
+      "frontend",
+      "code-review",
+      "verification"
+    ],
+    "roleAgentDir": "agents/roles",
+    "specialistAgentDir": "agents/specialists"
+  },
+  "roleRequiredFields": [
+    "id",
+    "display_name",
+    "mission",
+    "inputs",
+    "outputs",
+    "handoff_to",
+    "quality_gates",
+    "workflow_gates",
+    "upstream_challenge",
+    "default_commands",
+    "platform_bindings"
+  ],
+  "roleOptionalListFields": [
+    "recommended_shared_skills",
+    "recommended_ecc_skills",
+    "recommended_domain_skills",
+    "governance_rules",
+    "sub_agent_invocations"
+  ],
+  "teamCommandDefinitions": [
+    {
+      "name": "team-help",
+      "summary": "作为 `/team-*` 主链唯一公开入口，根据当前项目阶段、已有 artifacts 与用户目标，推荐下一条最合适的 `/team-*` 或 `/quick` 命令，并指出前置缺口、阻塞项与降级路径。",
+      "primary_role": "tech-lead",
+      "inputs": [
+        "当前目标或遇到的问题",
+        "当前阶段（若已知）",
+        "已存在的 artifacts / handoff / 测试证据",
+        "是否为既有项目（brownfield）",
+        "是否希望走快速模式或完整主链"
+      ],
+      "outputs": [
+        "推荐的下一条命令",
+        "推荐原因与适用前提",
+        "进入下一步前必须补齐的证据与 `artifact:persist` 落盘动作",
+        "brownfield 补齐建议",
+        "若不满足条件时的降级路径"
+      ],
+      "steps": [
+        "先识别用户当前所处阶段：是新需求、挑战会 / 设计收口、准备实现、准备评审、准备发布、观察窗口收口，还是只想处理小范围快速任务。",
+        "默认以 `karpathy-guidelines` 的方式先暴露歧义、范围边界与更简单路径，不在入口阶段静默替用户补全高风险假设。",
+        "检查现有证据是否齐备：PRD、delivery-plan、arch-design、handoff、execute-log、test-plan、launch-acceptance、deployment-context、release-plan、closeout-summary，以及 `docs/memory/project-context.md`。",
+        "若任务边界清晰、影响面小、风险低，优先推荐 `/quick`；否则继续沿 `/team-*` 主链推进。",
+        "若是既有项目（brownfield）且现状上下文不足，优先建议执行 `/update-codemaps` 并启用 `doc-architecture`，把现有模块、集成点、关键数据流和历史包袱回落到 `delivery-plan.md` / `arch-design.md`。",
+        "若需求规模较大或涉及多角色并行，实现前先要求把计划切成可独立验收、可独立 handoff 的 story-sized execution units，并确认 `artifact:persist` 已创建对应任务目录与关键 artifact，再进入 `/team-execute`。",
+        "若缺少 PRD 或需求边界，推荐 `/team-intake`；若缺少 challenge、design review 或 implementation-readiness，推荐 `/team-plan`；若 readiness proof 与 handoff 齐备，推荐 `/team-execute`；若已完成实现与自测，推荐 `/team-review`；若已获得放行，推荐 `/team-release`；若发布观察窗口结束，推荐 `/team-closeout`。",
+        "若是既有项目且上下文不足，提示先补齐 brownfield / doc-architecture 类上下文，再进入计划或执行。",
+        "输出结构化建议：推荐命令、原因、阻塞项、降级路径，并说明是否需要先运行 `npm run workflow:readiness`。"
+      ]
+    },
+    {
+      "name": "team-intake",
+      "summary": "用于接收需求、梳理目标、范围、约束和参与角色，并在涉及 UI 时提前锁定体验与质量门槛，同时输出需要进入需求挑战会的候选分组。",
+      "primary_role": "tech-lead",
+      "inputs": [
+        "需求背景",
+        "目标与优先级",
+        "关键约束与时间窗口",
+        "是否涉及 UI、终端与设计约束",
+        "是否企业内部应用、是否存在数据 / 合规风险",
+        "是否涉及私有流程、权限系统、内部发布流程、私有观测或专属业务建模等 private enterprise overlay 线索"
+      ],
+      "outputs": [
+        "需求简报",
+        "参与角色清单",
+        "待确认项列表",
+        "企业治理待确认项",
+        "领域技能包启用建议",
+        "UI 范围、终端假设与质量门禁",
+        "需求挑战会候选分组"
+      ],
+      "steps": [
+        "识别问题、目标、成功标准和上线时限。",
+        "默认使用 `karpathy-guidelines` 收敛 intake：显式写出关键假设、最小可行范围、非目标以及成功标准，避免把模糊愿望直接带进后续计划。",
+        "若任务包含架构文档补齐或演进，启用 `doc-architecture`，按 `docs/runbooks/doc-architecture-integration.md` 收集 Project Profile Card 并约束后续映射。",
+        "若为企业内部应用，先确认应用等级、技术架构等级、数据 / 合规风险是否需要后续补判。",
+        "识别是否需要私有 enterprise overlay 才能完成任务，并列出候选 overlay 能力、私有 runbook 或额外安装前提。",
+        "若需求包含前端变更，明确目标端、产品类型、关键页面、设计约束，以及可访问性和性能基线。",
+        "若任务复杂或存在方案分歧，提前建议需要参加需求挑战会的动态分组。",
+        "确认由哪些角色参与以及各自的输入缺口。",
+        "输出结构化 intake 结果并准备进入 `/team-plan`。",
+        "【落盘 — 必须执行，不可跳过】\n① 根据需求标题生成 slug（小写英文 + 短横线，≤30 字符，例 `user-login-flow`）。\n② 立即执行 `npm run artifact:persist -- ensure-task --date {YYYY-MM-DD} --slug {slug} --state intake`，确保 `docs/artifacts/{YYYY-MM-DD}-{slug}/` 和 INDEX 任务行存在。\n③ 再执行 `npm run artifact:persist -- ensure-artifact --date {YYYY-MM-DD} --slug {slug} --artifact prd --role tech-lead --status draft --state intake` 创建 `prd.md`。\n④ 立即在 `prd.md` 中补全本次 intake 的完整结构化内容（目标、范围、用户故事、风险、待确认项）。\n⑤ 完成后输出确认：`已创建 docs/artifacts/{YYYY-MM-DD}-{slug}/prd.md`。"
+      ]
+    },
+    {
+      "name": "team-plan",
+      "summary": "用于先完成需求挑战会与设计收口，再锁定交付计划、角色分工、风险与依赖，并形成 implementation-readiness 结论，把前端治理要求前置到方案阶段。",
+      "primary_role": "tech-lead",
+      "inputs": [
+        "需求简报或 PRD",
+        "现有技术上下文",
+        "资源和时间约束",
+        "设计与体验约束",
+        "intake 中识别的领域线索"
+      ],
+      "outputs": [
+        "交付计划",
+        "需求挑战会结论",
+        "implementation-readiness 结论与执行前提",
+        "brownfield 上下文快照",
+        "story slice 列表",
+        "角色分工",
+        "风险与依赖清单",
+        "应用等级 / 技术架构等级 / 关键组件偏离",
+        "是否需要 ADR",
+        "技能装配清单",
+        "前端交付物与检查点"
+      ],
+      "steps": [
+        "先完成需求挑战会：明确至少 3 个核心假设、对应质疑人、结论与未决项，再进入方案收口。",
+        "默认把 `karpathy-guidelines` 作为计划收口护栏：要求显式写出假设、更简单备选路径、当前不做项，以及为什么本轮范围已经足够。",
+        "按任务特征装配动态讨论分组，先讨论再收敛，避免未经质疑直接进入计划冻结。",
+        "若启用 `doc-architecture`，补齐 Service Catalog、Communication Matrix、NFR Summary，并明确其 artifact 回落位置。",
+        "若是既有项目（brownfield），先梳理现有模块边界、外部依赖、历史约束和缺失文档；必要时运行 `/update-codemaps`，再把 brownfield snapshot 回落到 `delivery-plan.md` 与 `arch-design.md`。",
+        "若为企业内部应用，锁定应用等级、技术架构等级、关键组件偏离和资产入口要求，并判断是否必须输出 ADR。",
+        "为本次任务显式装配 shared 能力、ECC 增强与可选 enterprise overlay 组合，并说明哪些私有 overlay 能力、runbook 或 overlay 仅按场景启用。",
+        "若存在多参数、多角色、多配置或多终端组合，提前判断是否需要 `pairwise-test-design` 压缩测试矩阵。",
+        "若包含 UI，锁定产品类型、视觉方向、设计 token、响应式基线，以及 `/team-review` 需要的前端证据。",
+        "在需求挑战会与并行设计都完成之前，不得把交付计划标记为可执行。",
+        "把实现工作切成 story-sized execution units：每个 slice 必须有清晰目标、验收标准、依赖、owner 和 handoff 终点，避免把多个高风险改动揉成一次 `/team-execute`。",
+        "在计划冻结前运行 `npm run workflow:readiness -- --phase execute --task-dir docs/artifacts/{YYYY-MM-DD}-{slug}` 校验 implementation-readiness；若失败，先回补 challenge、design review、handoff 或 artifact 证据。",
+        "指定每个阶段的主责角色与交接顺序。",
+        "明确风险、阻塞、升级点和检查节点，并沉淀 ADR 所需输入。",
+        "【落盘 — 必须执行，不可跳过】\n① 复用 intake 阶段已有的 slug。\n② 立即执行 `npm run artifact:persist -- ensure-task --date {YYYY-MM-DD} --slug {slug} --state plan`，确保任务目录和 INDEX 行可复用。\n③ 执行 `npm run artifact:persist -- ensure-artifact --date {YYYY-MM-DD} --slug {slug} --artifact delivery-plan --role tech-lead --status draft --state plan` 创建 `delivery-plan.md`。\n④ 若本阶段产出架构设计，执行 `npm run artifact:persist -- ensure-artifact --date {YYYY-MM-DD} --slug {slug} --artifact arch-design --role architect --status draft --state plan` 创建 `arch-design.md`。\n⑤ 如需 ADR，按既有规则在 `docs/adr/` 新建并同步 INDEX 的 ADR 列。\n⑥ 执行 `npm run artifact:persist -- write-project-context --project-name {project_name} --current-task {YYYY-MM-DD}-{slug} --phase handoff-ready --tech-stack \"{tech_stack_item}\" --dependency \"{dependency_item}\" --risk \"{risk_item}\" --next-step \"{next_step_item}\"` 刷新 `docs/memory/project-context.md`。\n⑦ 完成后逐条输出确认，例如：`已创建 delivery-plan.md / arch-design.md`，`已刷新 project-context.md`。"
+      ]
+    },
+    {
+      "name": "handoff",
+      "summary": "用于在角色之间执行标准化交接，保证上下游共享同一事实，并把阶段切换、下游质疑和 readiness proof 一起交接。",
+      "primary_role": "tech-lead",
+      "inputs": [
+        "当前角色结论",
+        "输入依据",
+        "风险与待确认项",
+        "必要时附上 UI 方案、截图或检查清单",
+        "当前阶段与目标阶段",
+        "readiness proof"
+      ],
+      "outputs": [
+        "结构化交接摘要",
+        "下一跳角色动作清单",
+        "可追溯的设计和质量证据",
+        "阶段切换凭证",
+        "readiness proof",
+        "下游质疑记录"
+      ],
+      "steps": [
+        "按 `rules/handoff-contract.md` 固定交接字段。",
+        "先确认当前阶段、目标阶段与 readiness 状态，再决定是否允许下一跳开始。",
+        "在 handoff 文件的 frontmatter 中显式写入 `current_phase`、`target_phase`、`readiness_status`、`accepted_by`；在正文中保留 `readiness proof` 与 `downstream challenge record`。",
+        "若变更涉及前端，附上设计 token、异常态说明、响应式约束和自测/评审证据。",
+        "显式说明已完成内容、未完成内容和风险。",
+        "接收方必须先留下至少 1 条下游质疑记录，再开始消费交接内容。",
+        "指定下一跳角色与期望产出。",
+        "【落盘 — 必须执行，不可跳过】\n① 确认当前任务 slug（目录格式 `{YYYY-MM-DD}-{slug}`）。\n② 立即执行 `npm run artifact:persist -- ensure-handoff --date {YYYY-MM-DD} --slug {slug} --from {from-role} --to {to-role} --status draft`，自动创建 `handoffs/{NNN}-{from-role}-to-{to-role}.md`。\n③ 立即在生成的 handoff 文件中补全本次交接的完整结构化内容（背景、输入依据、结论、风险、待确认项、下一跳角色、下游质疑记录）。\n④ 完成后输出确认：`已创建 handoffs/{NNN}-{from-role}-to-{to-role}.md`。"
+      ]
+    },
+    {
+      "name": "team-execute",
+      "summary": "用于驱动前端、后端等实现角色在既定边界内完成交付，但只有在 readiness proof、需求挑战会、设计收口和 handoff 都齐备后才允许进入实现。",
+      "primary_role": "backend-engineer",
+      "inputs": [
+        "方案、契约、任务拆解",
+        "docs/memory/project-context.md（当前任务、关键依赖、活跃风险）",
+        "story slice / 当前执行单元",
+        "实现范围与验收标准",
+        "技能装配清单",
+        "若涉及前端则附设计系统与体验约束",
+        "需求挑战会结论",
+        "上游 handoff",
+        "downstream challenge record"
+      ],
+      "outputs": [
+        "实现结果",
+        "自测结论",
+        "交给 QA 的说明",
+        "story slice 完成状态",
+        "领域扩展执行记录",
+        "必要时补充 UI 检查清单",
+        "readiness proof",
+        "阻断/回退说明"
+      ],
+      "steps": [
+        "先确认本次实现范围与不做项，并核对是否已具备进入实现的 readiness proof。",
+        "实现阶段默认遵循 `karpathy-guidelines`：锁定 in-scope / out-of-scope、优先最小实现、保持改动外科化，并按明确成功标准落地而不是边做边猜。",
+        "执行前运行 `npm run workflow:readiness -- --phase execute --task-dir docs/artifacts/{YYYY-MM-DD}-{slug}`；若校验失败，停止实现并回补 challenge、design review、handoff 或 artifact 证据。",
+        "若缺少需求挑战会、上游 handoff 或 Design Review 结论，立即停止并回交 tech-lead。",
+        "开始实现前先消费 `docs/memory/project-context.md`，确认当前任务、关键依赖、活跃风险与团队约束未过期。",
+        "一次 `/team-execute` 默认只消费一个 story-sized execution unit；若当前 slice 无法独立验收或独立 handoff，先回到 `/team-plan` 重切。",
+        "若任务命中领域扩展层，先读取对应 `skills/` 技能；若命中配套 runbook / profile / toolkit，也先补看对应文档再开始实现。",
+        "若包含前端变更，优先复用设计 token、遵循响应式与可访问性基线，并记录关键交互和边界态。",
+        "若实现中遇到连续修错、跨模块链路或表象报错，切到 `systematic-debugging` 先定位根因，再继续修改。",
+        "以最小改动完成实现并记录影响面。",
+        "即便使用 private enterprise overlay，也要把最终实现说明、自测结果和风险统一归并到 `/handoff` 输出中。",
+        "若前端变更需要真实浏览器验证，补用 `browser-smoke-testing` 形成关键页面 / 核心路径 smoke 证据。",
+        "前端交付前使用 `templates/ui-review-checklist.md` 补齐自测证据，再通过 `/handoff` 交给 QA 或 DevOps。",
+        "完成自测后通过 `/handoff` 交给 QA 或 DevOps。",
+        "【落盘 — 必须执行，不可跳过】\n① 确认任务 slug。\n② 执行 `npm run artifact:persist -- ensure-artifact --date {YYYY-MM-DD} --slug {slug} --artifact execute-log --role backend-engineer --status draft --state execute` 创建 `execute-log.md`。\n③ 立即在 `execute-log.md` 中补全：计划 vs 实际偏差、实施中的关键决定、阻塞与解决方式、影响面、未完成项。\n④ 若实施中有轻量决策需要跨任务沉淀，执行 `npm run artifact:persist -- append-memory --date {YYYY-MM-DD} --memory-type decisions --title {decision_title} --content \"{decision_markdown}\"` 追加到 `docs/memory/decisions.md`。\n⑤ 若实施中产生新 ADR，按既有规则在 `docs/adr/` 新建并同步 INDEX 的 ADR 列。\n⑥ 完成后输出确认：`已创建 execute-log.md`。"
+      ]
+    },
+    {
+      "name": "team-review",
+      "summary": "用于评审方案、实现、测试结果和交付质量，并在前端变更时强制检查视觉、交互、无障碍和性能。",
+      "primary_role": "qa-engineer",
+      "inputs": [
+        "实施说明",
+        "测试结果",
+        "风险和待确认项",
+        "若涉及前端则附 UI 评审清单和自测证据"
+      ],
+      "outputs": [
+        "评审结论",
+        "阻塞项",
+        "放行建议",
+        "上线验收结论",
+        "前端质量门禁检查结果",
+        "领域扩展约束核对结果"
+      ],
+      "steps": [
+        "检查交付物是否满足角色对应的质量门禁。",
+        "默认用 `karpathy-guidelines` 复核本轮交付是否保持最小范围、每处改动都能追溯到用户请求，并且成功标准与实际验证证据一致。",
+        "若启用 `doc-architecture`，按 `docs/runbooks/team-command-output-contracts.md` 的文档一致性审计字段核对服务名、API、事件、鉴权和索引完整性。",
+        "若任务启用了 private enterprise overlay 或配套私有 runbook / overlay，核对相关约束是否被正确执行，但不要把私有领域检查扩散成所有任务的默认门槛。",
+        "若存在明确的 consumer/provider 边界，参考 `docs/runbooks/contract-testing-playbook.md` 核对契约验证是否覆盖关键交互与失败路径。",
+        "若测试矩阵存在组合爆炸，优先用 `pairwise-test-design` 收敛覆盖策略，并说明哪些高风险场景需要额外定向补测。",
+        "若交付物涉及 GitHub Actions workflow、reusable workflow 或 composite action，参考 `docs/runbooks/actionlint-workflow-gates.md` 与 `docs/runbooks/zizmor-workflow-audits.md` 核对 workflow lint、安全审计与 triage 结论。",
+        "若交付物涉及 GitHub Actions workflow 的 `permissions`、默认 workflow 权限或 `GITHUB_TOKEN` scope 收敛，参考 `docs/runbooks/github-token-permissions-baseline.md` 核对最小权限建议、例外和回退边界。",
+        "若交付物涉及 Terraform、CloudFormation、Bicep、ARM、OpenTofu、Helm、Kubernetes 或其他 IaC / 模板基线检查，参考 `docs/runbooks/checkov-iac-gates.md` 核对 IaC 安全与合规预检结论。",
+        "若交付物涉及 Kubernetes manifests、Helm 渲染结果、kustomize 输出或 CRD schema 覆盖，参考 `docs/runbooks/kubeconform-schema-gates.md` 核对 schema 校验、版本边界和覆盖缺口。",
+        "若交付物涉及 Helm chart 模板、values 组合、subchart 或 snapshot 回归，参考 `docs/runbooks/helm-unittest-playbook.md` 核对 chart 层单测、snapshot 漂移和覆盖缺口。",
+        "若交付物需要把 manifests 送到目标 API server 做不落盘预检，参考 `docs/runbooks/kubectl-server-dry-run-gates.md` 核对 server-side validation、field conflict 和接收性结论。",
+        "若交付物涉及 Helm、Kubernetes、Terraform、YAML、JSON 或其他结构化配置策略，参考 `docs/runbooks/conftest-policy-gates.md` 核对 policy-as-code 预检、例外和阻塞条件。",
+        "若交付物涉及 Kubernetes admission、background scan、policy reports 或 image verification，参考 `docs/runbooks/kyverno-policy-gates.md` 核对 `Audit/Enforce` 状态、policy 命中和例外处理。",
+        "若变更涉及前端，必须验证视觉一致性、交互完整性、边界态、无障碍和前端性能。",
+        "若前端主路径或发布前验证需要真实浏览器证据，补用 `browser-smoke-testing`。",
+        "区分阻塞问题和非阻塞风险。",
+        "必要时把冲突升级给 `tech-lead`。",
+        "【落盘 — 必须执行，不可跳过】\n① 确认任务 slug。\n② 执行 `npm run artifact:persist -- ensure-artifact --date {YYYY-MM-DD} --slug {slug} --artifact test-plan --role qa-engineer --status draft --state review` 创建 `test-plan.md`。\n③ 执行 `npm run artifact:persist -- ensure-artifact --date {YYYY-MM-DD} --slug {slug} --artifact launch-acceptance --role qa-engineer --status draft --state accepted` 创建 `launch-acceptance.md`。\n④ 立即在这两个文件中补全测试范围、风险、Go / No-Go 检查项、已接受风险和最终上线结论。\n⑤ 若评审中有值得跨任务沉淀的经验教训，执行 `npm run artifact:persist -- append-memory --date {YYYY-MM-DD} --memory-type lessons --title {lesson_title} --content \"{lesson_markdown}\"` 追加到 `docs/memory/lessons-learned.md`。\n⑥ 完成后输出确认：`已创建 test-plan.md / launch-acceptance.md`。"
+      ]
+    },
+    {
+      "name": "team-release",
+      "summary": "用于组织发布准备、上线验证、监控与回滚保障，并在前端发布时覆盖 UI smoke、性能和回滚可见性。",
+      "primary_role": "devops-engineer",
+      "inputs": [
+        "测试放行结论",
+        "发布窗口",
+        "环境与回滚要求",
+        "发布负责人 / 值守人与观察窗口",
+        "launch acceptance 结论",
+        "企业治理上下文",
+        "若涉及前端则附 smoke 范围和关键监控项"
+      ],
+      "outputs": [
+        "发布方案",
+        "部署上下文",
+        "上线检查结果",
+        "放行结论与后续观察项",
+        "回滚与监控动作",
+        "企业内控补充信息",
+        "前端发布验证记录",
+        "可选领域扩展执行记录"
+      ],
+      "steps": [
+        "汇总发布范围、质量状态和环境前置条件。",
+        "默认沿用 `karpathy-guidelines` 复核发布输入：确认 release notes、rollout 范围、观察项与回滚前提仍然对应已约定的最小变更和成功标准，没有在发布阶段悄悄扩 scope。",
+        "记录发布责任链、执行步骤、暂停点 / Go-No-Go 判断点，以及观察窗口。",
+        "若包含前端变更，补充关键页面 smoke、静态资源发布风险、性能基线和回滚触发条件，必要时使用 `browser-smoke-testing` 留下真实浏览器验证证据。",
+        "若发布范围包含 GitHub Actions workflow、reusable workflow 或 release automation 变更，参考 `docs/runbooks/actionlint-workflow-gates.md` 与 `docs/runbooks/zizmor-workflow-audits.md` 汇总 workflow lint、安全审计与 triage 结论。",
+        "若发布范围包含 GitHub Actions workflow 的 `permissions`、默认 workflow 权限或 `GITHUB_TOKEN` scope 收敛，参考 `docs/runbooks/github-token-permissions-baseline.md` 汇总最小权限建议、例外和回退边界。",
+        "若发布范围包含 Terraform、CloudFormation、Bicep、ARM、OpenTofu、Helm、Kubernetes 或其他 IaC / 模板基线检查，参考 `docs/runbooks/checkov-iac-gates.md` 汇总 IaC 安全与合规预检结论。",
+        "若发布范围包含 Kubernetes manifests、Helm 渲染结果、kustomize 输出或 CRD schema 覆盖，参考 `docs/runbooks/kubeconform-schema-gates.md` 汇总 schema 校验、版本边界和覆盖缺口。",
+        "若发布范围包含 Helm chart 模板、values 组合、subchart 或 snapshot 回归，参考 `docs/runbooks/helm-unittest-playbook.md` 汇总 chart 层单测、snapshot 漂移和覆盖缺口。",
+        "若发布需要把 manifests 送到目标 API server 做不落盘预检，参考 `docs/runbooks/kubectl-server-dry-run-gates.md` 汇总 server-side validation、field conflict 和接收性结论。",
+        "若发布涉及容器镜像、Dockerfile、Helm、Kubernetes、Terraform 或仓库文件系统扫描，参考 `docs/runbooks/trivy-security-gates.md` 汇总镜像 / 文件系统 / IaC 扫描结果，并回写到放行结论或观察项。",
+        "若发布涉及 Helm、Kubernetes、Terraform、YAML、JSON 或其他结构化配置策略，参考 `docs/runbooks/conftest-policy-gates.md` 汇总 policy-as-code 预检、例外条件和阻塞结论。",
+        "若发布依赖 Kubernetes admission、background scan、policy reports 或 image verification 结果，参考 `docs/runbooks/kyverno-policy-gates.md` 汇总 `Audit/Enforce` 状态、policy 命中和例外边界。",
+        "若发布链主要运行在 GitHub Actions，且需要收敛 runner 的外部访问面或跟踪异常出站连接，参考 `docs/runbooks/runner-egress-hardening.md` 汇总 allowlist、异常访问和 triage 责任。",
+        "若发布包含二进制、容器镜像、压缩包或其他正式制品，参考 `docs/runbooks/sbom-generation-gates.md` 汇总 SBOM 生成范围、归档位置和版本追溯关系。",
+        "若发布需要为正式制品补 provenance 证明，参考 `docs/runbooks/artifact-attestation-gates.md` 汇总 attestation 的生成范围、归档位置和与产物的对应关系。",
+        "若发布链需要在 GitHub Actions 中整理更通用的 provenance 生成模式，参考 `docs/runbooks/slsa-generator-patterns.md` 汇总 workflow 约束、subject 绑定关系和归档方式。",
+        "若发布需要统一 attestation 的 predicate、schema 和 evidence model，参考 `docs/runbooks/in-toto-attestation-framework.md` 汇总证据结构、版本边界和与发布记录的映射方式。",
+        "若发布需要为正式制品或镜像补签名与验签链路，参考 `docs/runbooks/cosign-signing-gates.md` 汇总签名范围、验签入口和发布记录回链。",
+        "若发布需要独立验证 provenance / attestation，参考 `docs/runbooks/slsa-verification-gates.md` 汇总验证输入、验证结果和失败处置策略。",
+        "若集群侧需要在 admission 层强制执行签名、attestation 或验证策略，参考 `docs/runbooks/policy-controller-gates.md` 汇总策略范围、拒绝原因、例外流程和回退路径。",
+        "若发布链需要基于执行证据做更高阶的策略评估，参考 `docs/runbooks/witness-policy-gates.md` 汇总 evidence 来源、policy 规则、评估结果和例外处理。",
+        "若为企业内部应用，在发布方案中补齐应用等级、技术架构等级、资源隔离、关键组件偏离和资产入口。",
+        "若发布链命中 GitLab 手动流水线补充手册，可附加其执行记录，但不替代默认发布方案与验证步骤。",
+        "执行发布前后检查并记录结果，形成最终放行结论。",
+        "向 `tech-lead` 回报发布状态、放行结论和后续观察项。",
+        "【落盘 — 必须执行，不可跳过】\n① 确认任务 slug。\n② 执行 `npm run artifact:persist -- ensure-artifact --date {YYYY-MM-DD} --slug {slug} --artifact deployment-context --role devops-engineer --status draft --state released` 创建 `deployment-context.md`。\n③ 执行 `npm run artifact:persist -- ensure-artifact --date {YYYY-MM-DD} --slug {slug} --artifact release-plan --role devops-engineer --status draft --state released` 创建 `release-plan.md`。\n④ 立即在两个文件中补全环境、配置、密钥来源、部署入口、回滚入口、发布信息、执行步骤、验证与监控、放行结论。\n⑤ 执行 `npm run artifact:persist -- write-project-context --project-name {project_name} --current-task {YYYY-MM-DD}-{slug} --phase released --tech-stack \"{tech_stack_item}\" --dependency \"{dependency_item}\" --risk \"{risk_item}\" --next-step \"{next_step_item}\"` 刷新 `docs/memory/project-context.md`。\n⑥ 若发布中有值得跨任务沉淀的经验教训，执行 `npm run artifact:persist -- append-memory --date {YYYY-MM-DD} --memory-type lessons --title {lesson_title} --content \"{lesson_markdown}\"` 追加到 `docs/memory/lessons-learned.md`。\n⑦ 完成后逐条输出确认：`已创建 deployment-context.md / release-plan.md`，`已刷新 project-context.md`。"
+      ]
+    },
+    {
+      "name": "team-closeout",
+      "summary": "用于在发布与观察窗口结束后做最终收口，确认最终验收状态、残余风险处置、遗留项回写和任务关闭结论。",
+      "primary_role": "tech-lead",
+      "inputs": [
+        "发布结果与观察窗口记录",
+        "最终验收或业务确认结论",
+        "残余风险与事故 / 回滚情况",
+        "需要回写的 backlog / follow-up 项",
+        "已落盘的 PRD、Delivery Plan、Review、Release 等主链 artifact"
+      ],
+      "outputs": [
+        "最终收口结论",
+        "最终验收状态",
+        "观察窗口结论",
+        "残余风险处置结果",
+        "backlog 回写清单",
+        "任务关闭状态"
+      ],
+      "steps": [
+        "确认 `/team-release` 已完成，并具备发布结果、观察窗口、监控与回滚证据；若仍在发布中或观察窗口未结束，不得进入 closeout。",
+        "复核最终验收是否满足上线目标、业务可用性与主要风险边界，必要时对发布结果、观察窗口充分性和遗留项处理方式提出质疑。",
+        "把残余风险分类为接受、转移、延后处理或重新打开主链，并为每项风险明确责任人与下一步动作。",
+        "若观察窗口内出现事故、回滚或严重偏差，明确任务状态为 `re-open` 或 `follow-up-required`，而不是直接关闭。",
+        "若任务启用了 private enterprise overlay、配套私有 runbook 或 overlay，确认 closeout 结论已经消费这些领域证据，不允许只引用口头结论。",
+        "形成最终收口结论，明确 `最终验收状态`、`观察窗口结论`、`backlog 回写` 和 `任务关闭结论`。",
+        "向相关角色回传 closeout 结果：若已关闭则同步后续跟踪项；若未关闭则明确重开入口和责任链。",
+        "【落盘 — 必须执行，不可跳过】\n① 复用既有任务 slug。\n② 执行 `npm run artifact:persist -- ensure-artifact --date {YYYY-MM-DD} --slug {slug} --artifact closeout-summary --role tech-lead --status draft --state {final_state}` 创建 `closeout-summary.md`，其中 `{final_state}` 取 `closed`、`re-open` 或 `follow-up-required`。\n③ 立即在 `closeout-summary.md` 中补全：最终验收状态、观察窗口结论、残余风险处置、backlog 回写、任务关闭结论、lessons learned。\n④ 执行 `npm run artifact:persist -- write-project-context --project-name {project_name} --current-task {YYYY-MM-DD}-{slug} --phase {final_state} --tech-stack \"{tech_stack_item}\" --dependency \"{dependency_item}\" --risk \"{risk_item}\" --next-step \"{next_step_item}\"` 刷新 `docs/memory/project-context.md`。\n⑤ 若有 backlog 回写，执行 `npm run artifact:persist -- append-memory --date {YYYY-MM-DD} --memory-type backlog --title {backlog_title} --content \"{backlog_markdown}\"`。\n⑥ 若有跨任务经验沉淀，执行 `npm run artifact:persist -- append-memory --date {YYYY-MM-DD} --memory-type lessons --title {lesson_title} --content \"{lesson_markdown}\"`。\n⑦ 执行 `npm run artifact:persist -- write-session-summary --date {YYYY-MM-DD} --slug {slug} --role tech-lead --title \"Closeout Summary - {slug}\" --content \"{session_summary_markdown}\"` 写入 `docs/memory/sessions/{YYYY-MM-DD}-{NNN}-{slug}.md`。\n⑧ 完成后逐条输出确认：`已创建 closeout-summary.md`，`已刷新 project-context.md`，`已创建 sessions/{filename}`。"
+      ]
+    }
+  ],
+  "eccCommandDefinitions": [
+    {
+      "name": "plan",
+      "summary": "调用 specialist planners 产出更细粒度的实施方案，并把结果回落到团队角色交接模型。",
+      "primary_role": "planner",
+      "inputs": [
+        "目标、约束、现有上下文",
+        "风险与边界条件"
+      ],
+      "outputs": [
+        "实施计划",
+        "阶段拆解",
+        "需要回交给 `tech-lead` 的决策点"
+      ],
+      "steps": [
+        "聚焦实现策略、拆解阶段和依赖顺序。",
+        "明确哪些结论属于 specialist 建议，哪些需要角色或 `tech-lead` 决策。",
+        "通过 `/handoff` 或 `/team-plan` 把结果回落到团队主链。"
+      ]
+    },
+    {
+      "name": "tdd",
+      "summary": "使用 TDD specialist 帮助建立测试先行的实现节奏。",
+      "primary_role": "tdd-guide",
+      "inputs": [
+        "功能目标",
+        "现有测试缺口",
+        "相关接口或行为说明"
+      ],
+      "outputs": [
+        "测试优先计划",
+        "建议的 red-green-refactor 步骤",
+        "回归验证重点"
+      ],
+      "steps": [
+        "识别可先测试的外部行为与边界态。",
+        "先产出测试切入点，再规划最小实现路径。",
+        "把测试计划回交给研发角色或 QA 消费。"
+      ]
+    },
+    {
+      "name": "code-review",
+      "summary": "触发通用或语言专项 reviewer，对代码质量、设计风险和回归风险做结构化评审。",
+      "primary_role": "code-reviewer",
+      "inputs": [
+        "变更说明",
+        "diff 或实现摘要",
+        "测试与风险信息"
+      ],
+      "outputs": [
+        "评审结论",
+        "阻塞问题",
+        "语言或安全专项建议"
+      ],
+      "steps": [
+        "优先检查行为回归、设计问题、缺测和安全风险。",
+        "若仓库启用了 AI PR review 试点，可参考 `docs/runbooks/ai-pr-review-automation.md` 把 AI 摘要和风险提示作为辅助输入，但不能替代人工结论。",
+        "若 diff 涉及依赖清单、lockfile 或构建插件版本，参考 `docs/runbooks/dependency-review-gates.md` 检查新增依赖、漏洞和许可证变化。",
+        "若当前 PR 主要是依赖升级批次或自动化更新结果，参考 `docs/runbooks/dependency-update-automation.md` 判断分组是否合理、验证范围是否足够以及是否适合自动合并。",
+        "若仓库启用了 GitHub CodeQL / code scanning，参考 `docs/runbooks/codeql-pr-security-gates.md` 读取语义安全扫描结果与 triage 结论。",
+        "若 diff 涉及配置文件、示例、脚本、测试数据、文档或疑似凭据暴露，参考 `docs/runbooks/secret-scanning-gates.md` 检查新增命中、baseline 变化和泄漏处置要求。",
+        "若 diff 涉及 `.github/workflows/`、reusable workflow、composite action 或 workflow 表达式 / shell 片段，参考 `docs/runbooks/actionlint-workflow-gates.md` 检查 workflow 语法、结构、上下文引用和 shell 误用。",
+        "若 diff 涉及 GitHub Actions workflow 的 `permissions`、默认 workflow 权限或 `GITHUB_TOKEN` scope 收敛，参考 `docs/runbooks/github-token-permissions-baseline.md` 检查最小权限建议、例外和最终 YAML 配置是否一致。",
+        "若 diff 涉及 GitHub Actions workflow 的权限、第三方 action、secret 暴露、危险表达式或 release automation 安全面，参考 `docs/runbooks/zizmor-workflow-audits.md` 读取 workflow 安全审计结果与 triage 结论。",
+        "若 diff 涉及 Terraform、CloudFormation、Bicep、ARM、OpenTofu、Helm、Kubernetes 或其他 IaC / 模板基线检查，且仓库启用了 Checkov，参考 `docs/runbooks/checkov-iac-gates.md` 读取 IaC 安全与合规预检结果、例外和 triage 结论。",
+        "若 diff 涉及 Kubernetes manifests、Helm 渲染结果、kustomize 输出或 CRD schema 覆盖，且仓库启用了 schema 校验，参考 `docs/runbooks/kubeconform-schema-gates.md` 读取 schema 校验结果、覆盖缺口和版本边界。",
+        "若 diff 涉及 Helm chart 模板、values 组合、subchart 或 snapshot 断言，参考 `docs/runbooks/helm-unittest-playbook.md` 检查 chart 层单测、snapshot 更新和覆盖范围是否合理。",
+        "若 diff 涉及 `kubectl apply --server-side`、`--dry-run=server`、field manager 或 manifests 的 API server 接受性预检，参考 `docs/runbooks/kubectl-server-dry-run-gates.md` 读取 server-side validation、field conflict 和 RBAC 结论。",
+        "若 diff 涉及 Dockerfile、容器镜像、Helm、Kubernetes、Terraform 或仓库文件系统扫描，且仓库启用了 Trivy，参考 `docs/runbooks/trivy-security-gates.md` 读取镜像 / 文件系统 / IaC 扫描结果与 triage 结论。",
+        "若 diff 涉及 Helm、Kubernetes、Terraform、YAML、JSON 或其他结构化配置策略，且仓库启用了 policy-as-code 预检，参考 `docs/runbooks/conftest-policy-gates.md` 读取 policy 命中、例外和阻塞边界。",
+        "若 diff 涉及 Kyverno policy、background scan、policy reports、image verification 或 Kubernetes 原生策略治理，参考 `docs/runbooks/kyverno-policy-gates.md` 读取策略范围、`Audit/Enforce` 状态和例外处理结论。",
+        "若 diff 涉及 GitHub Actions workflow、token 权限、第三方 action pinning、分支保护或 release automation，且仓库启用了 OSSF Scorecard，参考 `docs/runbooks/scorecard-supply-chain-gates.md` 读取仓库级供应链基线结果与 triage 结论。",
+        "若 diff 涉及 GitHub Actions runner 的外部访问面、网络放行列表或 workflow 运行时收敛策略，参考 `docs/runbooks/runner-egress-hardening.md` 核对 egress allowlist、异常连接和例外处理边界。",
+        "若 diff 涉及 attestation predicate、schema、evidence model 或供应链 policy 规则，参考 `docs/runbooks/in-toto-attestation-framework.md` 与 `docs/runbooks/witness-policy-gates.md` 核对证据结构与策略边界。",
+        "必要时联动 language reviewer 或 security reviewer。",
+        "将结论回交给 `/team-review` 或对应实现角色。"
+      ]
+    },
+    {
+      "name": "build-fix",
+      "summary": "使用 build-error specialists 分析并修复构建、编译或测试失败。",
+      "primary_role": "build-error-resolver",
+      "inputs": [
+        "错误日志",
+        "构建命令",
+        "相关模块上下文"
+      ],
+      "outputs": [
+        "失败归因",
+        "修复建议",
+        "建议的验证命令"
+      ],
+      "steps": [
+        "先归因失败类型，再决定是否切到语言专项 resolver。",
+        "优先给出最小修复路径和验证命令。",
+        "完成后把结果回交给实现角色或 `tech-lead`。"
+      ]
+    },
+    {
+      "name": "verify",
+      "summary": "运行 verification specialists，对结论、实现和交付证据做持续验证。",
+      "primary_role": "loop-operator",
+      "inputs": [
+        "目标结论",
+        "验证标准",
+        "现有证据与命令"
+      ],
+      "outputs": [
+        "验证记录",
+        "未覆盖风险",
+        "是否建议继续迭代"
+      ],
+      "steps": [
+        "明确验证标准、停机条件，以及本轮需要补齐的证据。",
+        "逐轮区分哪些结论已经验证、哪些仍是未验证推测，不把计划当成证据。",
+        "若出现证据缺口、结果冲突或复现不稳定，先停在事实收集和验证，不要继续边猜边改。",
+        "把每一轮的验证结论回交给 `/handoff`、`/team-review` 或 `/team-release`，让主链能消费这些证据。"
+      ]
+    },
+    {
+      "name": "update-codemaps",
+      "summary": "扫描代码结构并生成 token-lean codemaps，适合作为 brownfield 项目的现状快照与主链前置上下文。",
+      "primary_role": "doc-updater",
+      "inputs": [
+        "代码仓结构",
+        "现有模块、入口、依赖与数据层信息",
+        "是否允许覆盖已有 codemap"
+      ],
+      "outputs": [
+        "docs/CODEMAPS/ 下的结构化 codemap",
+        ".reports/codemap-diff.txt 差异摘要",
+        "可供 `/team-help` / `/team-plan` 消费的 brownfield context"
+      ],
+      "steps": [
+        "先识别仓库类型、源码目录、入口文件和主要依赖边界。",
+        "为 architecture/backend/frontend/data/dependencies 生成 token-lean 文档，不写实现细节噪音。",
+        "若已有 codemap，先比较变更比例；超过阈值时要求人工确认再覆盖。",
+        "把结果作为 brownfield context snapshot 的辅助输入，回落到 `delivery-plan.md` / `arch-design.md`，不要形成平行事实源。"
+      ]
+    },
+    {
+      "name": "pua",
+      "summary": "启用 PUA 高能动性与高压闭环模式，统一处理连续失败、原地打转、空口完成、没搜就猜和被动等待。",
+      "primary_role": "planner",
+      "inputs": [
+        "当前任务描述或卡点",
+        "是否需要切换模式：p7 / p9 / p10 / pro / yes / mama / loop / on / off / flavor",
+        "当前失败次数、已尝试方案和验证状态"
+      ],
+      "outputs": [
+        "已选中的 PUA 模式",
+        "当前 flavor 与方法论路由",
+        "下一轮必须执行的动作清单",
+        "若为 on / off / flavor，则给出本地状态更新动作"
+      ],
+      "steps": [
+        "先根据参数路由决定模式：无参数默认加载 `pua` 核心；`p7`、`p9`、`p10`、`pro`、`yes`、`mama`、`loop` 分别切到对应 skill。",
+        "若参数是 `on`，创建或更新 `~/.claude/pua/config.json`，写入 `{ \"always_on\": true }`，并保留当前 flavor。",
+        "若参数是 `off`，创建或更新 `~/.claude/pua/config.json`，写入 `{ \"always_on\": false }`。",
+        "若参数是 `flavor`，先读取 `skills/pua/references/flavors.md`，再让用户明确选择 flavor，并把结果写入 `~/.claude/pua/config.json`。",
+        "若参数是任务描述或卡点，先读取 `skills/pua/references/methodology-router.md`，按任务类型自动选择默认 flavor 与方法论。",
+        "激活后严格遵循三条红线：没证据不算完成、没验证不允许归因、没穷尽不允许放弃。",
+        "若当前已连续失败 2 次以上，明确当前等级 L1-L4，并按 `skills/pua/SKILL.md` 的 7 项检查清单或失败切换链继续推进。",
+        "当前 harness-demo 仅对 SessionStart、PostToolUse、PostToolUseFailure、PreCompact、Stop 做了 hooks 映射；不支持 UserPromptSubmit 级别的即时拦截，需要显式说明这是降级兼容项。"
+      ]
+    },
+    {
+      "name": "multi-frontend",
+      "summary": "针对前端复杂改版、跨页面交互或多前端子域任务做专门编排。",
+      "primary_role": "planner",
+      "inputs": [
+        "前端范围",
+        "设计与接口约束",
+        "交付窗口"
+      ],
+      "outputs": [
+        "前端子任务拆解",
+        "页面/组件责任边界",
+        "前端验证链路"
+      ],
+      "steps": [
+        "优先识别页面、组件、状态、接口和设计系统五个维度。",
+        "联动 `frontend-engineer`、`qa-engineer` 和前端 specialists。",
+        "结果必须回落到 `/team-plan`、`/team-execute`、`/team-review`。"
+      ]
+    },
+    {
+      "name": "multi-backend",
+      "summary": "针对多服务、多模块或多数据边界的后端任务做编排。",
+      "primary_role": "planner",
+      "inputs": [
+        "服务边界",
+        "接口与数据影响",
+        "依赖与发布约束"
+      ],
+      "outputs": [
+        "后端子任务拆解",
+        "依赖顺序",
+        "验证与发布注意项"
+      ],
+      "steps": [
+        "先拆服务和模块边界，再拆验证与发布链。",
+        "必要时联动 architecture、database 和 language specialists。",
+        "结果回落到主团队交付链。"
+      ]
+    },
+    {
+      "name": "harness-audit",
+      "summary": "检查 Harness 配置的完整性和有效性，输出 7 维度评分和改进建议。",
+      "primary_role": "harness-optimizer",
+      "inputs": [],
+      "outputs": [
+        "Overall Score",
+        "Dimension Scores",
+        "Top Actions",
+        "Recommendations"
+      ],
+      "steps": [
+        "评估 Agent Coverage（代理覆盖）。",
+        "评估 Skill Completeness（技能完整性）。",
+        "评估 Hook Effectiveness（Hook 有效性）。",
+        "评估 Rule Enforcement（规则执行）。",
+        "评估 Command Coverage（命令覆盖）。",
+        "评估 Documentation Quality（文档质量）。",
+        "评估 Integration Depth（集成深度）。",
+        "输出改进建议和优先级。"
+      ]
+    }
+  ],
+  "specialistAgentDefinitions": [
+    {
+      "name": "planner",
+      "display_name": "Planner",
+      "mission": "负责把复杂需求转成可执行实施计划、阶段边界和并行拆解。",
+      "triggers": [
+        "需要更细实施计划",
+        "需求涉及多角色或多模块",
+        "要做并行拆解或阶段编排"
+      ],
+      "outputs": [
+        "实施计划",
+        "任务图",
+        "关键依赖与风险点"
+      ],
+      "default_commands": [
+        "/plan"
+      ],
+      "focus_rules": [
+        "rules/common/patterns.md",
+        "rules/common/agents.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "architect",
+      "display_name": "Specialist Architect",
+      "mission": "负责从 harness 视角补充系统边界、方案取舍和结构化技术建议。",
+      "triggers": [
+        "需要架构取舍建议",
+        "要补充边界或失败模式",
+        "需要 specialist 视角的系统设计评估"
+      ],
+      "outputs": [
+        "方案建议",
+        "失败模式与风险",
+        "需要回交给 role architect 的问题"
+      ],
+      "default_commands": [
+        "/plan",
+        "/code-review",
+        "/multi-backend"
+      ],
+      "focus_rules": [
+        "rules/common/patterns.md",
+        "rules/common/security.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "tdd-guide",
+      "display_name": "TDD Guide",
+      "mission": "负责建立测试先行节奏，帮助实现 red-green-refactor 工作流。",
+      "triggers": [
+        "需要先补测试",
+        "要明确回归保护",
+        "改动容易引发行为回归"
+      ],
+      "outputs": [
+        "TDD 路径",
+        "优先级最高的测试建议",
+        "回归矩阵"
+      ],
+      "default_commands": [
+        "/tdd",
+        "/verify"
+      ],
+      "focus_rules": [
+        "rules/common/testing.md"
+      ],
+      "focus_skills": [
+        "pairwise-test-design"
+      ]
+    },
+    {
+      "name": "code-reviewer",
+      "display_name": "Code Reviewer",
+      "mission": "负责做行为、设计、质量和回归风险评审。",
+      "triggers": [
+        "需要代码评审",
+        "要找潜在缺陷或设计问题",
+        "要给出结构化 review 结论"
+      ],
+      "outputs": [
+        "评审结论",
+        "问题列表",
+        "剩余风险"
+      ],
+      "default_commands": [
+        "/code-review"
+      ],
+      "focus_rules": [
+        "rules/common/coding-style.md",
+        "rules/common/testing.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "security-reviewer",
+      "display_name": "Security Reviewer",
+      "mission": "负责识别认证、授权、输入处理、依赖和数据暴露等安全问题。",
+      "triggers": [
+        "改动涉及安全边界",
+        "需要安全 review",
+        "怀疑存在漏洞或敏感数据暴露"
+      ],
+      "outputs": [
+        "安全问题清单",
+        "缓解建议",
+        "是否建议阻塞放行"
+      ],
+      "default_commands": [
+        "/code-review",
+        "/verify"
+      ],
+      "focus_rules": [
+        "rules/common/security.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "build-error-resolver",
+      "display_name": "Build Error Resolver",
+      "mission": "负责归因构建、编译和测试失败，并给出最小修复路径。",
+      "triggers": [
+        "构建失败",
+        "测试跑不通",
+        "编译日志难以快速定位"
+      ],
+      "outputs": [
+        "失败归因",
+        "修复建议",
+        "验证命令"
+      ],
+      "default_commands": [
+        "/build-fix",
+        "/verify"
+      ],
+      "focus_rules": [
+        "rules/common/testing.md"
+      ],
+      "focus_skills": [
+        "systematic-debugging"
+      ]
+    },
+    {
+      "name": "e2e-runner",
+      "display_name": "E2E Runner",
+      "mission": "负责用端到端视角梳理关键用户路径和回归风险。",
+      "triggers": [
+        "需要 E2E 覆盖",
+        "要定义关键用户旅程",
+        "前端变更影响交互主路径"
+      ],
+      "outputs": [
+        "E2E 方案",
+        "关键用户路径",
+        "端到端风险"
+      ],
+      "default_commands": [
+        "/verify",
+        "/multi-frontend"
+      ],
+      "focus_rules": [
+        "rules/common/testing.md",
+        "rules/typescript/frontend.md"
+      ],
+      "focus_skills": [
+        "browser-smoke-testing"
+      ]
+    },
+    {
+      "name": "refactor-cleaner",
+      "display_name": "Refactor Cleaner",
+      "mission": "负责识别死代码、重复实现和可安全收敛的复杂度。",
+      "triggers": [
+        "需要重构清理",
+        "发现死代码",
+        "要降低复杂度或重复实现"
+      ],
+      "outputs": [
+        "清理建议",
+        "潜在风险",
+        "建议的分步重构路径"
+      ],
+      "default_commands": [
+        "/code-review",
+        "/plan"
+      ],
+      "focus_rules": [
+        "rules/common/coding-style.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "doc-updater",
+      "display_name": "Doc Updater",
+      "mission": "负责判断改动引发的文档影响，并给出同步建议。",
+      "triggers": [
+        "改动需要同步文档",
+        "不确定该改哪些文档",
+        "需要保持 runbook/spec/example 一致"
+      ],
+      "outputs": [
+        "文档影响面",
+        "建议更新项",
+        "缺失文档清单"
+      ],
+      "default_commands": [],
+      "focus_rules": [
+        "rules/common/git-workflow.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "docs-lookup",
+      "display_name": "Docs Lookup",
+      "mission": "负责快速定位规范、API 文档和内部知识入口。",
+      "triggers": [
+        "需要查文档",
+        "需要快速搜规则/示例/规范",
+        "多文档上下文需要收敛"
+      ],
+      "outputs": [
+        "文档入口",
+        "关键信息摘录",
+        "推荐下一跳"
+      ],
+      "default_commands": [
+        "/plan"
+      ],
+      "focus_rules": [
+        "rules/common/patterns.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "chief-of-staff",
+      "display_name": "Chief of Staff",
+      "mission": "负责复杂任务的沟通编排、汇报摘要和协作节奏设计。",
+      "triggers": [
+        "任务跨角色很多",
+        "需要高层摘要或阶段汇报",
+        "需要梳理同步节奏和升级路径"
+      ],
+      "outputs": [
+        "摘要",
+        "同步计划",
+        "升级建议"
+      ],
+      "default_commands": [],
+      "focus_rules": [
+        "rules/common/agents.md",
+        "rules/common/git-workflow.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "loop-operator",
+      "display_name": "Loop Operator",
+      "mission": "负责组织验证循环、多阶段执行和中间结果收敛。",
+      "triggers": [
+        "需要多轮验证",
+        "需要自动化式迭代节奏",
+        "任务需要明确停机条件和循环检查"
+      ],
+      "outputs": [
+        "循环计划",
+        "阶段结果",
+        "停机或继续建议"
+      ],
+      "default_commands": [
+        "/verify"
+      ],
+      "focus_rules": [
+        "rules/common/performance.md",
+        "rules/common/agents.md"
+      ],
+      "focus_skills": [
+        "systematic-debugging"
+      ]
+    },
+    {
+      "name": "harness-optimizer",
+      "display_name": "Harness Optimizer",
+      "mission": "负责优化插件、规则、hooks、commands 和安装链的可用性。",
+      "triggers": [
+        "要改进 harness 本身",
+        "要提升插件可用性",
+        "需要优化规则和命令编排"
+      ],
+      "outputs": [
+        "harness 改进建议",
+        "目录或配置调整方案",
+        "回归风险提示"
+      ],
+      "default_commands": [
+        "/plan"
+      ],
+      "focus_rules": [
+        "rules/common/hooks.md",
+        "rules/common/agents.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "cpp-reviewer",
+      "display_name": "C++ Reviewer",
+      "mission": "负责 C++ 代码质量和设计评审。",
+      "triggers": [
+        "需要 C++ review",
+        "怀疑 C++ 改动有资源或边界问题"
+      ],
+      "outputs": [
+        "C++ 评审结论",
+        "潜在问题",
+        "建议修复项"
+      ],
+      "default_commands": [
+        "/code-review"
+      ],
+      "focus_rules": [
+        "rules/common/coding-style.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "cpp-build-resolver",
+      "display_name": "C++ Build Resolver",
+      "mission": "负责 C++ 构建、链接和测试失败归因。",
+      "triggers": [
+        "C++ 编译失败",
+        "链接失败",
+        "CTest 或构建日志不明确"
+      ],
+      "outputs": [
+        "失败归因",
+        "修复建议",
+        "验证命令"
+      ],
+      "default_commands": [
+        "/build-fix"
+      ],
+      "focus_rules": [
+        "rules/common/testing.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "go-reviewer",
+      "display_name": "Go Reviewer",
+      "mission": "负责 Go 代码质量、接口和并发行为评审。",
+      "triggers": [
+        "需要 Go review",
+        "怀疑 goroutine、context 或接口边界问题"
+      ],
+      "outputs": [
+        "Go 评审结论",
+        "风险项",
+        "建议修复"
+      ],
+      "default_commands": [
+        "/code-review"
+      ],
+      "focus_rules": [
+        "rules/golang/coding-style.md",
+        "rules/golang/testing.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "go-build-resolver",
+      "display_name": "Go Build Resolver",
+      "mission": "负责 Go 构建、依赖和测试失败归因。",
+      "triggers": [
+        "Go build/test 失败",
+        "模块或依赖错误",
+        "构建日志需要快速定位"
+      ],
+      "outputs": [
+        "失败归因",
+        "修复建议",
+        "验证命令"
+      ],
+      "default_commands": [
+        "/build-fix"
+      ],
+      "focus_rules": [
+        "rules/golang/testing.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "python-reviewer",
+      "display_name": "Python Reviewer",
+      "mission": "负责 Python 代码质量、边界和安全性评审。",
+      "triggers": [
+        "需要 Python review",
+        "怀疑 Python 改动有边界或测试问题"
+      ],
+      "outputs": [
+        "Python 评审结论",
+        "风险项",
+        "建议修复"
+      ],
+      "default_commands": [
+        "/code-review"
+      ],
+      "focus_rules": [
+        "rules/python/coding-style.md",
+        "rules/python/security.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "database-reviewer",
+      "display_name": "Database Reviewer",
+      "mission": "负责数据库 schema、查询、事务和迁移风险评审。",
+      "triggers": [
+        "涉及 SQL 或 schema 变更",
+        "需要数据库 review",
+        "担心迁移或查询性能"
+      ],
+      "outputs": [
+        "数据库风险结论",
+        "迁移建议",
+        "性能或一致性提醒"
+      ],
+      "default_commands": [
+        "/code-review",
+        "/multi-backend"
+      ],
+      "focus_rules": [
+        "rules/common/security.md",
+        "rules/java/jpa.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "typescript-reviewer",
+      "display_name": "TypeScript Reviewer",
+      "mission": "负责 TypeScript/JavaScript 代码质量、类型边界和前端实现评审。",
+      "triggers": [
+        "需要 TypeScript review",
+        "怀疑类型边界或前端实现有问题"
+      ],
+      "outputs": [
+        "TypeScript 评审结论",
+        "风险项",
+        "建议修复"
+      ],
+      "default_commands": [
+        "/code-review",
+        "/multi-frontend"
+      ],
+      "focus_rules": [
+        "rules/typescript/coding-style.md",
+        "rules/typescript/frontend.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "java-reviewer",
+      "display_name": "Java Reviewer",
+      "mission": "负责 Java / Spring Boot 代码质量、分层和事务边界评审。",
+      "triggers": [
+        "需要 Java review",
+        "怀疑 Spring Boot/JPA 设计或边界问题"
+      ],
+      "outputs": [
+        "Java 评审结论",
+        "风险项",
+        "建议修复"
+      ],
+      "default_commands": [
+        "/code-review",
+        "/multi-backend"
+      ],
+      "focus_rules": [
+        "rules/java/coding-style.md",
+        "rules/java/springboot.md",
+        "rules/java/jpa.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "java-build-resolver",
+      "display_name": "Java Build Resolver",
+      "mission": "负责 Java / Maven / Gradle 构建和测试失败归因。",
+      "triggers": [
+        "Java build/test 失败",
+        "Maven/Gradle 日志难定位",
+        "依赖或编译错误"
+      ],
+      "outputs": [
+        "失败归因",
+        "修复建议",
+        "验证命令"
+      ],
+      "default_commands": [
+        "/build-fix"
+      ],
+      "focus_rules": [
+        "rules/java/testing.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "kotlin-reviewer",
+      "display_name": "Kotlin Reviewer",
+      "mission": "负责 Kotlin 代码质量、架构和协程使用评审。",
+      "triggers": [
+        "需要 Kotlin review",
+        "怀疑 Kotlin/Android/KMP 设计问题"
+      ],
+      "outputs": [
+        "Kotlin 评审结论",
+        "风险项",
+        "建议修复"
+      ],
+      "default_commands": [
+        "/code-review"
+      ],
+      "focus_rules": [
+        "rules/common/coding-style.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "kotlin-build-resolver",
+      "display_name": "Kotlin Build Resolver",
+      "mission": "负责 Kotlin / Gradle 构建失败归因。",
+      "triggers": [
+        "Kotlin build 失败",
+        "Gradle 失败",
+        "需要快速定位构建问题"
+      ],
+      "outputs": [
+        "失败归因",
+        "修复建议",
+        "验证命令"
+      ],
+      "default_commands": [
+        "/build-fix"
+      ],
+      "focus_rules": [
+        "rules/common/testing.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "rust-reviewer",
+      "display_name": "Rust Reviewer",
+      "mission": "负责 Rust 代码质量、所有权边界和错误处理评审。",
+      "triggers": [
+        "需要 Rust review",
+        "怀疑 Rust 设计或错误处理问题"
+      ],
+      "outputs": [
+        "Rust 评审结论",
+        "风险项",
+        "建议修复"
+      ],
+      "default_commands": [
+        "/code-review"
+      ],
+      "focus_rules": [
+        "rules/common/coding-style.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "rust-build-resolver",
+      "display_name": "Rust Build Resolver",
+      "mission": "负责 Rust 构建、borrow checker 和测试失败归因。",
+      "triggers": [
+        "Rust 编译失败",
+        "borrow checker 报错",
+        "Cargo test 失败"
+      ],
+      "outputs": [
+        "失败归因",
+        "修复建议",
+        "验证命令"
+      ],
+      "default_commands": [
+        "/build-fix"
+      ],
+      "focus_rules": [
+        "rules/common/testing.md"
+      ],
+      "focus_skills": []
+    },
+    {
+      "name": "pytorch-build-resolver",
+      "display_name": "PyTorch Build Resolver",
+      "mission": "负责 PyTorch / CUDA 训练、依赖和运行时错误归因。",
+      "triggers": [
+        "PyTorch/CUDA 报错",
+        "训练环境异常",
+        "需要快速定位框架或算子问题"
+      ],
+      "outputs": [
+        "失败归因",
+        "修复建议",
+        "环境检查项"
+      ],
+      "default_commands": [
+        "/build-fix"
+      ],
+      "focus_rules": [
+        "rules/python/testing.md"
+      ],
+      "focus_skills": []
+    }
+  ],
+  "requiredTemplateFiles": [
+    "templates/api-contract.md",
+    "templates/design-system-brief.md",
+    "templates/ui-implementation-plan.md",
+    "templates/ui-review-checklist.md",
+    "templates/release-plan.md",
+    "templates/system/role-skill.md.tmpl",
+    "templates/system/agent-role.md.tmpl",
+    "templates/system/command.md.tmpl",
+    "templates/system/specialist-agent.md.tmpl"
+  ],
+  "requiredSharedSkills": [
+    "api-contract",
+    "frontend-engineering",
+    "frontend-ui-ux-system",
+    "doc-architecture"
+  ],
+  "requiredEccSkills": [
+    "browser-smoke-testing",
+    "pairwise-test-design",
+    "testcontainers-integration-testing",
+    "systematic-debugging",
+    "error-experience-library",
+    "karpathy-guidelines",
+    "parallel-execution",
+    "java-unit-test",
+    "maven-qa",
+    "mysql-query",
+    "langfuse-coding-trace",
+    "harness-audit"
+  ],
+  "sharedSkillReferenceFiles": {
+    "doc-architecture": [
+      "references/discovery-questionnaire.md",
+      "references/service-decomposition-guide.md",
+      "references/audit-checklist.md",
+      "references/doc-evolution-guide.md",
+      "references/artifact-mapping.md",
+      "references/tech-stack-profiles.md",
+      "references/templates/agents-md.tmpl.md",
+      "references/templates/architecture.tmpl.md",
+      "references/templates/domain.tmpl.md",
+      "references/templates/spec.tmpl.md",
+      "references/templates/plan.tmpl.md",
+      "references/templates/runbook.tmpl.md",
+      "references/templates/frontend.tmpl.md"
+    ],
+    "frontend-engineering": [
+      "references/react-next-baseline.md",
+      "references/component-patterns.md",
+      "references/quality-checklist.md"
+    ],
+    "frontend-ui-ux-system": [
+      "references/product-style-map.md",
+      "references/design-tokens.md",
+      "references/interaction-accessibility.md",
+      "references/delivery-checklist.md"
+    ]
+  },
+  "requiredRules": [
+    "rules/team-operating-model.md",
+    "rules/handoff-contract.md",
+    "rules/artifact-standards.md",
+    "rules/escalation-policy.md",
+    "rules/frontend-engineering-standards.md",
+    "rules/frontend-ui-ux-standards.md",
+    "rules/frontend-quality-gates.md",
+    "rules/frontend-design-knowledge-base.md"
+  ],
+  "requiredRulePackFiles": [
+    "rules/README.md",
+    "rules/common/coding-style.md",
+    "rules/common/git-workflow.md",
+    "rules/common/testing.md",
+    "rules/common/performance.md",
+    "rules/common/patterns.md",
+    "rules/common/hooks.md",
+    "rules/common/agents.md",
+    "rules/common/security.md",
+    "rules/typescript/README.md",
+    "rules/typescript/coding-style.md",
+    "rules/typescript/testing.md",
+    "rules/typescript/frontend.md",
+    "rules/java/README.md",
+    "rules/java/coding-style.md",
+    "rules/java/springboot.md",
+    "rules/java/jpa.md",
+    "rules/java/testing.md",
+    "rules/java/security.md",
+    "rules/python/README.md",
+    "rules/python/coding-style.md",
+    "rules/python/testing.md",
+    "rules/python/security.md",
+    "rules/golang/README.md",
+    "rules/golang/coding-style.md",
+    "rules/golang/testing.md"
+  ],
+  "requiredExtraFiles": [
+    "hooks/README.md",
+    "hooks/hooks.json",
+    "hooks/memory-persistence/README.md",
+    "hooks/strategic-compact/README.md",
+    "contexts/dev.md",
+    "contexts/review.md",
+    "contexts/research.md",
+    "examples/project-CLAUDE.md",
+    "examples/user-CLAUDE.md",
+    "examples/saas-nextjs-CLAUDE.md",
+    "examples/springboot-service-CLAUDE.md",
+    "mcp-configs/mcp-servers.json",
+    "tests/test_layout.py",
+    "scripts/lib/audit-logger.js",
+    "scripts/lib/team-skills-data.json",
+    "scripts/lib/team-skills-platform.js",
+    "scripts/build-platform-artifacts.js",
+    "scripts/validate-library.js",
+    "scripts/validate-workflow-state.js",
+    "scripts/query-audit-logs.js",
+    "scripts/hooks/session-start.js",
+    "scripts/hooks/session-end.js",
+    "scripts/hooks/pre-compact.js",
+    "scripts/hooks/suggest-compact.js"
+  ]
+}

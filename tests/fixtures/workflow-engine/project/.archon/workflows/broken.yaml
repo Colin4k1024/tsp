@@ -1,0 +1,7 @@
+version: ecc.workflow.v1
+name: broken
+description: Broken workflow fixture.
+nodes:
+  - id: bad
+    depends_on: [missing]
+    prompt: Broken.

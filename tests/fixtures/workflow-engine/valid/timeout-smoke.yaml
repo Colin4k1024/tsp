@@ -1,0 +1,7 @@
+version: ecc.workflow.v1
+name: timeout-smoke
+description: A workflow that exercises bash timeout handling.
+nodes:
+  - id: slow-bash
+    bash: node -e "setTimeout(() => process.stdout.write('timeout-smoke-ok'), 200)"
+    timeout_ms: 25

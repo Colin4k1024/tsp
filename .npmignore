@@ -1,0 +1,38 @@
+# Development & CI
+tests/
+docs/plans/
+docs/presentation/
+docs/runbooks/
+docs/toolkits/
+docs/adr/
+docs/artifacts/
+docs/memory/
+.github/
+.git/
+
+# Config & lint
+eslint.config.js
+.eslintrc*
+.markdownlint*
+.editorconfig
+.gitignore
+.npmignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts
+coverage/
+.nyc_output/
+*.tgz
+crates/**/target/
+crates/**/target/**
+crates/**/target-*/
+crates/**/target-*/**
+
+# Sensitive local config
+.claude/settings.local.json
+.env*

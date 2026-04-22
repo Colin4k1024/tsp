@@ -1,0 +1,18 @@
+version: ecc.workflow.v1
+name: continue-on-error
+description: Continue downstream work that is not blocked when continueOnError is enabled.
+nodes:
+  - id: plan
+    prompt: Create the plan.
+  - id: backend
+    depends_on: [plan]
+    bash: npm test
+  - id: frontend
+    depends_on: [plan]
+    command: /team-execute
+  - id: notify
+    depends_on: [frontend]
+    prompt: Notify downstream teams.
+  - id: review
+    depends_on: [backend, frontend]
+    prompt: Review the result.

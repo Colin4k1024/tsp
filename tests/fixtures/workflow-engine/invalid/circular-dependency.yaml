@@ -1,0 +1,10 @@
+version: ecc.workflow.v1
+name: circular-dependency
+description: Workflow dependencies must form a DAG.
+nodes:
+  - id: plan
+    depends_on: [review]
+    prompt: Plan the task.
+  - id: review
+    depends_on: [plan]
+    prompt: Review the plan.

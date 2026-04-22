@@ -1,0 +1,5 @@
+# Third-party vendor bundles
+**/layer.js
+**/monaco-editor/**
+**/goframe-v2/examples/**
+**/node_modules/**

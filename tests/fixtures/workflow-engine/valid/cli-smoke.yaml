@@ -1,0 +1,12 @@
+version: ecc.workflow.v1
+name: cli-smoke
+description: A workflow that exercises the workflow CLI with default handlers.
+nodes:
+  - id: collect-context
+    prompt: Collect execution context.
+  - id: shell-check
+    depends_on: [collect-context]
+    bash: node -e "process.stdout.write('cli-smoke-ok')"
+  - id: handoff
+    depends_on: [shell-check]
+    command: /handoff

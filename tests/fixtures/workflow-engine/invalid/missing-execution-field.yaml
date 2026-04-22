@@ -1,0 +1,6 @@
+version: ecc.workflow.v1
+name: missing-execution-field
+description: Node must declare exactly one execution field.
+nodes:
+  - id: invalid
+    interactive: true

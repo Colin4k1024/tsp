@@ -1,0 +1,7 @@
+version: ecc.workflow.v1
+name: unknown-dependency
+description: Depends on a node that does not exist.
+nodes:
+  - id: review
+    depends_on: [plan]
+    prompt: Review.

@@ -1,0 +1,15 @@
+version: ecc.workflow.v1
+name: resume-smoke
+description: A workflow that can be resumed after a partial failure.
+nodes:
+  - id: plan
+    prompt: Plan the execution.
+  - id: backend
+    depends_on: [plan]
+    bash: placeholder-backend
+  - id: frontend
+    depends_on: [plan]
+    command: /team-execute
+  - id: review
+    depends_on: [backend, frontend]
+    prompt: Review the output.

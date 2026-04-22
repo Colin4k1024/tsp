@@ -1,0 +1,15 @@
+version: ecc.workflow.v1
+name: branching
+description: A workflow with a parallelizable middle layer.
+nodes:
+  - id: plan
+    prompt: Create the plan.
+  - id: backend
+    depends_on: [plan]
+    bash: npm test
+  - id: frontend
+    depends_on: [plan]
+    command: /team-execute
+  - id: review
+    depends_on: [backend, frontend]
+    prompt: Review the result.

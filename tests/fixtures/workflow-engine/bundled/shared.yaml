@@ -1,0 +1,6 @@
+version: ecc.workflow.v1
+name: shared
+description: Bundled version of a shared workflow.
+nodes:
+  - id: bundled-step
+    prompt: Bundled workflow.

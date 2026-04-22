@@ -1,0 +1,9 @@
+version: ecc.workflow.v1
+name: duplicate-vars-test
+description: Workflow fixture with the same variable repeated.
+nodes:
+  - id: step-1
+    bash: echo {{taskDir}}
+  - id: step-2
+    depends_on: [step-1]
+    prompt: Summarize {{taskDir}}.

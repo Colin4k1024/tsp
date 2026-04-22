@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "description": "Model routing profiles — defines task-to-model mappings for cost-aware and capability-aware model selection. Inspired by gstack model-profiles.",
+  "profiles": {
+    "default": {
+      "description": "Balanced default profile for most development tasks.",
+      "routing": {
+        "planning": { "model": "sonnet", "reason": "Complex multi-step reasoning for task decomposition" },
+        "implementation": { "model": "sonnet", "reason": "Best coding model for primary development" },
+        "review": { "model": "sonnet", "reason": "Thorough code review requires deep understanding" },
+        "testing": { "model": "sonnet", "reason": "Test design needs understanding of edge cases" },
+        "documentation": { "model": "haiku", "reason": "Documentation updates are lower complexity" },
+        "quick-fix": { "model": "haiku", "reason": "Simple fixes don't need heavy reasoning" },
+        "architecture": { "model": "opus", "reason": "Architectural decisions need deepest reasoning" },
+        "security-review": { "model": "opus", "reason": "Security analysis needs maximum thoroughness" },
+        "brainstorming": { "model": "sonnet", "reason": "Creative exploration benefits from balanced capability" },
+        "debugging": { "model": "sonnet", "reason": "Root cause analysis needs strong reasoning" }
+      }
+    },
+    "cost-optimized": {
+      "description": "Minimize token cost by routing simpler tasks to lighter models.",
+      "routing": {
+        "planning": { "model": "sonnet", "reason": "Planning still needs strong reasoning" },
+        "implementation": { "model": "haiku", "reason": "Most implementation is pattern-following" },
+        "review": { "model": "sonnet", "reason": "Review needs deeper analysis" },
+        "testing": { "model": "haiku", "reason": "Test writing is often mechanical" },
+        "documentation": { "model": "haiku", "reason": "Low complexity" },
+        "quick-fix": { "model": "haiku", "reason": "Trivial changes" },
+        "architecture": { "model": "sonnet", "reason": "Downgraded from opus for cost" },
+        "security-review": { "model": "sonnet", "reason": "Downgraded from opus for cost" },
+        "brainstorming": { "model": "haiku", "reason": "Acceptable for quick explorations" },
+        "debugging": { "model": "sonnet", "reason": "Debugging still needs reasoning" }
+      }
+    },
+    "quality-first": {
+      "description": "Maximize quality by routing to strongest models. Higher cost.",
+      "routing": {
+        "planning": { "model": "opus", "reason": "Deepest reasoning for planning" },
+        "implementation": { "model": "sonnet", "reason": "Best coding model" },
+        "review": { "model": "opus", "reason": "Most thorough review" },
+        "testing": { "model": "sonnet", "reason": "Strong test design" },
+        "documentation": { "model": "sonnet", "reason": "Higher quality docs" },
+        "quick-fix": { "model": "sonnet", "reason": "Even quick fixes get full attention" },
+        "architecture": { "model": "opus", "reason": "Maximum thoroughness" },
+        "security-review": { "model": "opus", "reason": "No compromise on security" },
+        "brainstorming": { "model": "opus", "reason": "Deepest creative exploration" },
+        "debugging": { "model": "opus", "reason": "Maximum reasoning for root cause" }
+      }
+    }
+  },
+  "task-type-detection": {
+    "description": "Heuristics for auto-detecting task type from context.",
+    "signals": {
+      "planning": ["delivery plan", "task decomposition", "milestone", "拆解", "排期"],
+      "implementation": ["implement", "create", "build", "实现", "开发", "编码"],
+      "review": ["review", "审查", "检查", "code review"],
+      "testing": ["test", "测试", "验证", "coverage"],
+      "documentation": ["doc", "文档", "README", "更新说明"],
+      "quick-fix": ["fix", "修复", "typo", "配置调整", "quick"],
+      "architecture": ["architecture", "架构", "ADR", "系统设计", "选型"],
+      "security-review": ["security", "安全", "CVE", "漏洞", "鉴权"],
+      "brainstorming": ["brainstorm", "方案对比", "头脑风暴", "选择"],
+      "debugging": ["debug", "调试", "排查", "根因", "定位问题"]
+    }
+  }
+}

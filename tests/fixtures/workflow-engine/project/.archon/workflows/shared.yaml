@@ -1,0 +1,6 @@
+version: ecc.workflow.v1
+name: shared
+description: Project override for bundled workflow.
+nodes:
+  - id: project-step
+    command: /team-execute
