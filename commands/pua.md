@@ -34,4 +34,4 @@
 5. 若参数是任务描述或卡点，先读取 `skills/pua/references/methodology-router.md`，按任务类型自动选择默认 flavor 与方法论。
 6. 激活后严格遵循三条红线：没证据不算完成、没验证不允许归因、没穷尽不允许放弃。
 7. 若当前已连续失败 2 次以上，明确当前等级 L1-L4，并按 `skills/pua/SKILL.md` 的 7 项检查清单或失败切换链继续推进。
-8. 当前 harness-demo 仅对 SessionStart、PostToolUse、PostToolUseFailure、PreCompact、Stop 做了 hooks 映射；不支持 UserPromptSubmit 级别的即时拦截，需要显式说明这是降级兼容项。
+8. 当前本平台仅对 SessionStart、PostToolUse、PostToolUseFailure、PreCompact、Stop 做了 hooks 映射；不支持 UserPromptSubmit 级别的即时拦截，需要显式说明这是降级兼容项。
