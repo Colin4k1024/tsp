@@ -154,7 +154,7 @@ jobs:
 
       - name: Pack tarball for offline install
         shell: bash
-        run: npm pack --json | tee .npm-pack.json
+        run: npm pack --json --ignore-scripts | tee .npm-pack.json
 
       - name: Validate packed tarball contents
         shell: bash
