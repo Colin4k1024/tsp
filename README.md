@@ -2,7 +2,7 @@
 
 面向团队协作与平台治理的开源 Team Skills Platform，用于把单代理执行模式升级成“`Tech Lead` 编排 + 专业角色协作”的虚拟研发团队工作模型，并叠加 ECC 风格的 harness layer、specialist 命令与运行时增强能力。当前平台同时支持 `team mode` 与 `solo mode`，前者强调多人交接，后者强调单人闭环但保留同样的关键门禁。
 
-> English: Team Skills Platform (TSP) is an open-source framework for role-based AI delivery workflows. It packages role prompts, shared skills, commands, rules, hooks, examples, and install tooling for Claude Code, Codex, Cursor, and similar environments. Private enterprise extensions are optional and distributed separately through `--overlay enterprise`; the public repository ships only public capabilities.
+> English: Team Skills Platform (TSP) is an open-source framework for role-based AI delivery workflows. It packages role prompts, shared skills, commands, rules, hooks, examples, and install tooling for Claude Code, Codex, Cursor, and similar environments. Custom extensions can be layered on top via the overlay mechanism; the public repository ships only public capabilities.
 
 ## Quick Start / 最小安装
 
@@ -14,17 +14,11 @@ node scripts/install-apply.js --profile team --target claude
 node scripts/install-apply.js --profile full --target codex
 ```
 
-如果你的任务确实依赖私有流程、权限或内部发布集成，再额外叠加：
-
-```bash
-node scripts/install-apply.js --profile team --target claude --overlay enterprise
-```
-
 ## Who It's For / 适合谁
 
 - 想把 AI 编码从“单代理乱跑”升级成“角色分工 + 明确 handoff + 明确 gate”的团队
 - 需要一套可安装、可验证、可迁移的 prompts、skills、commands、rules 与 hooks 底座
-- 想在公开能力之上，为私有企业扩展预留清晰 overlay 边界的团队
+- 想在公开能力之上，叠加自定义 overlay 扩展的团队
 
 ## Community / 社区协作
 
@@ -60,7 +54,7 @@ TSP 采用 **角色 + 技能 + Agent + 规则 + Hooks + Workflow 引擎** 六层
 
 安装工具链支持 **10 个目标平台**：Claude、Cursor、Antigravity、Codex、Gemini、OpenCode、CodeBuddy、Copilot、Windsurf、Augment。
 
-发布为 npm 包 `@colin4k1024/tsp-create`，内置 Rust bridge 预构建二进制，安装零依赖。
+发布为 npm 包 `@colin4k1024/tsp`，内置 Rust bridge 预构建二进制，安装零依赖。
 
 ### 集成的开源框架与方法论
 
@@ -152,7 +146,7 @@ TSP 整合了多个社区开源框架的精华能力，而非从零构建：
 	- 设计与协作：brainstorming、discuss-phase、multi-perspective-review、cross-model-review、quick-execution、karpathy-guidelines
 	- 语言与框架：springboot-patterns、django-patterns、golang-patterns、kotlin-patterns、rust-patterns、swiftui-patterns 等
 - `karpathy-guidelines` 已默认进入 TSP 主流程的推荐行为层：`/team-help` 到 `/team-release` 会优先用它来暴露假设、收敛最小范围、限制改动边界并锁定成功标准，但它不是新的硬门禁。
-- 公开 `skills/` 只承载通用能力；私有企业扩展通过 optional `enterprise` overlay 交付。
+- 公开 `skills/` 只承载通用能力；自定义扩展通过 custom overlay 叠加交付。
 - GitLab 手动流水线、Langfuse 追踪、前端公司样式 profile、业务服务设计 toolkit 等配套能力改由 `docs/runbooks/`、`docs/toolkits/` 与 `scripts/` 承接。
 - `rules/common/` 与语言规则目录为 specialists 提供统一判断标准。
 - `hooks/`、`contexts/`、`examples/`、`mcp-configs/` 作为可扩展运行时入口；当前仓库已提供 session persistence、tool observation、cost tracking、context budget、instinct learning、context compaction 与 archive 相关脚本。
@@ -530,9 +524,9 @@ OPENCODE_CONFIG_DIR=/tmp/opencode ./scripts/install-opencode.sh
 
 无需克隆仓库，直接通过 npx 一键安装到目标平台。npm 包已包含所有平台（macOS/Linux/Windows）的预编译二进制文件，无需 Rust 工具链，无需 GitHub 访问：
 
-- `tsp-create` 当前公开支持的 targets：`claude`、`cursor`、`antigravity`、`codex`、`gemini`、`opencode`、`codebuddy`、`copilot`、`windsurf`、`augment`
+- `tsp` 当前公开支持的 targets：`claude`、`cursor`、`antigravity`、`codex`、`gemini`、`opencode`、`codebuddy`、`copilot`、`windsurf`、`augment`
 - 当前公开支持的 profiles：`core`、`developer`、`security`、`research`、`team`、`full`
-- 私有企业能力通过 optional overlay 交付，不作为公开 `tsp-create` profile 暴露
+- 自定义能力通过 overlay 机制扩展，不作为公开 `tsp` profile 暴露
 
 支持深度不是所有 target 都完全一致，当前建议按下面理解：
 
@@ -547,19 +541,19 @@ OPENCODE_CONFIG_DIR=/tmp/opencode ./scripts/install-opencode.sh
 
 ```bash
 # 交互式向导（推荐首次使用）
-npx @colin4k1024/tsp-create
+npx @colin4k1024/tsp
 
 # 非交互式，直接指定目标和 profile
-npx @colin4k1024/tsp-create --target claude --profile full
-npx @colin4k1024/tsp-create --target cursor --profile team
-npx @colin4k1024/tsp-create --target codex --profile full
-npx @colin4k1024/tsp-create --target opencode --profile full
+npx @colin4k1024/tsp --target claude --profile full
+npx @colin4k1024/tsp --target cursor --profile team
+npx @colin4k1024/tsp --target codex --profile full
+npx @colin4k1024/tsp --target opencode --profile full
 
 # 预览安装计划（不写入文件）
-npx @colin4k1024/tsp-create --dry-run
+npx @colin4k1024/tsp --dry-run
 
 # 从源码安装（开发者模式，需要 git）
-npx @colin4k1024/tsp-create --from-source
+npx @colin4k1024/tsp --from-source
 ```
 
 安装时会自动完成：
@@ -588,8 +582,8 @@ npx @colin4k1024/tsp-create --from-source
 - 想按场景查 Codex 怎么用：看 [docs/runbooks/codex-usage-scenarios.md](docs/runbooks/codex-usage-scenarios.md)
 - 想直接复制高频提示与并行说法：看 [docs/runbooks/claude-conversation-prompt-recipes.md](docs/runbooks/claude-conversation-prompt-recipes.md) 和 [docs/runbooks/codex-parallel-prompt-recipes.md](docs/runbooks/codex-parallel-prompt-recipes.md)
 - 想按角色直接复制常用说法：看 [docs/runbooks/role-prompt-recipes.md](docs/runbooks/role-prompt-recipes.md)
-- 想快速判断私有企业扩展怎么接：看 [docs/runbooks/enterprise-extension-quick-start.md](docs/runbooks/enterprise-extension-quick-start.md)
-- 想按任务类型快速抄一页速查：看 [docs/runbooks/frontend-bugfix-one-page.md](docs/runbooks/frontend-bugfix-one-page.md)、[docs/runbooks/backend-api-delivery-one-page.md](docs/runbooks/backend-api-delivery-one-page.md)、[docs/runbooks/release-closure-one-page.md](docs/runbooks/release-closure-one-page.md)
+- 想创建自定义扩展 overlay：看 [docs/runbooks/custom-overlay.md](docs/runbooks/custom-overlay.md)
+- 想按任务类型快速抄一页速查：看 [docs/runbooks/frontend-bugfix-one-page.md](docs/runbooks/frontend-bugfix-one-page.md)、[docs/runbooks/release-closure-one-page.md](docs/runbooks/release-closure-one-page.md)
 - 想直接看成品对话示例：看 [docs/runbooks/claude-end-to-end-conversation-example.md](docs/runbooks/claude-end-to-end-conversation-example.md) 和 [docs/runbooks/codex-end-to-end-conversation-example.md](docs/runbooks/codex-end-to-end-conversation-example.md)
 - 想按角色看成品交接对话：看 [docs/runbooks/qa-review-conversation-example.md](docs/runbooks/qa-review-conversation-example.md)、[docs/runbooks/devops-release-conversation-example.md](docs/runbooks/devops-release-conversation-example.md)、[docs/runbooks/tech-lead-closure-conversation-example.md](docs/runbooks/tech-lead-closure-conversation-example.md)
 - 想看上游角色怎么澄清、排期和出方案：看 [docs/runbooks/product-manager-clarification-conversation-example.md](docs/runbooks/product-manager-clarification-conversation-example.md)、[docs/runbooks/project-manager-planning-conversation-example.md](docs/runbooks/project-manager-planning-conversation-example.md)、[docs/runbooks/architect-design-conversation-example.md](docs/runbooks/architect-design-conversation-example.md)
@@ -606,8 +600,6 @@ npx @colin4k1024/tsp-create --from-source
 - 想完整走一遍主链：看 [docs/runbooks/first-team-workflow-walkthrough.md](docs/runbooks/first-team-workflow-walkthrough.md)
 - 安装或使用异常：看 [docs/runbooks/troubleshooting.md](docs/runbooks/troubleshooting.md)
 - 想快速看完这轮都优化了什么：看 [docs/runbooks/batch-optimization-completion-checklist.md](docs/runbooks/batch-optimization-completion-checklist.md)
-- 想直接转发一版团队交付说明：看 [docs/runbooks/team-delivery-brief-2026-03-29.md](docs/runbooks/team-delivery-brief-2026-03-29.md)
-- 想看正式版本收口记录：看 [docs/runbooks/version-closure-2026-03-29.md](docs/runbooks/version-closure-2026-03-29.md)
 - 想看 ECC 运行时能力、记忆持久化和并行执行：看 [docs/runbooks/ecc-harness-usage.md](docs/runbooks/ecc-harness-usage.md)、[docs/runbooks/error-experience-usage.md](docs/runbooks/error-experience-usage.md)、[docs/runbooks/parallel-execution-usage.md](docs/runbooks/parallel-execution-usage.md)
 - 想先搞清楚现在到底有哪些命令、skills 和 runtime：看 [docs/runbooks/command-and-capability-matrix.md](docs/runbooks/command-and-capability-matrix.md) 和 [docs/runbooks/runtime-capabilities-overview.md](docs/runbooks/runtime-capabilities-overview.md)
 - 想直接查本地 audit jsonl：运行 `node scripts/query-audit-logs.js --summary-only`
@@ -618,7 +610,7 @@ npx @colin4k1024/tsp-create --from-source
 - 示例怎么选：看 [examples/INDEX.md](examples/INDEX.md)
 - 想直接复制 examples 里的会话脚本：看 [examples/claude-conversation-script.md](examples/claude-conversation-script.md)、[examples/codex-conversation-script.md](examples/codex-conversation-script.md)、[examples/role-conversation-scripts.md](examples/role-conversation-scripts.md)
 - 想按任务类型直接复制示例：看 [examples/claude-scenario-playbook.md](examples/claude-scenario-playbook.md) 和 [examples/codex-scenario-playbook.md](examples/codex-scenario-playbook.md)
-- 想给私有 enterprise overlay 留安装位：看 [docs/runbooks/enterprise-overlay.md](docs/runbooks/enterprise-overlay.md)
+- 想创建自定义扩展 overlay：看 [docs/runbooks/custom-overlay.md](docs/runbooks/custom-overlay.md)
 
 ## 文档入口
 
@@ -663,7 +655,7 @@ npx @colin4k1024/tsp-create --from-source
 
 **运维与进阶**
 
-- [docs/runbooks/enterprise-overlay.md](docs/runbooks/enterprise-overlay.md)
+- [docs/runbooks/custom-overlay.md](docs/runbooks/custom-overlay.md)
 - [docs/runbooks/external-capability-intake.md](docs/runbooks/external-capability-intake.md)
 - [docs/runbooks/command-and-capability-matrix.md](docs/runbooks/command-and-capability-matrix.md)
 - [docs/runbooks/ecc-harness-usage.md](docs/runbooks/ecc-harness-usage.md)
@@ -674,8 +666,6 @@ npx @colin4k1024/tsp-create --from-source
 
 **演示与材料**
 
-- [docs/runbooks/team-delivery-brief-2026-03-29.md](docs/runbooks/team-delivery-brief-2026-03-29.md)
-- [docs/runbooks/version-closure-2026-03-29.md](docs/runbooks/version-closure-2026-03-29.md)
 - [docs/runbooks/demo-scenario.md](docs/runbooks/demo-scenario.md)
 - [docs/runbooks/demo-execution-log.md](docs/runbooks/demo-execution-log.md)
 - [docs/presentation/README.md](docs/presentation/README.md)

@@ -47,10 +47,10 @@
     "status": "started",
     "call_id": "50319a58524145328c1f450ff5aa30d3",
     "session_id": "md-smoke",
-    "project_path": "/Users/jiafan/Desktop/poc/harness-demo",
+    "project_path": "/path/to/your/project",
     "source": "tech-lead",
     "payload": {
-      "requirement": "为 harness-demo 添加 tests/test_platform_smoke.py，验证平台安装产物关键路径（roles/skills/commands/规则/marketplace）均存在",
+      "requirement": "为本平台添加 tests/test_platform_smoke.py，验证平台安装产物关键路径（roles/skills/commands/规则/marketplace）均存在",
       "priority": "high",
       "roles_involved": [
         "tech-lead",
@@ -69,7 +69,7 @@
     "status": "success",
     "call_id": "50319a58524145328c1f450ff5aa30d3",
     "session_id": "md-smoke",
-    "project_path": "/Users/jiafan/Desktop/poc/harness-demo",
+    "project_path": "/path/to/your/project",
     "source": "tech-lead",
     "payload": {
       "output": "intake-complete",
@@ -90,7 +90,7 @@
     "status": "started",
     "call_id": "7d052f7914bc42aaadf6e8adc89a2288",
     "session_id": "md-smoke",
-    "project_path": "/Users/jiafan/Desktop/poc/harness-demo",
+    "project_path": "/path/to/your/project",
     "source": "tech-lead",
     "payload": {
       "based_on": "intake-complete"
@@ -104,7 +104,7 @@
     "status": "success",
     "call_id": "7d052f7914bc42aaadf6e8adc89a2288",
     "session_id": "md-smoke",
-    "project_path": "/Users/jiafan/Desktop/poc/harness-demo",
+    "project_path": "/path/to/your/project",
     "source": "tech-lead",
     "payload": {
       "tasks": [
@@ -128,7 +128,7 @@
     "status": "started",
     "call_id": "a038518ee0224379900b344d2b12ae0e",
     "session_id": "md-smoke",
-    "project_path": "/Users/jiafan/Desktop/poc/harness-demo",
+    "project_path": "/path/to/your/project",
     "source": "backend-engineer",
     "payload": {
       "task": "create tests/test_platform_smoke.py"
@@ -142,7 +142,7 @@
     "status": "success",
     "call_id": "a038518ee0224379900b344d2b12ae0e",
     "session_id": "md-smoke",
-    "project_path": "/Users/jiafan/Desktop/poc/harness-demo",
+    "project_path": "/path/to/your/project",
     "source": "backend-engineer",
     "payload": {
       "file_created": "tests/test_platform_smoke.py",
@@ -158,7 +158,7 @@
     "status": "started",
     "call_id": "e72c93cb5a284b81a9144f2722f09635",
     "session_id": "md-smoke",
-    "project_path": "/Users/jiafan/Desktop/poc/harness-demo",
+    "project_path": "/path/to/your/project",
     "source": "qa-engineer",
     "payload": {
       "test_file": "tests/test_platform_smoke.py"
@@ -172,7 +172,7 @@
     "status": "success",
     "call_id": "e72c93cb5a284b81a9144f2722f09635",
     "session_id": "md-smoke",
-    "project_path": "/Users/jiafan/Desktop/poc/harness-demo",
+    "project_path": "/path/to/your/project",
     "source": "qa-engineer",
     "payload": {
       "pytest_exit_code": 0,

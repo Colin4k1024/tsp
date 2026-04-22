@@ -25,7 +25,7 @@
 - 保留通用底座：由 `architect` / `tech-lead` 直接承担方案决策
 - 接口契约、兼容性和错误处理由 `architect` / `backend-engineer` 直接承担
 - 发布风险、回滚和监控由 `/team-release` 与发布治理 runbook 承接
-- private enterprise overlay 默认关闭，只在 intake 或 plan 明确命中私有流程、权限或企业域能力时再启用；具体安装约定看 [../docs/runbooks/enterprise-overlay.md](../docs/runbooks/enterprise-overlay.md)
+- custom overlay 默认不安装，只在 intake 或 plan 明确命中团队专属流程、权限或领域能力时再叠加；具体安装约定看 [../docs/runbooks/custom-overlay.md](../docs/runbooks/custom-overlay.md)
 
 ### 3. 命令流更强调后端拆解与评审
 
@@ -39,7 +39,7 @@
 - 改数据库必须说明迁移和回滚策略
 - 自测必须覆盖单测、集成测试和关键边界态
 - 构建失败优先使用 `/build-fix`，但最终修复结论回到主链
-- 涉及私有企业能力时，在 intake 或 plan 阶段显式声明是否需要启用 enterprise overlay
+- 涉及团队专属能力时，在 intake 或 plan 阶段显式声明是否需要叠加 custom overlay
 
 ### 5. 默认交付物也要后端化
 
@@ -87,7 +87,7 @@
 - 改数据库必须说明迁移和回滚策略
 - 自测必须覆盖单测、集成测试和关键边界态
 - 构建失败优先使用 `/build-fix`，但最终修复结论回到主链
-- private enterprise overlay 默认关闭，只在 intake 或 plan 明确命中私有流程、权限或企业域能力时再启用；具体场景先看 [../docs/runbooks/enterprise-overlay.md](../docs/runbooks/enterprise-overlay.md)
+- custom overlay 默认不安装，只在 intake 或 plan 明确命中团队专属流程或领域能力时再叠加；具体场景先看 [../docs/runbooks/custom-overlay.md](../docs/runbooks/custom-overlay.md)
 
 ## 常用提示模板
 
@@ -96,7 +96,7 @@
 目标：新增订单审批状态流转 API
 范围：接口、权限校验、测试计划
 不做：前端页面
-约束：评估是否需要 private enterprise overlay
+约束：评估是否需要叠加 custom overlay
 ```
 
 ```text
@@ -108,4 +108,4 @@
 
 如果仓库同时承载前端管理台，建议改用 [project-CLAUDE.md](project-CLAUDE.md) 或在此基础上补充前端角色、前端技能和 UI 质量门禁说明。
 
-如果项目长期涉及私有流程、权限或企业发布观察，建议把 enterprise overlay 的使用约束并回项目模板，而不是继续写零散注释。
+如果项目长期涉及团队专属流程、权限或发布扩展，建议把 custom overlay 的使用约束并回项目模板，而不是继续写零散注释。

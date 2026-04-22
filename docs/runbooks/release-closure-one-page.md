@@ -30,7 +30,7 @@ owner: 工程团队
 - 观察窗口与核心指标
 - 回滚条件与步骤
 - 责任链
-- private enterprise overlay 或 runbook 执行记录
+- custom overlay 或 runbook 执行记录
 
 ## 4. 最短回写示例
 

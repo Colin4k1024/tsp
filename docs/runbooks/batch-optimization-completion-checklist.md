@@ -11,22 +11,21 @@ owner: 工程团队
 本文用于快速回答一个问题：这轮批量优化到底已经完成了什么。
 
 如果你想看减法判断依据，继续看 [../plans/llm-surface-reduction-audit.md](../plans/llm-surface-reduction-audit.md)。如果你想看逐阶段执行历史，继续看 [../plans/llm-surface-reduction-execution-history.md](../plans/llm-surface-reduction-execution-history.md)。
-如果你想直接转发给团队，继续看 [team-delivery-brief-2026-03-29.md](team-delivery-brief-2026-03-29.md)。
 
 ## 1. 文档入口收敛
 
 ### 1.1 已完成
 
-- [README.md](../../README.md) 已补齐 Claude、Codex、private enterprise overlay 场景和输出模板入口。
+- [README.md](../../README.md) 已补齐 Claude、Codex、custom overlay 场景和输出模板入口。
 - [team-skills-usage.md](team-skills-usage.md) 已补齐 overlay、runbook、toolkit 的最短入口与阅读顺序。
-- [enterprise-overlay-integration.md](enterprise-overlay-integration.md) 已补齐正式 private enterprise overlay、runbook、toolkit 的分层说明和回落规则。
-- [enterprise-extension-quick-start.md](enterprise-extension-quick-start.md) 已从“company + runbook”扩展为“company + runbook + toolkit”的最短判断路径。
+-  已补齐正式 custom overlay、runbook、toolkit 的分层说明和回落规则。
+- [custom-overlay.md](custom-overlay.md) 已从“company + runbook”扩展为“company + runbook + toolkit”的最短判断路径。
 - [batch-optimization-completion-checklist.md](batch-optimization-completion-checklist.md) 当前文档已作为本轮收口入口。
 
 ### 1.2 当前结果
 
 - 用户现在可以从总入口直接判断一个能力应该进入 company、runbook 还是 toolkit。
-- private enterprise overlay 场景不再只覆盖 私有流程、权限集成、GitLab、Langfuse，也明确覆盖 biz-service-designer 这类设计态 toolkit。
+- custom overlay 场景不再只覆盖 私有流程、权限集成、GitLab、Langfuse，也明确覆盖 biz-service-designer 这类设计态 toolkit。
 
 ## 2. Examples 层补齐
 

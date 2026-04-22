@@ -174,7 +174,7 @@ Agent 启动时加载顺序：
 
 ### 与既有体系映射
 
-| context-engineering 文档 | harness-demo 既有产物 | 关系 |
+| context-engineering 文档 | Team Skills Platform 既有产物 | 关系 |
 |--------------------------|---------------------|------|
 | PROJECT.md | PRD 背景/约束 + Delivery Plan 版本目标 | 精简聚合 |
 | REQUIREMENTS.md | PRD 用户故事/验收标准 | token 受控子集 |

@@ -11,7 +11,7 @@
 - 需要规划时优先走 `/team-intake` -> `/team-plan`
 - 需要专项分析时使用 `/plan`、`/code-review`、`/build-fix`，但结论必须回到 `/handoff` 或 `/team-*`
 - 前端任务默认补齐响应式、A11y、性能和 `ui-review-checklist`
-- 如果涉及私有流程、权限中心或公司域扩展，明确说明是否需要启用 enterprise overlay；安装约定看 [../docs/runbooks/enterprise-overlay.md](../docs/runbooks/enterprise-overlay.md)
+- 如果涉及私有流程、权限中心或公司域扩展，明确说明是否需要启用 enterprise overlay；安装约定看 [../docs/runbooks/custom-overlay.md](../docs/runbooks/custom-overlay.md)
 
 常用入口：
 

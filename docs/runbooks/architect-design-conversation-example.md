@@ -20,8 +20,8 @@ owner: 工程团队
 
 ```text
 请以 architect 视角处理当前任务。
-输出：系统边界、接口契约、数据约束、主要技术风险、是否需要 private enterprise overlay。
-如果需要 private enterprise overlay，请区分候选项和正式启用项。
+输出：系统边界、接口契约、数据约束、主要技术风险、是否需要 custom overlay。
+如果需要 custom overlay，请区分候选项和正式启用项。
 ```
 
 ## 3. 期望结果长什么样

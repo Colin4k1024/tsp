@@ -28,7 +28,7 @@ owner: 工程团队
 - 前后端协作
 - handoff 交接
 - review 收口
-- 是否启用 private enterprise overlay 的判断
+- 是否启用 custom overlay 的判断
 
 ## 2. 演练前准备
 
@@ -46,7 +46,7 @@ owner: 工程团队
 
 - `/handoff` 命令`：用于生成或汇总结构化交接结果
 - `handoff 交接文档`：指 `/handoff` 命令产出的结构化交接内容
-- `private enterprise overlay 候选项`：在 intake 阶段被识别，但尚未正式启用的公司领域能力
+- `custom overlay 候选项`：在 intake 阶段被识别，但尚未正式启用的公司领域能力
 
 ## 3. 第一步：/team-intake
 
@@ -58,7 +58,7 @@ owner: 工程团队
 范围：前端列表页、筛选表单、后端查询接口、测试计划
 不做：审批流程定义改造、历史数据回填、发布脚本重构
 约束：前端必须附带 ui-review-checklist；后端必须说明接口兼容性；需要判断是否启用 私有流程或权限集成
-输出：参与角色、主要风险、是否建议启用 private enterprise overlay、下一步建议
+输出：参与角色、主要风险、是否建议启用 custom overlay、下一步建议
 ```
 
 ### 3.2 期望输出重点
@@ -71,7 +71,7 @@ owner: 工程团队
 - 主要风险：前后端筛选参数一致性、权限口径、空态和错误态是否一致
 - 下一步命令：进入 `/team-plan`
 
-这一阶段只需要识别 `private enterprise overlay 候选项`，不要在 intake 阶段仓促下最终启用决定。
+这一阶段只需要识别 `custom overlay 候选项`，不要在 intake 阶段仓促下最终启用决定。
 
 一个简化判断可以这样写：
 
@@ -99,7 +99,7 @@ overlay 候选项：
 ```text
 /team-plan
 基于当前 intake 结果，拆解 architect、frontend-engineer、backend-engineer、qa-engineer 的任务。
-要求给出依赖关系、技能装配清单、每次 handoff 的最小交付物，并明确 private enterprise overlay 是否启用。
+要求给出依赖关系、技能装配清单、每次 handoff 的最小交付物，并明确 custom overlay 是否启用。
 ```
 
 ### 4.2 期望输出重点
@@ -110,7 +110,7 @@ overlay 候选项：
 - 依赖关系：接口契约先于页面联调，筛选字段定义先于 QA 编写用例
 - 技能装配清单：`shared`、`ecc`、`company` 三层是否启用
 - handoff 交付物：架构说明、实现结果、自测证据、QA 关注点
-- 是否启用 private enterprise overlay：如果只是审批记录查询，一般应结论为 `enterprise: 未启用` 或 `候选已识别但本次不启用`
+- 是否启用 custom overlay：如果只是审批记录查询，一般应结论为 `enterprise: 未启用` 或 `候选已识别但本次不启用`
 
 本步骤标准输出建议对照 [team-command-output-contracts.md](team-command-output-contracts.md) 中 `/team-plan` 的 `技能装配清单`。
 
@@ -141,7 +141,7 @@ overlay 候选项：
 
 - frontend-engineer：页面和交互实现完成，附带响应式、自测截图或 checklist 结论
 - backend-engineer：接口、权限和测试完成，附带兼容性说明和测试结果
-- 领域扩展执行记录：若实际启用了 private enterprise overlay，必须按 [team-command-output-contracts.md](team-command-output-contracts.md) 回落记录
+- 领域扩展执行记录：若实际启用了 custom overlay，必须按 [team-command-output-contracts.md](team-command-output-contracts.md) 回落记录
 - 待确认事项：例如筛选项默认值、空态文案、权限口径边界
 
 本步骤标准输出建议对照 [team-command-output-contracts.md](team-command-output-contracts.md) 中 `/team-execute` 的 `领域扩展执行记录`。
@@ -150,7 +150,7 @@ overlay 候选项：
 
 - 把 execute 写成一句“已完成开发”
 - 只给代码 diff，不给自测证据
-- 已经使用了 private enterprise overlay，却没有记录 `能力名`、`输入来源`、`执行结果`
+- 已经使用了 custom overlay，却没有记录 `能力名`、`输入来源`、`执行结果`
 
 ## 6. 第四步：/handoff
 
@@ -170,7 +170,7 @@ handoff 的作用是把 execute 结果从“各自完成了什么”整理成“
 - 自测范围与证据
 - 剩余风险
 - QA 关注点
-- 若命中 private enterprise overlay，则附带技能装配清单或领域扩展执行记录
+- 若命中 custom overlay，则附带技能装配清单或领域扩展执行记录
 
 这里说的 `handoff 交接文档`，指的是 `/handoff` 命令整理出的结构化结果。它通常承载在本次对话输出、任务记录或评审上下文中，不要求额外创建独立文件，但必须保留结构化字段。
 
@@ -221,7 +221,7 @@ QA 关注点：
 
 1. 团队是否真的跑通了主链
 2. handoff 是否足够支撑 QA 接手
-3. private enterprise overlay 是否被正确判断并回落记录
+3. custom overlay 是否被正确判断并回落记录
 4. 哪一步最容易丢失结构化输出
 
 ## 8. 演练完成后的复盘
@@ -233,7 +233,7 @@ QA 关注点：
 - 哪些字段最容易漏
 - 哪些内容应该写进项目级 `CLAUDE.md`
 
-如果复盘发现每次都漏同一类内容，比如前端证据、数据库回滚说明或 private enterprise overlay 判断，可以把这类要求提升到项目级工作约定中。
+如果复盘发现每次都漏同一类内容，比如前端证据、数据库回滚说明或 custom overlay 判断，可以把这类要求提升到项目级工作约定中。
 
 ## 9. 下一步怎么做
 

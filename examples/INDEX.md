@@ -24,8 +24,8 @@
 - `claude-scenario-playbook.md`：Claude 端按任务类型选示例的场景集
 - `codex-conversation-script.md`：Codex 端可直接复制的会话脚本
 - `codex-scenario-playbook.md`：Codex 端按任务类型选示例的场景集
-- `enterprise-overlay-scenario-playbook.md`：私有企业扩展场景的兼容占位入口
-- `enterprise-overlay-output-playbook.md`：私有企业扩展输出示例的兼容占位入口
+- `enterprise-overlay-scenario-playbook.md`：自定义 overlay 扩展场景的兼容占位入口
+- `enterprise-overlay-output-playbook.md`：自定义 overlay 扩展输出示例的兼容占位入口
 - `role-conversation-scripts.md`：角色级高频会话脚本合集
 - `project-type-starter-playbook.md`：按项目类型直接复制 Claude / Codex 起手句
 - `vertical-project-conversation-scripts.md`：更垂直项目类型的连续对话脚本
@@ -45,7 +45,7 @@
 | 前后端混合、中后台平台、角色较完整 | [project-CLAUDE.md](project-CLAUDE.md) | 结构最完整，适合作为默认主模板 |
 | Next.js / React / Tailwind，前端是主战场 | [saas-nextjs-CLAUDE.md](saas-nextjs-CLAUDE.md) | 这是前端差异指南，告诉你如何从主模板收缩到前端版 |
 | Spring Boot / JPA / MySQL，后端是主战场 | [springboot-service-CLAUDE.md](springboot-service-CLAUDE.md) | 这是后端差异指南，告诉你如何从主模板收缩到后端版 |
-| 审批流 / 工作流 / 权限联动明显的企业项目 | [workflow-enterprise-CLAUDE.md](workflow-enterprise-CLAUDE.md) | 适合长期命中 private enterprise overlay 与发布治理的场景 |
+| 审批流 / 工作流 / 权限联动明显的企业项目 | [workflow-enterprise-CLAUDE.md](workflow-enterprise-CLAUDE.md) | 适合长期命中 custom overlay 与发布治理的场景 |
 | 命令 / skills / docs / hooks 为主的平台治理仓库 | [platform-governance-CLAUDE.md](platform-governance-CLAUDE.md) | 适合平台基建、治理和能力同步任务 |
 | BI 看板 / 运营分析台 / 报表中心 | [data-analytics-dashboard-CLAUDE.md](data-analytics-dashboard-CLAUDE.md) | 适合指标口径、图表、查询性能和导出边界都很重要的项目 |
 | GitHub Actions / 供应链治理仓库 | [github-actions-supply-chain-CLAUDE.md](github-actions-supply-chain-CLAUDE.md) | 适合 workflow、permissions、attestation、SBOM、签名治理 |
@@ -62,8 +62,8 @@
 | 想按 Claude 任务类型直接选脚本 | [claude-scenario-playbook.md](claude-scenario-playbook.md) | 适合按“新功能 / 小修复 / 发布 / specialist 收口”快速起手 |
 | 想直接复制 Codex 对话脚本 | [codex-conversation-script.md](codex-conversation-script.md) | 适合先跑并行编排和收口示例 |
 | 想按 Codex 并行场景直接选脚本 | [codex-scenario-playbook.md](codex-scenario-playbook.md) | 适合按“前端并行 / 后端并行 / build-fix / 发布”快速起手 |
-| 想快速判断是否需要私有企业扩展 | [../docs/runbooks/enterprise-overlay.md](../docs/runbooks/enterprise-overlay.md) | 适合先确认任务是否依赖 private enterprise overlay |
-| 想看私有企业扩展兼容入口 | [../docs/runbooks/enterprise-extension-quick-start.md](../docs/runbooks/enterprise-extension-quick-start.md) | 适合保留企业扩展入口，但不在公开仓承载内部内容 |
+| 想快速判断是否需要自定义 overlay 扩展 | [../docs/runbooks/custom-overlay.md](../docs/runbooks/custom-overlay.md) | 适合先确认任务是否依赖 custom overlay |
+| 想看自定义 overlay 扩展兼容入口 | [../docs/runbooks/custom-overlay.md](../docs/runbooks/custom-overlay.md) | 适合保留企业扩展入口，但不在公开仓承载内部内容 |
 | 想按角色复制高频说法 | [role-conversation-scripts.md](role-conversation-scripts.md) | 适合 QA、DevOps、Tech Lead、PM、Architect |
 | 想按项目类型直接复制第一段话 | [project-type-starter-playbook.md](project-type-starter-playbook.md) | 适合流程型企业项目、平台治理仓库、数据看板项目 |
 | 想先体验 TDD、Harness Audit 或 runtime 能力 | [claude-scenario-playbook.md](claude-scenario-playbook.md) / [codex-scenario-playbook.md](codex-scenario-playbook.md) | 适合按能力而不是按项目类型起手 |
@@ -95,17 +95,17 @@
 1. 先看 [springboot-service-CLAUDE.md](springboot-service-CLAUDE.md)
 2. 如果后续前端交付变重，再补充通用版中的前端门禁和角色链路
 
-### 路径 D：私有企业扩展场景
+### 路径 D：自定义 overlay 扩展场景
 
-1. 先看 [../docs/runbooks/enterprise-overlay.md](../docs/runbooks/enterprise-overlay.md)
-2. 再看 [../docs/runbooks/enterprise-extension-quick-start.md](../docs/runbooks/enterprise-extension-quick-start.md)
+1. 先看 [../docs/runbooks/custom-overlay.md](../docs/runbooks/custom-overlay.md)
+2. 再看 [../docs/runbooks/custom-overlay.md](../docs/runbooks/custom-overlay.md)
 3. 最后再回到 [project-CLAUDE.md](project-CLAUDE.md) 或你的项目模板，把长期有效的 overlay 约束并回项目级配置
 
 ### 路径 E：流程型企业项目
 
 1. 先看 [workflow-enterprise-CLAUDE.md](workflow-enterprise-CLAUDE.md)
-2. 再补看 [../docs/runbooks/enterprise-overlay.md](../docs/runbooks/enterprise-overlay.md)
-3. 如果发布与观察要求较重，再看 [../docs/runbooks/enterprise-extension-quick-start.md](../docs/runbooks/enterprise-extension-quick-start.md)
+2. 再补看 [../docs/runbooks/custom-overlay.md](../docs/runbooks/custom-overlay.md)
+3. 如果发布与观察要求较重，再看 [../docs/runbooks/custom-overlay.md](../docs/runbooks/custom-overlay.md)
 
 ### 路径 F：平台治理仓库
 
@@ -180,11 +180,11 @@
 | 默认角色 | 更完整 | 更偏前端 | 更偏后端 |
 | 默认命令流 | 主链完整 | 更强调 `/multi-frontend` | 更强调 `/multi-backend` |
 | 默认技能装配 | shared + 前后端 + 通用专项 | shared + 前端专项 | shared + 后端专项 |
-| private enterprise overlay | 默认关闭，按任务判断 | 默认关闭，通常较少启用 | 默认关闭，但更可能命中流程或权限场景 |
+| custom overlay | 默认关闭，按任务判断 | 默认关闭，通常较少启用 | 默认关闭，但更可能命中流程或权限场景 |
 
 补充理解：
 
-- `workflow-enterprise-CLAUDE.md` 更强调 private enterprise overlay 判断、发布观察和完整主链
+- `workflow-enterprise-CLAUDE.md` 更强调 custom overlay 判断、发布观察和完整主链
 - `platform-governance-CLAUDE.md` 更强调 `/tdd`、`/harness-audit` 和文档一致性
 - `data-analytics-dashboard-CLAUDE.md` 更强调指标口径、图表交互、查询性能和导出边界
 - `github-actions-supply-chain-CLAUDE.md` 更强调 workflow 门禁、token 权限、provenance 与发布证据链
@@ -210,8 +210,8 @@
 - Claude 按场景选：看 [claude-scenario-playbook.md](claude-scenario-playbook.md)
 - Codex 直接开跑：看 [codex-conversation-script.md](codex-conversation-script.md)
 - Codex 按场景选：看 [codex-scenario-playbook.md](codex-scenario-playbook.md)
-- 私有企业扩展兼容入口：看 [enterprise-overlay-scenario-playbook.md](enterprise-overlay-scenario-playbook.md)
-- 私有企业扩展输出兼容入口：看 [enterprise-overlay-output-playbook.md](enterprise-overlay-output-playbook.md)
+- 自定义 overlay 扩展兼容入口：看 [enterprise-overlay-scenario-playbook.md](enterprise-overlay-scenario-playbook.md)
+- 自定义 overlay 扩展输出兼容入口：看 [enterprise-overlay-output-playbook.md](enterprise-overlay-output-playbook.md)
 - 按角色补局部收口：看 [role-conversation-scripts.md](role-conversation-scripts.md)
 - 按项目类型直接复制起手句：看 [project-type-starter-playbook.md](project-type-starter-playbook.md)
 - 按更垂直项目类型复制连续脚本：看 [vertical-project-conversation-scripts.md](vertical-project-conversation-scripts.md)

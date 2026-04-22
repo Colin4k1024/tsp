@@ -70,8 +70,8 @@ async function run() {
 
   test('normalizeRepositorySlug supports git+https github urls', () => {
     assert.strictEqual(
-      normalizeRepositorySlug({ url: 'git+https://github.com/Colin4k1024/harness-engineering.git' }),
-      'Colin4k1024/harness-engineering'
+      normalizeRepositorySlug({ url: 'git+https://github.com/Colin4k1024/tsp.git' }),
+      'Colin4k1024/tsp'
     );
   });
 
@@ -104,7 +104,7 @@ async function run() {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'prebuilt-sync-local-'));
     fs.writeFileSync(
       path.join(root, 'package.json'),
-      JSON.stringify({ name: '@colin4k1024/tsp-create', version: '2.1.4', repository: { url: 'git+https://github.com/Colin4k1024/harness-engineering.git' } }),
+      JSON.stringify({ name: '@colin4k1024/tsp', version: '2.1.4', repository: { url: 'git+https://github.com/Colin4k1024/tsp.git' } }),
       'utf8'
     );
     const binaryPath = path.join(root, 'bin', 'prebuilt', 'darwin-arm64');
@@ -140,7 +140,7 @@ async function run() {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'prebuilt-sync-'));
     fs.writeFileSync(
       path.join(root, 'package.json'),
-      JSON.stringify({ version: '2.1.5', repository: { url: 'git+https://github.com/Colin4k1024/harness-engineering.git' } }),
+      JSON.stringify({ version: '2.1.5', repository: { url: 'git+https://github.com/Colin4k1024/tsp.git' } }),
       'utf8'
     );
 
@@ -176,7 +176,7 @@ async function run() {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'prebuilt-sync-npm-'));
     fs.writeFileSync(
       path.join(root, 'package.json'),
-      JSON.stringify({ name: '@colin4k1024/tsp-create', version: '2.1.5', repository: { url: 'git+https://github.com/Colin4k1024/harness-engineering.git' } }),
+      JSON.stringify({ name: '@colin4k1024/tsp', version: '2.1.5', repository: { url: 'git+https://github.com/Colin4k1024/tsp.git' } }),
       'utf8'
     );
 
@@ -191,7 +191,7 @@ async function run() {
       if (url.includes('/repos/')) {
         return { ok: false, status: 404, arrayBuffer: async () => new ArrayBuffer(0) };
       }
-      if (url === 'https://registry.npmjs.org/%40colin4k1024%2Ftsp-create') {
+      if (url === 'https://registry.npmjs.org/%40colin4k1024%2Ftsp') {
         const integrity = `sha512-${crypto.createHash('sha512').update(tarball).digest('base64')}`;
         return {
           ok: true,
@@ -202,14 +202,14 @@ async function run() {
               '2.1.3': {
                 dist: {
                   integrity,
-                  tarball: 'https://registry.npmjs.org/@colin4k1024/tsp-create/-/colin4k1024-tsp-create-2.1.3.tgz',
+                  tarball: 'https://registry.npmjs.org/@colin4k1024/tsp/-/colin4k1024-tsp-2.1.3.tgz',
                 },
               },
             },
           }),
         };
       }
-      if (url === 'https://registry.npmjs.org/@colin4k1024/tsp-create/-/colin4k1024-tsp-create-2.1.3.tgz') {
+      if (url === 'https://registry.npmjs.org/@colin4k1024/tsp/-/colin4k1024-tsp-2.1.3.tgz') {
         return {
           ok: true,
           status: 200,
@@ -242,7 +242,7 @@ async function run() {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'prebuilt-sync-missing-'));
     fs.writeFileSync(
       path.join(root, 'package.json'),
-      JSON.stringify({ name: '@colin4k1024/tsp-create', version: '2.1.5', repository: { url: 'git+https://github.com/Colin4k1024/harness-engineering.git' } }),
+      JSON.stringify({ name: '@colin4k1024/tsp', version: '2.1.5', repository: { url: 'git+https://github.com/Colin4k1024/tsp.git' } }),
       'utf8'
     );
 
@@ -252,7 +252,7 @@ async function run() {
       if (url.includes('/repos/')) {
         return { ok: false, status: 404, arrayBuffer: async () => new ArrayBuffer(0) };
       }
-      if (url === 'https://registry.npmjs.org/%40colin4k1024%2Ftsp-create') {
+      if (url === 'https://registry.npmjs.org/%40colin4k1024%2Ftsp') {
         const integrity = `sha512-${crypto.createHash('sha512').update(tarball).digest('base64')}`;
         return {
           ok: true,
@@ -263,14 +263,14 @@ async function run() {
               '2.1.3': {
                 dist: {
                   integrity,
-                  tarball: 'https://registry.npmjs.org/@colin4k1024/tsp-create/-/colin4k1024-tsp-create-2.1.3.tgz',
+                  tarball: 'https://registry.npmjs.org/@colin4k1024/tsp/-/colin4k1024-tsp-2.1.3.tgz',
                 },
               },
             },
           }),
         };
       }
-      if (url === 'https://registry.npmjs.org/@colin4k1024/tsp-create/-/colin4k1024-tsp-create-2.1.3.tgz') {
+      if (url === 'https://registry.npmjs.org/@colin4k1024/tsp/-/colin4k1024-tsp-2.1.3.tgz') {
         return {
           ok: true,
           status: 200,
@@ -314,7 +314,7 @@ async function run() {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'prebuilt-sync-write-'));
     fs.writeFileSync(
       path.join(root, 'package.json'),
-      JSON.stringify({ version: '2.1.5', repository: { url: 'git+https://github.com/Colin4k1024/harness-engineering.git' } }),
+      JSON.stringify({ version: '2.1.5', repository: { url: 'git+https://github.com/Colin4k1024/tsp.git' } }),
       'utf8'
     );
 

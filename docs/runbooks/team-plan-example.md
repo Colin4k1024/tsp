@@ -58,5 +58,5 @@ owner: 工程团队
 ## 4. 常见错误
 
 - 只有任务拆分，没有依赖和风险
-- private enterprise overlay启用结果没写清楚
+- custom overlay启用结果没写清楚
 - 前端检查点没有进入计划输出

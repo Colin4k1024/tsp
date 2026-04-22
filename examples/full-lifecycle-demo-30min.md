@@ -75,7 +75,7 @@
 
 - 有需求复杂度，但不抽象
 - 同时包含产品、流程、权限、前后端、通知、归档
-- 很适合演示 private enterprise overlay、shared skills、主链命令和 artifact 落盘
+- 很适合演示 custom overlay、shared skills、主链命令和 artifact 落盘
 
 ### 4.2 现场展示的需求摘要
 
@@ -143,7 +143,7 @@
 
 如果观众对企业项目感兴趣，可以多讲 1 分钟：
 
-- 为什么这里会识别 private enterprise overlay
+- 为什么这里会识别 custom overlay
 - 为什么数据合规和权限问题要在 intake 就出现
 
 ## 6. 环节二：/team-plan（7-12 分钟）

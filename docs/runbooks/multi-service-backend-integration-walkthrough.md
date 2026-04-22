@@ -14,7 +14,7 @@ owner: 工程团队
 
 - 任务：订单服务新增审批记录查询能力，并与权限服务联动
 - 涉及：接口契约、权限判断、测试和发布风险
-- 可能命中：private enterprise overlay 候选项
+- 可能命中：custom overlay 候选项
 
 ## 2. 推荐链路
 
@@ -44,7 +44,7 @@ owner: 工程团队
 - 接口兼容性说明
 - 集成测试结果
 - 权限边界结果
-- 如果启用了 private enterprise overlay，补执行记录
+- 如果启用了 custom overlay，补执行记录
 
 ## 6. verify 阶段要特别验证什么
 
@@ -56,6 +56,6 @@ owner: 工程团队
 
 - 只有本服务视角，没有跨服务依赖视角
 - 接口改了，但没有给消费方明确 handoff
-- private enterprise overlay 已经命中，却没有任何记录
+- custom overlay 已经命中，却没有任何记录
 
 与后端日常说明配合阅读：[backend-engineer-daily-operations.md](backend-engineer-daily-operations.md)

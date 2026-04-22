@@ -23,7 +23,7 @@ owner: 工程团队
 
 - 目标是否单一且可执行
 - 范围外事项是否明确
-- private enterprise overlay 是否只是候选项还是需要进入 plan
+- custom overlay 是否只是候选项还是需要进入 plan
 - 当前任务适合短链路还是完整主链
 
 ## 3. plan 阶段必须确认什么
@@ -60,7 +60,7 @@ owner: 工程团队
 ## 6. 常见错误
 
 - 让多个角色并行输出，却没有单点收口
-- 在 intake 阶段过早拍板 private enterprise overlay
+- 在 intake 阶段过早拍板 custom overlay
 - 把 specialist 结论当成最终决定
 - 平台治理问题没有和业务交付问题区分，导致该用 `/harness-audit` 时还在做零散 review
 

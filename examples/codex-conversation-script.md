@@ -53,7 +53,7 @@
 目标：新增订单审批状态流转接口
 范围：接口、权限校验、测试计划
 不做：前端页面
-约束：如果命中私有企业扩展场景，先判断是否需要 enterprise overlay
+约束：如果命中自定义 overlay 扩展场景，先判断是否需要 enterprise overlay
 ```
 
 第二句：
@@ -68,7 +68,7 @@
 ```text
 /multi-backend
 基于当前 intake 或 plan，把接口实现、权限边界、测试策略三部分并行分析。
-如果命中 private enterprise overlay 或私有 runbook 扩展，请明确说明是正式启用、仅保留候选，还是按场景使用。
+如果命中 custom overlay 或私有 runbook 扩展，请明确说明是正式启用、仅保留候选，还是按场景使用。
 最终请整理出可直接回写 /team-plan 的结果。
 ```
 
@@ -106,6 +106,6 @@
 - 并行前先做 intake，不要直接开跑多个 specialist
 - 并行后第一件事永远是收口到 handoff
 - 如果你想知道 `/tdd`、`/harness-audit` 分别适合什么任务，先看 [../docs/runbooks/specialist-commands-playbook.md](../docs/runbooks/specialist-commands-playbook.md)
-- 如果任务已经落到私有企业扩展场景，先看 [../docs/runbooks/enterprise-overlay.md](../docs/runbooks/enterprise-overlay.md) 和 [../docs/runbooks/enterprise-extension-quick-start.md](../docs/runbooks/enterprise-extension-quick-start.md)
+- 如果任务已经落到自定义 overlay 扩展场景，先看 [../docs/runbooks/custom-overlay.md](../docs/runbooks/custom-overlay.md) 和 [../docs/runbooks/custom-overlay.md](../docs/runbooks/custom-overlay.md)
 - 如果你想看更细的并行表达，继续看 [../docs/runbooks/codex-parallel-prompt-recipes.md](../docs/runbooks/codex-parallel-prompt-recipes.md)
 - 如果你想看完整成品对话，继续看 [../docs/runbooks/codex-end-to-end-conversation-example.md](../docs/runbooks/codex-end-to-end-conversation-example.md)

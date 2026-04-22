@@ -23,7 +23,7 @@ owner: 工程团队
 
 - 接口契约是否已明确
 - 是否涉及数据库变更
-- 是否涉及 private enterprise overlay，如 私有流程、权限集成
+- 是否涉及 custom overlay，如 私有流程、权限集成
 - 是否需要 architect 或 devops-engineer 提前介入
 
 ## 3. 实现时的固定检查
@@ -58,6 +58,6 @@ owner: 工程团队
 - 只交付代码，不交付兼容性说明
 - 数据库改了，但没有迁移和回滚方案
 - 明明适合先用 `/tdd` 锁定接口与测试边界，却直接写实现
-- private enterprise overlay 已用到，却没有执行记录
+- custom overlay 已用到，却没有执行记录
 
 后端专项场景可继续看 [../../examples/springboot-service-CLAUDE.md](../../examples/springboot-service-CLAUDE.md)。

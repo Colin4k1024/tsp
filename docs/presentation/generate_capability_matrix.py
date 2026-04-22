@@ -390,6 +390,7 @@ add_two_columns(s16, 'vertical 场景成熟度与使用方式',
     ]
 )
 
-output = '/Users/jiafan/Desktop/poc/harness-demo/docs/presentation/agent-capability-matrix.pptx'
+import os
+output = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'agent-capability-matrix.pptx')
 prs.save(output)
 print(f'PPTX saved: {output}')

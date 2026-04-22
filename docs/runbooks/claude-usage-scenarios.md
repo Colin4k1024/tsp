@@ -93,7 +93,6 @@ owner: 工程团队
 ## 5. 一页速查
 
 - 前端缺陷修复一页速查：[frontend-bugfix-one-page.md](frontend-bugfix-one-page.md)
-- 后端接口交付一页速查：[backend-api-delivery-one-page.md](backend-api-delivery-one-page.md)
 - 发布收口一页速查：[release-closure-one-page.md](release-closure-one-page.md)
 - 事故分诊一页速查：[incident-triage-one-page.md](incident-triage-one-page.md)
 - 管理层价值速查一页：[executive-value-one-page.md](executive-value-one-page.md)
@@ -115,8 +114,8 @@ owner: 工程团队
 
 ## 8. 企业扩展与发布收口
 
-- 私有 enterprise overlay 的接入说明：[enterprise-overlay.md](enterprise-overlay.md)
-- 企业扩展 quick start 占位入口：[enterprise-extension-quick-start.md](enterprise-extension-quick-start.md)
+- 自定义 overlay 扩展：[custom-overlay.md](custom-overlay.md)
+- 自定义 overlay 创建入口：[custom-overlay.md](custom-overlay.md)
 - Langfuse 追踪与可观测性集成指南：[langfuse-and-observability-integration-guide.md](langfuse-and-observability-integration-guide.md)
 - 发布治理阅读路径：[release-governance-reading-path.md](release-governance-reading-path.md)
 
@@ -165,10 +164,10 @@ owner: 工程团队
 2. 架构设计看 [architect-daily-operations.md](architect-daily-operations.md) 和 [system-architecture-design-walkthrough.md](system-architecture-design-walkthrough.md)
 3. 发布治理看 [canary-staging-release-walkthrough.md](canary-staging-release-walkthrough.md)、[production-incident-response-walkthrough.md](production-incident-response-walkthrough.md)、[release-rollback-recovery-walkthrough.md](release-rollback-recovery-walkthrough.md)
 
-### 8.8 私有企业扩展场景
+### 8.8 自定义 overlay 扩展场景
 
-1. 想判断是否需要私有企业扩展，先看 [enterprise-overlay.md](enterprise-overlay.md)
-2. 想看企业扩展兼容入口，继续看 [enterprise-extension-quick-start.md](enterprise-extension-quick-start.md)
+1. 想创建自定义 overlay，看 [custom-overlay.md](custom-overlay.md)
+2. 
 
 ### 8.9 按受众快速进入
 

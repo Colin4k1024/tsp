@@ -74,4 +74,4 @@ description: >
 1. 与 [systematic-debugging](../systematic-debugging/SKILL.md) 互补：PUA 负责高压推进，systematic-debugging 负责根因定位。
 2. 与 `/verify` 互补：PUA 强调“不要空口完成”，真正的验证证据仍应回流到 `/verify`、`/handoff`、`/team-review` 或 `/team-release`。
 3. 若启用了 always-on，SessionStart hook 会从本地状态恢复 flavor 和失败等级。
-4. 当前 harness-demo 不支持 UserPromptSubmit 级别的用户发火拦截，所以这部分是显式降级项；主要依赖 skill 语义触发、/pua 手动触发和失败后 hooks 升级。
+4. 当前本平台不支持 UserPromptSubmit 级别的用户发火拦截，所以这部分是显式降级项；主要依赖 skill 语义触发、/pua 手动触发和失败后 hooks 升级。

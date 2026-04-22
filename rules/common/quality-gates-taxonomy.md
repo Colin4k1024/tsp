@@ -2,7 +2,7 @@
 
 ## 来源
 
-融合 GSD gates 分类法与 harness-demo 现有质量门禁（前端门禁、handoff 契约、放行机制），
+融合 GSD gates 分类法与 Team Skills Platform 现有质量门禁（前端门禁、handoff 契约、放行机制），
 统一为四类 gate，使所有角色和 `/team-*` 命令使用一致的门禁语言。
 
 ## 分类

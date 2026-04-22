@@ -36,9 +36,9 @@ owner: 工程团队
 
 - [gitlab-manual-pipeline-release.md](gitlab-manual-pipeline-release.md)
 - [gitlab-release-integration-playbook.md](gitlab-release-integration-playbook.md)
-- [enterprise-overlay-intake-and-plan-examples.md](enterprise-overlay-intake-and-plan-examples.md)
-- [enterprise-overlay-release-and-observability-output-examples.md](enterprise-overlay-release-and-observability-output-examples.md)
-- [enterprise-extension-quick-start.md](enterprise-extension-quick-start.md)
+- 
+- 
+- [custom-overlay.md](custom-overlay.md)
 
 ## 4. 需要附加可观测性
 
@@ -46,7 +46,7 @@ owner: 工程团队
 
 - [langfuse-coding-trace.md](langfuse-coding-trace.md)
 - [langfuse-and-observability-integration-guide.md](langfuse-and-observability-integration-guide.md)
-- [enterprise-overlay-release-and-observability-output-examples.md](enterprise-overlay-release-and-observability-output-examples.md)
+- 
 
 ## 5. 不知道先看哪篇时
 

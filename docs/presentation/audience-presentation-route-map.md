@@ -25,8 +25,8 @@
 ### 推荐顺序
 
 1. [executive-briefing-talk-track.md](executive-briefing-talk-track.md)
-2. [team-skills-platform-intro.pptx](team-skills-platform-intro.pptx)
-3. [agent-capability-matrix.pptx](agent-capability-matrix.pptx)
+2. `team-skills-platform-intro.pptx`（运行 generate_ppt.py 生成）
+3. `agent-capability-matrix.pptx`（运行 generate_capability_matrix.py 生成）
 4. [vertical-scenario-route-map.md](vertical-scenario-route-map.md)
 5. 如果需要 runbook 层的一页材料，继续看 [../runbooks/executive-value-one-page.md](../runbooks/executive-value-one-page.md)
 

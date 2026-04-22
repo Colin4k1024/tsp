@@ -52,7 +52,7 @@ owner: 工程团队
 你期望拿到：
 
 - 哪些角色参与
-- 是否需要 private enterprise overlay
+- 是否需要 custom overlay
 - 下一步该进入实现、专项分析还是交接
 
 ## 场景 C：先锁测试，再开始做

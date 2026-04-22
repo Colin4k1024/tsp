@@ -61,8 +61,8 @@ owner: 工程团队
 
 ```text
 请以 architect 视角处理当前任务。
-输出：系统边界、接口契约、数据约束、主要技术风险、是否需要 private enterprise overlay。
-如果需要 private enterprise overlay，请区分候选项和正式启用项。
+输出：系统边界、接口契约、数据约束、主要技术风险、是否需要 custom overlay。
+如果需要 custom overlay，请区分候选项和正式启用项。
 ```
 
 适用场景：涉及接口、数据边界、流程引擎或权限中心时。
@@ -72,7 +72,7 @@ owner: 工程团队
 ```text
 请以 qa-engineer 视角给出当前任务的测试结论。
 输出：测试范围、已验证项、阻塞项、非阻塞风险、放行建议、上线后观察建议。
-如果存在 private enterprise overlay 或发布扩展，请说明是否需要额外验证证据。
+如果存在 custom overlay 或发布扩展，请说明是否需要额外验证证据。
 ```
 
 适用场景：研发已交付，需要形成明确的 review 结论时。
@@ -82,7 +82,7 @@ owner: 工程团队
 ```text
 请以 devops-engineer 视角执行 /team-release。
 输出：发布方案、观察窗口、核心指标、回滚条件、回滚步骤、责任链。
-如果 GitLab 手动流水线或 Langfuse 追踪只作为 runbook 补充，而不是正式 private enterprise overlay，也请明确写出。
+如果 GitLab 手动流水线或 Langfuse 追踪只作为 runbook 补充，而不是正式 custom overlay，也请明确写出。
 ```
 
 适用场景：发布阶段最容易漏写企业扩展和观察窗口时。

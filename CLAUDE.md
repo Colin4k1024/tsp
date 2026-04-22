@@ -68,7 +68,7 @@
 - specialist agents 位于 `agents/specialists/`（已合入 ECC 全量 specialist agent 集）
 - ECC 精选技能位于 `skills/`，150+ 平铺技能目录位于 `skills/`，总计 200+ skills
 - 公司领域扩展技能位于 `skills/`（canonical source）
-- Node.js 安装工具链：`node scripts/install-apply.js --profile <name> --target <platform>`，支持 10 个安装目标（claude/cursor/antigravity/codex/gemini/opencode/codebuddy/copilot/windsurf/augment）、`team`、`enterprise`、`full` 等 profile
+- Node.js 安装工具链：`node scripts/install-apply.js --profile <name> --target <platform>`，支持 10 个安装目标（claude/cursor/antigravity/codex/gemini/opencode/codebuddy/copilot/windsurf/augment）、`team`、`full` 等 profile
 - common / language rules 位于 `rules/common/` 与各语言子目录（kotlin/rust/swift/cpp/csharp/php/perl/zh 等）
 - hooks、contexts、examples、mcp-configs 提供可扩展运行时入口
 
@@ -184,7 +184,7 @@ node scripts/install-apply.js --profile full --target opencode
 | 想直接复制高频提示模板 | [docs/runbooks/claude-conversation-prompt-recipes.md](docs/runbooks/claude-conversation-prompt-recipes.md) |
 | 想直接复制 Codex 并行表达 | [docs/runbooks/codex-parallel-prompt-recipes.md](docs/runbooks/codex-parallel-prompt-recipes.md) |
 | 想按角色直接复制常用说法 | [docs/runbooks/role-prompt-recipes.md](docs/runbooks/role-prompt-recipes.md) |
-| 想快速判断 company / runbook / toolkit | [docs/runbooks/enterprise-extension-quick-start.md](docs/runbooks/enterprise-extension-quick-start.md) |
+| 想创建自定义扩展 overlay | [docs/runbooks/custom-overlay.md](docs/runbooks/custom-overlay.md) |
 | 想先看命令、skills 和 runtime 的总矩阵 | [docs/runbooks/command-and-capability-matrix.md](docs/runbooks/command-and-capability-matrix.md) |
 | 想看 ECC 运行时能力与记忆/并行增强 | [docs/runbooks/ecc-harness-usage.md](docs/runbooks/ecc-harness-usage.md) |
 | 想单独理解 runtime hooks 与后台机制 | [docs/runbooks/runtime-capabilities-overview.md](docs/runbooks/runtime-capabilities-overview.md) |

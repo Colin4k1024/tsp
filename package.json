@@ -1,10 +1,10 @@
 {
-  "name": "@colin4k1024/tsp-create",
+  "name": "@colin4k1024/tsp",
   "version": "2.4.0",
   "description": "Open-source Team Skills Platform for role-based AI delivery workflows, shared skills, hooks, commands, and multi-platform installs.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Colin4k1024/harness-engineering.git"
+    "url": "git+https://github.com/Colin4k1024/tsp.git"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",

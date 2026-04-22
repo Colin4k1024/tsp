@@ -57,4 +57,4 @@ owner: 工程团队
 - 监控指标没有明确观察窗口
 - 平台入口或发布 runbook 刚变更，却没有用 `/harness-audit` 检查安装和文档链路是否一致
 
-可结合这些演练一起看：[release-governance-reading-path.md](release-governance-reading-path.md)、[pre-release-checklist.md](pre-release-checklist.md)、[enterprise-overlay-release-and-observability-output-examples.md](enterprise-overlay-release-and-observability-output-examples.md)、[enterprise-extension-quick-start.md](enterprise-extension-quick-start.md)、[devops-release-conversation-example.md](devops-release-conversation-example.md)、[hotfix-emergency-release-walkthrough.md](hotfix-emergency-release-walkthrough.md)、[multi-service-backend-integration-walkthrough.md](multi-service-backend-integration-walkthrough.md)
+可结合这些演练一起看：[release-governance-reading-path.md](release-governance-reading-path.md)、[pre-release-checklist.md](pre-release-checklist.md)、、、[devops-release-conversation-example.md](devops-release-conversation-example.md)、[hotfix-emergency-release-walkthrough.md](hotfix-emergency-release-walkthrough.md)、[multi-service-backend-integration-walkthrough.md](multi-service-backend-integration-walkthrough.md)

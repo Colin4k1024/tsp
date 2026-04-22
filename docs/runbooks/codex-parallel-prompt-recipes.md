@@ -38,7 +38,7 @@ owner: 工程团队
 ```text
 /multi-backend
 基于当前 intake 或 plan，把接口实现、权限边界、测试策略三部分并行分析。
-如果命中 私有流程或权限集成，请明确说明是 private enterprise overlay 还是仅保留为候选项。
+如果命中 私有流程或权限集成，请明确说明是 custom overlay 还是仅保留为候选项。
 最终请整理出可直接回写 /team-plan 的结果。
 ```
 

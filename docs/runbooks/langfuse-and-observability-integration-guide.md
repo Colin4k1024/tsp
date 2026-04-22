@@ -26,7 +26,7 @@ owner: 工程团队
 
 - trace：一次任务、一次发布、一次事故处理
 - span：某个阶段，如 intake、execute、verify、release
-- 关键标签：任务名、角色、风险级别、是否命中 private enterprise overlay
+- 关键标签：任务名、角色、风险级别、是否命中 custom overlay
 
 ## 4. 回写位置
 

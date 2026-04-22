@@ -29,7 +29,7 @@ owner: 工程团队
 ```text
 已确认结论
 - 审批记录查询接口和列表页已完成实现、自测、QA 验证与灰度发布
-- 本次未正式启用 private enterprise overlay
+- 本次未正式启用 custom overlay
 - GitLab 与 Langfuse 仅作为发布 runbook 补充
 
 未决问题

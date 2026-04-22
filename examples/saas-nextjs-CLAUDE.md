@@ -24,7 +24,7 @@
 
 - 保留通用底座：由 `architect` / `tech-lead` 直接承担方案决策
 - 默认增加前端专项：`frontend-engineering`、`frontend-ui-ux-system`
-- private enterprise overlay 默认关闭，只在 intake 或 plan 明确命中私有流程、权限或内部平台依赖时再启用；如果后续真的涉及企业扩展场景，直接看 [enterprise-overlay-scenario-playbook.md](enterprise-overlay-scenario-playbook.md)
+- custom overlay 默认关闭，只在 intake 或 plan 明确命中私有流程、权限或内部平台依赖时再启用；如果后续真的涉及企业扩展场景，直接看 [enterprise-overlay-scenario-playbook.md](enterprise-overlay-scenario-playbook.md)
 
 ### 3. 命令流更强调前端专项拆解
 
@@ -84,7 +84,7 @@
 - 自测必须覆盖移动端、平板和桌面端
 - 进入 QA 前必须补齐 `templates/ui-review-checklist.md`
 - 代码评审前优先跑 `/code-review`，验证前优先跑 `/verify`
-- private enterprise overlay 默认关闭，只在 intake 或 plan 明确命中私有流程、权限或内部平台依赖时再启用；输出收口示例看 [enterprise-overlay-output-playbook.md](enterprise-overlay-output-playbook.md)
+- custom overlay 默认关闭，只在 intake 或 plan 明确命中私有流程、权限或内部平台依赖时再启用；输出收口示例看 [enterprise-overlay-output-playbook.md](enterprise-overlay-output-playbook.md)
 
 ## 常用提示模板
 

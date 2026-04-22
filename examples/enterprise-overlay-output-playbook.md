@@ -1,5 +1,5 @@
-# Private Enterprise Overlay Output Playbook
+# Custom Overlay Output Playbook
 
-这组私有企业扩展输出示例已迁移到私有 `enterprise` overlay 仓库。公开仓不再分发 handoff / review / release 的企业专属模板。
+本文说明通过 custom overlay 扩展机制交付的团队专属产出（handoff、review、release 模板等）应如何组织。
 
-公开安装与 overlay 约定见 [../docs/runbooks/enterprise-overlay.md](../docs/runbooks/enterprise-overlay.md)。
+关于如何创建和使用 custom overlay，参见 [../docs/runbooks/custom-overlay.md](../docs/runbooks/custom-overlay.md)。

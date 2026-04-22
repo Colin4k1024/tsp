@@ -9,11 +9,11 @@
 | 新功能完整主链 | `/team-intake` -> `/team-plan` | 需求、角色、风险都还没锁定 |
 | 小缺陷短链路 | `/code-review` -> `/handoff` -> `/team-review` | 范围清楚、无需复杂拆解 |
 | 测试先行开发 | `/team-plan` -> `/tdd` -> `/team-execute` | 想先锁测试和成功标准，再进入实现 |
-| 后端接口 + overlay 判断 | `/team-intake` -> `/team-plan` | 需要判断是否依赖私有企业扩展 |
+| 后端接口 + overlay 判断 | `/team-intake` -> `/team-plan` | 需要判断是否依赖自定义 overlay 扩展 |
 | 发布收口 | `/team-release` | 已有实现、自测和 QA 结论 |
 | specialist 结果回主链 | `/handoff` | 已经跑过 `/plan`、`/code-review`、`/verify` 等专项分析 |
 | 平台能力自检 | `/harness-audit` | 新增了命令、skills、hooks 或文档后，想看还有哪些入口未同步 |
-| 私有企业扩展专项 | 看 [../docs/runbooks/enterprise-overlay.md](../docs/runbooks/enterprise-overlay.md) | 需要判断是否必须安装 private enterprise overlay |
+| 自定义 overlay 扩展专项 | 看 [../docs/runbooks/custom-overlay.md](../docs/runbooks/custom-overlay.md) | 需要叠加自定义 overlay |
 
 ## 场景 1：新功能完整主链
 
@@ -25,7 +25,7 @@
 - 目标：新增订单审批记录查询能力
 - 范围：接口、筛选条件、测试计划、最终 handoff
 - 不做：审批流程定义改造、历史数据回填
-- 约束：需要判断是否依赖 private enterprise overlay
+- 约束：需要判断是否依赖 custom overlay 扩展
 ```
 
 然后继续：
@@ -33,7 +33,7 @@
 ```text
 基于当前 intake 结果继续执行 /team-plan。
 请拆出角色职责、依赖、handoff 节点、风险和技能装配清单。
-如果 private enterprise overlay 不启用，也请明确写出未启用原因。
+如果 custom overlay 不安装，也请明确写出未启用原因。
 ```
 
 ## 场景 2：小缺陷短链路
@@ -51,7 +51,7 @@
 ## 场景 3：后端接口 + overlay 判断
 
 ```text
-请先以 /team-intake 方式处理当前后端任务，并重点判断是否命中 private enterprise overlay 候选项。
+请先以 /team-intake 方式处理当前后端任务，并重点判断是否命中 custom overlay 候选项。
 如果涉及私有流程、权限中心或公司专属平台，请给出候选项；如果不启用，也要说明原因。
 
 任务：新增订单审批状态流转接口与权限校验。

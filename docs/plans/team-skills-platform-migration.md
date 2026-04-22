@@ -43,7 +43,7 @@ source_of_truth:
 - 新需求一律从 `tech-lead` 或明确的角色入口开始。
 - 仓库只保留平台资产，不保留历史业务代码与业务文档内容。
 - 活跃安装索引只面向新的 Team Skills 平台。
-- 设计态资料、脚本型资料和公司样式资料优先以 runbook / toolkit / profile 方式承接，不再默认包装成正式 private enterprise overlay。
+- 设计态资料、脚本型资料和公司样式资料优先以 runbook / toolkit / profile 方式承接，不再默认包装成正式 custom overlay。
 
 ## 5. 验收标准
 

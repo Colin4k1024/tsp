@@ -58,6 +58,6 @@ owner: 工程团队
 
 - 只写发布步骤，不写回滚和观察项
 - 放行结论没有条件说明
-- private enterprise overlay 或 runbook 扩展记录没有回落到 release 输出
+- custom overlay 或 runbook 扩展记录没有回落到 release 输出
 
 发布前、中、后的快速参考可继续看：[pre-release-checklist.md](pre-release-checklist.md)、[canary-decision-matrix.md](canary-decision-matrix.md)、[post-rollback-verification-checklist.md](post-rollback-verification-checklist.md)

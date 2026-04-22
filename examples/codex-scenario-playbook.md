@@ -13,7 +13,7 @@
 | 发布收口 | `/team-release` | 已有 review 结论，准备上线或回滚判断 |
 | 多 agent 结果收口 | `/handoff` | specialist 或 `/multi-*` 已给出多份结论 |
 | 平台能力自检 | `/harness-audit` | 新增了命令、skills、hooks 或文档后，想快速看哪里未同步 |
-| private enterprise overlay 专项 | 看 [enterprise-overlay-scenario-playbook.md](enterprise-overlay-scenario-playbook.md) | 需要直接复制私有流程、权限、发布或观测扩展场景 |
+| custom overlay 专项 | 看 [enterprise-overlay-scenario-playbook.md](enterprise-overlay-scenario-playbook.md) | 需要直接复制私有流程、权限、发布或观测扩展场景 |
 
 ## 场景 1：前端并行修复
 
@@ -40,7 +40,7 @@
 目标：新增订单审批状态流转接口
 范围：接口、权限校验、测试计划
 不做：前端页面
-约束：需要判断是否依赖 private enterprise overlay
+约束：需要判断是否依赖 custom overlay
 ```
 
 再继续：

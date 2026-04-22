@@ -44,7 +44,7 @@
 
 ## 3. 建议打开的材料
 
-- [team-skills-platform-intro.pptx](team-skills-platform-intro.pptx)
-- [agent-capability-matrix.pptx](agent-capability-matrix.pptx)
+- `team-skills-platform-intro.pptx`（运行 generate_ppt.py 生成）
+- `agent-capability-matrix.pptx`（运行 generate_capability_matrix.py 生成）
 - [audience-presentation-route-map.md](audience-presentation-route-map.md)
 - [vertical-scenario-route-map.md](vertical-scenario-route-map.md)

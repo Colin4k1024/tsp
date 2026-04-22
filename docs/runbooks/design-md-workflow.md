@@ -3,7 +3,7 @@
 > **定位**：DESIGN.md 是 AI agent 的设计执行层文件，放在项目根目录后，
 > 前端 agent 读取即可生成视觉一致的 UI，无需 Figma 导出或手写设计规范。
 >
-> 本文说明如何在 harness-demo `/team-*` 工作流中创建、使用和维护 DESIGN.md。
+> 本文说明如何在 Team Skills Platform `/team-*` 工作流中创建、使用和维护 DESIGN.md。
 
 ---
 

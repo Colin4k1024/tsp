@@ -1,6 +1,6 @@
 # DESIGN.md 字段映射参考
 
-> 本文件说明 DESIGN.md 9 个区块的字段，与 harness-demo 现有 token 体系（Color / Typography / Spacing / Radius / Shadow / Motion）和设计工具的对应关系。
+> 本文件说明 DESIGN.md 9 个区块的字段，与 Team Skills Platform 现有 token 体系（Color / Typography / Spacing / Radius / Shadow / Motion）和设计工具的对应关系。
 >
 > **用途**：帮助 `frontend-engineer` 和 `qa-engineer` 在读取 DESIGN.md 后，准确将值映射到代码 CSS/JS token，确保实现与设计文件一致。
 

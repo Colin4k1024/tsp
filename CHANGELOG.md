@@ -181,7 +181,7 @@ node tests/run-all.js
 
 ## Highlights
 
-`@colin4k1024/tsp-create` npm 包现在内置 `crates/oris-claude-bridge` 源码和多平台预构建 bridge 二进制，安装时会按用户操作系统自动选择对应 bridge。
+`@colin4k1024/tsp` npm 包现在内置 `crates/oris-claude-bridge` 源码和多平台预构建 bridge 二进制，安装时会按用户操作系统自动选择对应 bridge。
 
 ## What's New
 

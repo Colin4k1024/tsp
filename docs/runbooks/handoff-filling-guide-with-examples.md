@@ -27,7 +27,7 @@ handoff 不是重复 diff，而是让下一角色能直接接住结果。
 - 自测范围与证据
 - 剩余风险
 - QA 关注点
-- 若命中 private enterprise overlay，则补装配或执行记录
+- 若命中 custom overlay，则补装配或执行记录
 
 ## 3. 后端 API 示例
 
@@ -51,9 +51,9 @@ QA 关注点：断点切换、键盘可达性、无结果空态
 
 如果一次交接同时包含前后端结果，建议分块写，不要混成一段模糊总结。
 
-## 6. private enterprise overlay 场景
+## 6. custom overlay 场景
 
-如果启用了 private enterprise overlay，handoff 里还应写：
+如果启用了 custom overlay，handoff 里还应写：
 
 - 启用了什么能力
 - 为什么启用
@@ -65,6 +65,6 @@ QA 关注点：断点切换、键盘可达性、无结果空态
 - 只有“已完成开发”
 - 没有验证证据
 - 没写剩余风险
-- private enterprise overlay 用了却没留下记录
+- custom overlay 用了却没留下记录
 
 如果你要看 handoff 在完整链路里的位置，继续看 [first-team-workflow-walkthrough.md](first-team-workflow-walkthrough.md)。

@@ -27,7 +27,7 @@
 
 ```text
 请按 Team Skills Platform 工作模型处理当前流程型企业项目需求。
-先执行 /team-intake，重点锁定目标、范围、风险、参与角色，以及是否需要启用 private enterprise overlay。
+先执行 /team-intake，重点锁定目标、范围、风险、参与角色，以及是否需要启用 custom overlay。
 
 任务背景：
 - 目标：新增请假审批流程的发起、待办查询和节点审批能力
@@ -51,7 +51,7 @@
 目标：新增请假审批流程的发起、待办查询和节点审批能力
 范围：流程接口、权限校验、测试计划、发布观察要求
 不做：流程模型重设计、历史实例迁移
-约束：判断 private enterprise overlay 与私有观测能力是否需要启用
+约束：判断 custom overlay 与私有观测能力是否需要启用
 ```
 
 ```text

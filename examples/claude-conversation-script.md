@@ -22,7 +22,7 @@
 ```text
 基于当前 intake 结果继续执行 /team-plan。
 请拆出角色职责、依赖、handoff 节点、风险和技能装配清单。
-如果命中 private enterprise overlay 或兼容 runbook，也请明确写出是正式启用、仅保留候选，还是按场景使用。
+如果命中 custom overlay 或兼容 runbook，也请明确写出是正式启用、仅保留候选，还是按场景使用。
 ```
 
 第三句：

@@ -24,7 +24,7 @@ owner: 工程团队
 - 目标与范围外事项是否清楚
 - 研发 handoff 是否包含自测证据
 - 哪些风险必须阻塞放行
-- 是否存在 private enterprise overlay 相关验证要求
+- 是否存在 custom overlay 相关验证要求
 
 ## 3. 测试执行的固定检查
 

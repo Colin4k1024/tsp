@@ -4,7 +4,7 @@
 
 ## 概述
 
-Evolution 系统受 [Oris](https://github.com/Colin4k1024/Oris) 框架启发，为 harness-engineering 平台提供 **经验基因（Gene）** 的创建、验证、衰退、共享能力。核心思路是：成功解决过的问题方案应该被沉淀为可复用的"基因"，在未来遇到相似信号时优先尝试已验证方案（Replay-First），而不是每次都走完整 LLM 推理。
+Evolution 系统受 [Oris](https://github.com/Colin4k1024/Oris) 框架启发，为 TSP（Team Skills Platform）提供 **经验基因（Gene）** 的创建、验证、衰退、共享能力。核心思路是：成功解决过的问题方案应该被沉淀为可复用的"基因"，在未来遇到相似信号时优先尝试已验证方案（Replay-First），而不是每次都走完整 LLM 推理。
 
 ## 快速开始
 

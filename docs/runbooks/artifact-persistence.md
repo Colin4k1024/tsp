@@ -254,4 +254,4 @@ status: draft | approved
 - **deployment-context.md 不是 release-plan 的附录**：环境、配置、密钥和回滚入口必须可独立检索。
 - **closeout-summary.md 不是 release-plan 尾注**：只有经过观察窗口并完成 backlog 回填，任务才算真正收口。
 - **backlog.md 是跨任务真相源**：发布后遗留项、技术债和二期候选必须进入 `docs/memory/backlog.md`。
-- **路径前缀**：所有路径均相对于消费方项目仓库根目录，不是 harness-demo 本身。
+- **路径前缀**：所有路径均相对于消费方项目仓库根目录，不是 Team Skills Platform 本身。

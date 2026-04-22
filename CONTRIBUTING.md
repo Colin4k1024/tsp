@@ -4,7 +4,7 @@ Thank you for helping improve Team Skills Platform.
 
 ## Before you open a pull request
 
-Please make sure your change has a clear user-facing reason and that it fits the public repository surface. Public changes should not introduce private enterprise materials, internal credentials, or organization-specific instructions.
+Please make sure your change has a clear user-facing reason and that it fits the public repository surface. Public changes should not introduce private or internal materials, internal credentials, or organization-specific instructions.
 
 ## Typical workflow
 

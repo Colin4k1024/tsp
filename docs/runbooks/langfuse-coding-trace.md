@@ -1,6 +1,6 @@
 # Langfuse 编码追踪手册
 
-本手册承接原 `langfuse-coding-trace` private enterprise overlay。它现在是编码、QA、发布流程的可观测性补充 runbook，不再作为正式 `skills/` 安装入口。
+本手册承接原 `langfuse-coding-trace` custom overlay。它现在是编码、QA、发布流程的可观测性补充 runbook，不再作为正式 `skills/` 安装入口。
 
 如果你想先判断什么时候该启用 Langfuse、记录哪些 trace 和 span，以及如何回写主链，继续看 [langfuse-and-observability-integration-guide.md](langfuse-and-observability-integration-guide.md)。
 

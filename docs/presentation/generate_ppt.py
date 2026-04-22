@@ -345,7 +345,8 @@ def main():
     ])
 
     # Save
-    output_path = "/Users/jiafan/Desktop/poc/harness-demo/docs/presentation/team-skills-platform-intro.pptx"
+    import os
+    output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "team-skills-platform-intro.pptx")
     prs.save(output_path)
     print(f"PPTX saved to: {output_path}")
 

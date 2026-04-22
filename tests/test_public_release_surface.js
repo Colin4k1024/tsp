@@ -102,7 +102,7 @@ test('community documents exist and README links to them', () => {
 test('GitHub community entry points use absolute URLs and current validation commands', () => {
   const issueConfig = fs.readFileSync(path.join(ROOT, '.github', 'ISSUE_TEMPLATE', 'config.yml'), 'utf8');
   assert.ok(
-    issueConfig.includes('https://github.com/Colin4k1024/harness-engineering/blob/main/docs/runbooks/team-skills-usage.md'),
+    issueConfig.includes('https://github.com/Colin4k1024/tsp/blob/main/docs/runbooks/team-skills-usage.md'),
     'issue contact links should use absolute GitHub URLs'
   );
   assert.ok(

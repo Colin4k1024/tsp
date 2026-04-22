@@ -66,7 +66,7 @@ owner: 工程团队
 ```text
 基于当前 intake 结果继续执行 /team-plan。
 请拆出角色职责、依赖、handoff 节点、风险和技能装配清单。
-如果 private enterprise overlay 不启用，也请明确写出未启用原因。
+如果 custom overlay 不启用，也请明确写出未启用原因。
 ```
 
 期望结果至少包含：

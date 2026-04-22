@@ -18,7 +18,7 @@ description: >
 
 1. 先阅读 [frontend-engineering-standards.md](../../rules/frontend-engineering-standards.md) 锁定技术基线和质量红线。
 2. 企业内部应用补看 [enterprise-architecture-governance.md](../../rules/common/enterprise-architecture-governance.md) 与 [enterprise-component-baseline.md](../../rules/common/enterprise-component-baseline.md)，确认是否受统一框架、组件和兼容性约束。
-3. 若目标项目明确采用私有企业前端样式 profile，再补看 [frontend-enterprise-style-profile.md](../../docs/runbooks/frontend-enterprise-style-profile.md)，确认是否需要附加样式与 Figma 映射约束。
+3. 若目标项目明确采用自定义前端样式 profile，再补看 [frontend-enterprise-style-profile.md](../../docs/runbooks/frontend-enterprise-style-profile.md)，确认是否需要附加样式与 Figma 映射约束。
 4. 使用 [react-next-baseline.md](references/react-next-baseline.md) 和 [component-patterns.md](references/component-patterns.md) 决定页面、组件、hooks、状态与数据流分层。
 5. 若是新界面或大改版，先补齐 [ui-implementation-plan.md](../../templates/ui-implementation-plan.md) 再进入编码。
 6. 若启用了公司前端样式 profile，把附加样式约束同步回写到 `ui-implementation-plan.md`、`/team-execute` 和 `/handoff`。

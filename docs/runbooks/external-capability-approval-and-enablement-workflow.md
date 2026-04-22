@@ -36,4 +36,4 @@ owner: 工程团队
 - 能力已接入，但没有文档入口和维护责任人
 - 没判断 portability 就直接进入正式层
 
-与这些文档配合阅读：[external-capability-intake.md](external-capability-intake.md)、[enterprise-overlay-integration.md](enterprise-overlay-integration.md)
+与这些文档配合阅读：[external-capability-intake.md](external-capability-intake.md)、

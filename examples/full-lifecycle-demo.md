@@ -35,7 +35,7 @@
 这个场景适合演示的原因：
 
 - 同时包含产品需求、流程审批、权限、前后端、通知、归档
-- 很容易展示 private enterprise overlay、shared skills 和主链命令的配合
+- 很容易展示 custom overlay、shared skills 和主链命令的配合
 - 既有业务验收，也有发布和观察窗口
 
 ## 4. 演示前准备

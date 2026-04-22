@@ -16,7 +16,7 @@ Pure Host executes a manifest of tasks using Claude CLI with:
 ## Installation
 
 ```bash
-# As part of harness-engineering (already included)
+# As part of tsp (already included)
 npm install
 
 # Standalone

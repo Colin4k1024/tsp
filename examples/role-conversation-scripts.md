@@ -7,10 +7,10 @@
 ```text
 /team-review
 请以 qa-engineer 视角基于当前 handoff、自测结果和风险说明，输出测试结论、阻塞项、放行建议和残余风险。
-如果存在 private enterprise overlay 或私有发布扩展要求，也请说明是否需要额外验证证据。
+如果存在 custom overlay 或自定义发布扩展要求，也请说明是否需要额外验证证据。
 ```
 
-如果任务已经明确命中私有企业扩展约束，先补看 [../docs/runbooks/enterprise-overlay.md](../docs/runbooks/enterprise-overlay.md)。
+如果任务已经明确命中自定义 overlay 扩展约束，先补看 [../docs/runbooks/custom-overlay.md](../docs/runbooks/custom-overlay.md)。
 
 ## DevOps 发布
 
@@ -20,7 +20,7 @@
 如果这些能力只是私有 runbook 补充，而不是正式 overlay 依赖，也请明确写出。
 ```
 
-如果当前发布就是私有灰度或观察窗口场景，直接补看 [../docs/runbooks/enterprise-extension-quick-start.md](../docs/runbooks/enterprise-extension-quick-start.md)。
+如果当前发布就是自定义灰度或观察窗口场景，先看 [../docs/runbooks/custom-overlay.md](../docs/runbooks/custom-overlay.md)。
 
 ## Tech Lead 收口
 
@@ -50,11 +50,11 @@
 
 ```text
 请以 architect 视角处理当前任务。
-输出：系统边界、接口契约、数据约束、主要技术风险、是否需要 private enterprise overlay。
-如果需要 private enterprise overlay，请区分候选项和正式启用项。
+输出：系统边界、接口契约、数据约束、主要技术风险、是否需要 custom overlay。
+如果需要 custom overlay，请区分候选项和正式启用项。
 ```
 
-如果需要判断私有 overlay 与公开 runbook 的边界，先看 [../docs/runbooks/enterprise-overlay.md](../docs/runbooks/enterprise-overlay.md)。
+如果需要判断私有 overlay 与公开 runbook 的边界，先看 [../docs/runbooks/custom-overlay.md](../docs/runbooks/custom-overlay.md)。
 
 继续阅读：
 
@@ -62,4 +62,4 @@
 - [../docs/runbooks/qa-review-conversation-example.md](../docs/runbooks/qa-review-conversation-example.md)
 - [../docs/runbooks/devops-release-conversation-example.md](../docs/runbooks/devops-release-conversation-example.md)
 - [../docs/runbooks/tech-lead-closure-conversation-example.md](../docs/runbooks/tech-lead-closure-conversation-example.md)
-- [../docs/runbooks/enterprise-extension-quick-start.md](../docs/runbooks/enterprise-extension-quick-start.md)
+- [../docs/runbooks/custom-overlay.md](../docs/runbooks/custom-overlay.md)

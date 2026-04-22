@@ -1,5 +1,5 @@
-# Private Enterprise Overlay Scenario Playbook
+# Custom Overlay Scenario Playbook
 
-这组私有企业扩展示例已迁移到私有 `enterprise` overlay 仓库。公开仓不再内置企业专属场景脚本。
+本文说明如何通过 custom overlay 为团队叠加专属场景脚本、runbook 和上线流程。
 
-如果你只需要在公开仓预留安装位，请看 [../docs/runbooks/enterprise-overlay.md](../docs/runbooks/enterprise-overlay.md)。
+关于如何创建和安装 custom overlay，参见 [../docs/runbooks/custom-overlay.md](../docs/runbooks/custom-overlay.md)。

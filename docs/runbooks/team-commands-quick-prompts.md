@@ -87,7 +87,7 @@ owner: 工程团队
 
 - 只说“帮我做一下”，不写目标和范围
 - 只写实现，不写风险与下一步
-- 命中了 private enterprise overlay 或发布扩展，却没有进入主链输出
+- 命中了 custom overlay 或发布扩展，却没有进入主链输出
 
 完整示例继续看：[team-intake-example.md](team-intake-example.md)、[team-plan-example.md](team-plan-example.md)、[team-execute-example.md](team-execute-example.md)、[team-handoff-example.md](team-handoff-example.md)、[team-review-example.md](team-review-example.md)、[team-release-example.md](team-release-example.md)
 

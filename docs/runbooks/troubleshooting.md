@@ -22,7 +22,7 @@ source_of_truth:
 - 运行 `node scripts/build-platform-artifacts.js` 或 `node scripts/validate-library.js` 失败
 - Claude 或 Codex 找不到角色 agent / specialist
 - 项目级 `CLAUDE.md` 不知道哪些字段是必须的
-- 使用了 private enterprise overlay，但 review 阶段无法说明启用原因和执行记录
+- 使用了 custom overlay，但 review 阶段无法说明启用原因和执行记录
 - `npm run graphify:doctor` 失败（Python 版本或 Graphify CLI 缺失）
 
 ## 2. 安装脚本相关问题
@@ -138,7 +138,7 @@ Codex 检查点：
 - 还有什么风险
 - 下一角色应该关注什么
 
-如果启用了 private enterprise overlay，还要附带装配或执行记录。
+如果启用了 custom overlay，还要附带装配或执行记录。
 
 ### 5.3 不知道怎么开口才能拿到结构化输出
 
@@ -160,15 +160,15 @@ Codex 检查点：
 
 ### 6.2 常见误区
 
-- 看到审批或权限字样就立刻默认启用 private enterprise overlay
+- 看到审批或权限字样就立刻默认启用 custom overlay
 - intake 没记录候选项，plan 阶段只能凭记忆判断
-- execute 实际用了 private enterprise overlay，但 review 阶段没有证据可回溯
+- execute 实际用了 custom overlay，但 review 阶段没有证据可回溯
 
 详细判定清单见 [project-onboarding.md](project-onboarding.md)。
 
-如果你卡在“候选项怎么写”或“plan 怎么表达未启用”，直接看 [enterprise-overlay-intake-and-plan-examples.md](enterprise-overlay-intake-and-plan-examples.md)。
+如果你卡在“候选项怎么写”或“plan 怎么表达未启用”，直接看 。
 
-如果你已经进入 review 或 release，但不知道 overlay、runbook、toolkit 的执行记录怎么回写，继续看 [enterprise-overlay-release-and-observability-output-examples.md](enterprise-overlay-release-and-observability-output-examples.md)。
+如果你已经进入 review 或 release，但不知道 overlay、runbook、toolkit 的执行记录怎么回写，继续看 。
 
 ### 6.3 发布治理不知道从哪看起
 

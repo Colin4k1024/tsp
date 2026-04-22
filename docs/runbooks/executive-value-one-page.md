@@ -44,8 +44,8 @@ owner: 工程团队
 ## 5. 最短阅读顺序
 
 1. [../presentation/executive-briefing-talk-track.md](../presentation/executive-briefing-talk-track.md)
-2. [../presentation/team-skills-platform-intro.pptx](../presentation/team-skills-platform-intro.pptx)
-3. [../presentation/agent-capability-matrix.pptx](../presentation/agent-capability-matrix.pptx)
+2. `docs/presentation/team-skills-platform-intro.pptx`（运行 generate_ppt.py 生成）
+3. `docs/presentation/agent-capability-matrix.pptx`（运行 generate_capability_matrix.py 生成）
 4. [vertical-scenario-capability-matrix.md](vertical-scenario-capability-matrix.md)
 
 ## 6. 什么时候需要继续下钻

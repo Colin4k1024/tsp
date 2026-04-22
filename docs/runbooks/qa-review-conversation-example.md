@@ -21,7 +21,7 @@ owner: 工程团队
 ```text
 /team-review
 请以 qa-engineer 视角基于当前 handoff、自测结果和风险说明，输出测试结论、阻塞项、放行建议和残余风险。
-如果存在 private enterprise overlay 或发布扩展要求，也请说明是否需要额外验证证据。
+如果存在 custom overlay 或发布扩展要求，也请说明是否需要额外验证证据。
 ```
 
 ## 3. 期望结果长什么样
@@ -46,7 +46,7 @@ owner: 工程团队
 - 发布前补一次兼容性 smoke
 
 附加验证要求
-- 本次未启用 private enterprise overlay
+- 本次未启用 custom overlay
 - 发布阶段若启用 Langfuse 追踪，应把 trace 结果作为观察证据补回 release
 ```
 

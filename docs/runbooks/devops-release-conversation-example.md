@@ -21,7 +21,7 @@ owner: 工程团队
 ```text
 /team-release
 请以 devops-engineer 视角基于当前测试放行结果，整理发布方案、观察窗口、回滚条件、责任链，并判断是否需要 GitLab 手动流水线或 Langfuse 追踪。
-如果这些能力只是 runbook 补充，而不是正式 private enterprise overlay，也请明确写出。
+如果这些能力只是 runbook 补充，而不是正式 custom overlay，也请明确写出。
 ```
 
 ## 3. 期望结果长什么样
@@ -85,4 +85,4 @@ owner: 工程团队
 请把本次发布观察结果和可选领域扩展执行记录整理成一次 /handoff，供 tech-lead 收口。
 ```
 
-与这些文档配合阅读：[devops-engineer-daily-operations.md](devops-engineer-daily-operations.md)、[team-release-example.md](team-release-example.md)、[enterprise-overlay-release-and-observability-output-examples.md](enterprise-overlay-release-and-observability-output-examples.md)
+与这些文档配合阅读：[devops-engineer-daily-operations.md](devops-engineer-daily-operations.md)、[team-release-example.md](team-release-example.md)、

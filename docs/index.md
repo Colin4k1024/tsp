@@ -23,7 +23,7 @@ hero:
       link: /runbooks/team-skills-usage
     - theme: alt
       text: GitHub
-      link: https://github.com/Colin4k1024/harness-engineering
+      link: https://github.com/Colin4k1024/tsp
 
 features:
   - icon: 🧭

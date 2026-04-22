@@ -4,8 +4,6 @@
 
 ## 1. 文件说明
 
-- [team-skills-platform-intro.pptx](team-skills-platform-intro.pptx)：平台总体介绍，适合做首次宣讲或项目接入说明。
-- [agent-capability-matrix.pptx](agent-capability-matrix.pptx)：能力矩阵与运行时增强能力说明，适合讲 ECC harness、memory、parallel execution。
 - [generate_ppt.py](generate_ppt.py)：生成平台总览 PPTX 的脚本。
 - [generate_capability_matrix.py](generate_capability_matrix.py)：生成能力矩阵 PPTX 的脚本。
 - [presentation-talk-track.md](presentation-talk-track.md)：5 分钟 / 15 分钟口头讲解提词稿。

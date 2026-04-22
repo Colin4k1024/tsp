@@ -49,14 +49,14 @@
 - 前端任务必须附带响应式、A11y、性能验证和 `ui-review-checklist`
 - 接口或数据库变更必须写清兼容性、迁移步骤和回滚方案
 - 任何 specialist 结论都不能绕过 `tech-lead` 直接成为最终决定
-- 若涉及 private enterprise overlay，必须在 intake 或 plan 阶段显式说明是正式启用、仅保留候选，还是只参考兼容说明
+- 若涉及 custom overlay，必须在 intake 或 plan 阶段显式说明是正式启用、仅保留候选，还是只参考兼容说明
 
 ## 默认技能装配
 
 - 共享能力：`api-contract`
 - 前端任务：`frontend-engineering`、`frontend-ui-ux-system`
 - 专项入口：验证走 `/verify`，安全评审走 `/code-review` 或对应 specialist，发布治理直接走 `/team-release` 与发布 runbook
-- private enterprise overlay：默认关闭，仅在任务明确依赖私有流程、权限、发布或观测能力时再启用；兼容入口见 `examples/enterprise-overlay-scenario-playbook.md` 和 `examples/enterprise-overlay-output-playbook.md`
+- custom overlay：默认关闭，仅在任务明确依赖私有流程、权限、发布或观测能力时再启用；兼容入口见 `examples/enterprise-overlay-scenario-playbook.md` 和 `examples/enterprise-overlay-output-playbook.md`
 
 ## 默认交付物
 
@@ -74,7 +74,7 @@
 范围：前端列表页、筛选表单、后端查询接口、测试计划
 不做：审批流程定义改造、历史数据回填
 约束：前端必须附带 ui-review-checklist，后端必须说明接口兼容性
-输出：参与角色、主要风险、是否需要启用 private enterprise overlay、下一步建议
+输出：参与角色、主要风险、是否需要启用 custom overlay、下一步建议
 ```
 
 ```text

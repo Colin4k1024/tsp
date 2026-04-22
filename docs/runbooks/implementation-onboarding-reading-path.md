@@ -45,7 +45,7 @@ owner: 工程团队
 - 已知项目类型：直接从 examples 模板起手
 - 已知 vertical：直接从矩阵检查 starter、walkthrough、demo 是否齐全
 - 只想先跑通主链：跳过 vertical，先走 onboarding + walkthrough
-- 需要 overlay / runbook / toolkit 边界：补看 [enterprise-extension-quick-start.md](enterprise-extension-quick-start.md)
+- 需要 overlay / runbook / toolkit 边界：补看 [custom-overlay.md](custom-overlay.md)
 
 ## 5. 最小执行顺序
 

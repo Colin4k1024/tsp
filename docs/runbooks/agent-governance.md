@@ -68,7 +68,7 @@ source_of_truth:
 |------|------|
 | G-16 | 向下游传递工作时必须经过 `/handoff`，包含 [handoff-contract.md](../../rules/handoff-contract.md) 的全部强制字段 |
 | G-17 | 禁止只传链接不附摘要、只传结论不附依据、把未确认事项包装成已完成 |
-| G-18 | 启用了 private enterprise overlay / runbook / toolkit 后，必须在 handoff 的技能装配清单区块中说明 |
+| G-18 | 启用了 custom overlay / runbook / toolkit 后，必须在 handoff 的技能装配清单区块中说明 |
 
 ---
 

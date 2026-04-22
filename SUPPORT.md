@@ -6,7 +6,7 @@ This public repository supports:
 
 - Public Team Skills Platform capabilities
 - Public install flows, docs, examples, and release tooling
-- Compatibility guidance for optional private enterprise overlays
+- Support for the optional custom overlay extension mechanism
 - Public install profiles: `core`, `developer`, `security`, `research`, `team`, `full`
 
 ## Target support levels
@@ -25,7 +25,7 @@ Primary public onboarding docs currently focus on `claude`, `cursor`, `codex`, a
 ## What this repository does not support
 
 - Full workflow parity across every public install target
-- Private enterprise overlays or internal business integrations
+- Organization-specific private overlays or custom integrations that are not part of this repository
 - Organization-specific rollout advice that depends on private infrastructure
 - Direct support for credentials, private environments, or internal deployment systems
 

@@ -32,7 +32,7 @@ owner: 工程团队
 ```text
 基于当前 intake 结果继续执行 /team-plan。
 请拆出角色职责、依赖、handoff 节点、风险和技能装配清单。
-如果 private enterprise overlay 不启用，也请明确写出未启用原因。
+如果 custom overlay 不启用，也请明确写出未启用原因。
 ```
 
 适用场景：你不想自己拼 plan 的字段，只想让输出直接变成可执行计划。
@@ -72,7 +72,7 @@ owner: 工程团队
 ## 6. 后端加 company 判断的起手式
 
 ```text
-请先以 /team-intake 方式处理当前后端任务，并重点判断是否命中 private enterprise overlay 候选项。
+请先以 /team-intake 方式处理当前后端任务，并重点判断是否命中 custom overlay 候选项。
 如果涉及流程审批、权限中心或公司专属平台，请给出候选项；如果不启用，也要说明原因。
 
 任务：新增订单审批流转接口与权限校验。
@@ -80,14 +80,14 @@ owner: 工程团队
 不做：前端页面。
 ```
 
-适用场景：后端任务容易提前把 private enterprise overlay 混成默认启用，这段模板可以把判断动作显式化。
+适用场景：后端任务容易提前把 custom overlay 混成默认启用，这段模板可以把判断动作显式化。
 
 ## 7. 发布前让 Claude 帮你收口
 
 ```text
 基于当前实现、自测和 QA 结论，执行 /team-release。
 请输出发布方案、观察窗口、回滚条件、责任链，并补充是否需要 GitLab 手动流水线或 Langfuse 追踪。
-如果这些能力只是 runbook 补充，而不是正式 private enterprise overlay，也请写清楚。
+如果这些能力只是 runbook 补充，而不是正式 custom overlay，也请写清楚。
 ```
 
 适用场景：发布阶段最容易把企业扩展写丢，这段模板可以把判断和回写一起带出来。
