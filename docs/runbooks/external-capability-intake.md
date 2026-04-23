@@ -44,6 +44,7 @@ status:
 | source_name | source_url | license | trust_tier | maintenance_signal | portability | overlap_with_existing | import_mode | target_layer | target_name | why_now | status |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | `anthropics/skills:webapp-testing` | [anthropics/skills](https://github.com/anthropics/skills) | `Apache-2.0 / verify target folder before adaptation` | `A-official` | `65.8k` stars；2025-11 仍有 `webapp-testing` 相关 PR 活跃 | `codex+claude` | 已有 `frontend-engineering`、前端门禁，但没有独立浏览器 smoke / webapp 测试 skill | `adapt-into-local-skill` | `ecc` | `browser-smoke-testing` | 补齐前端与发布链之间的浏览器验证空位 | `approved` |
+| `alchaincyf/huashu-design` | [alchaincyf/huashu-design](https://github.com/alchaincyf/huashu-design) | `Custom / personal use free；企业商用与工具链集成需上游授权` | `B-proven-community` | `4.4k+` stars；2026-04 仍活跃更新；包含独立 `SKILL.md`、演示与导出工具链 | `practice-only` | 已有 `frontend-ui-ux-system`、`ui-ux-promax` 与前端门禁，但没有专门面向高保真 HTML 原型、HTML-first deck、时间轴动画与设计评审的外部设计 skill 接入说明 | `reference-only-runbook` | `runbook` | `huashu-design-integration` | 在不复制上游内容的前提下，为 TSP 补齐外部设计 skill 接入路径、README 说明与致谢归档；待获得授权后再决定是否升级为本地化适配候选 | `approved` |
 | `Colin4k1024/andrej-karpathy-skills` | [Colin4k1024/andrej-karpathy-skills](https://github.com/Colin4k1024/andrej-karpathy-skills/tree/main) | `MIT` | `B-proven-community` | 轻量仓库，当前核心内容稳定；包含 `CLAUDE.md` 与 `karpathy-guidelines` skill 形态 | `codex+claude` | 已有 `coding-standards`、`tdd-workflow`、`verification-loop`，但缺少一层专门约束“先暴露假设、避免过度设计、限定改动边界、先定义成功标准”的行为护栏 | `adapt-into-local-skill` | `ecc` | `karpathy-guidelines` | 补齐实现前的行为约束层，让现有质量与验证技能前面多一道“别猜、别做重、别多改、先定义成功”的轻量护栏 | `approved` |
 | `tanweai/pua` | [tanweai/pua](https://github.com/tanweai/pua) | `MIT` | `B-proven-community` | `16k+` stars；2026-04 仍持续更新；多平台技能分发和 Claude hooks 已成型 | `claude-first` | 已有 `systematic-debugging`、`verification-loop`、`loop-operator`，但没有统一的高能动性、高压闭环与失败升级协议 | `adapt-into-local-skill` | `ecc` | `pua` | 补齐“别放弃、别甩锅、别空口完成”的行为层能力，并与现有验证/调试能力互补 | `approved` |
 | `obra/superpowers:systematic-debugging` | [obra/superpowers](https://github.com/obra/superpowers) | `MIT` | `B-proven-community` | `20.2k` stars；含 Codex 实验支持说明；技能库覆盖调试与验证 | `codex+claude` | 已有 `/verify`，但缺少根因定位流程 | `adapt-into-local-skill` | `ecc` | `systematic-debugging` | 补强“排查根因”而不只是“反复验证” | `approved` |
@@ -139,6 +140,7 @@ status:
 - `helm-unittest-playbook` 已本地化落在 [docs/runbooks/helm-unittest-playbook.md](helm-unittest-playbook.md)。
 - `kubectl-server-dry-run-gates` 已本地化落在 [docs/runbooks/kubectl-server-dry-run-gates.md](kubectl-server-dry-run-gates.md)。
 - `graphify-knowledge-graph` 已本地化落在 [skills/graphify/SKILL.md](../../skills/graphify/SKILL.md) 与 [docs/runbooks/graphify-knowledge-graph-usage.md](graphify-knowledge-graph-usage.md)。
+- `huashu-design-integration` 当前仅以 docs-only 方式落地：主入口说明与致谢位于 [README.md](../../README.md)，不进入 `skills/`、install profile 或 npm 内置分发面；若后续获得上游授权，再重新走 intake / approval 决定是否升级为本地化适配。
 
 ## 下一批待补充候选
 

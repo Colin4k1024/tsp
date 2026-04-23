@@ -72,6 +72,28 @@ TSP 整合了多个社区开源框架的精华能力，而非从零构建：
 | **rtk** (Rust Token Killer) | 社区 | CLI 代理透明命令重写，60-90% token 节约，100+ 命令支持（git/gh/cargo/npm/docker/kubectl/aws） |
 | 社区贡献 | 多方 | UI/UX Pro Max 设计系统、vertical workflow examples、Santa Method 对抗验证、Ralph RFC Pipeline |
 
+### 外部设计 skill 接入
+
+TSP 当前支持把第三方设计 skill 作为外部扩展能力接入使用，其中 [huashu-design](https://github.com/alchaincyf/huashu-design) 是与本平台协同性较高的一项：它偏向高保真设计产出，覆盖 HTML 原生交互原型、浏览器演讲幻灯片、时间轴动画、信息图与 5 维度设计评审；TSP 则负责团队协作、角色分工、handoff、quality gate 与发布收口。
+
+推荐的组合方式是：让 TSP 管任务链路，让 huashu-design 管最终视觉和动效交付。典型场景包括：
+
+- `frontend-engineer` 先在 TSP 流程内收敛页面目标、状态边界和验收标准，再调用 huashu-design 做高保真原型或动画样机。
+- `tech-lead` / `qa-engineer` 在评审阶段把 huashu-design 产出的 HTML demo、deck 或动画作为 UI 证据补充到 review / release 资料里。
+- `product-manager` / `architect` 在方案讨论阶段借助 huashu-design 的设计方向顾问、设计评审与 deck 产出，加速多方案对比。
+
+上游安装方式：
+
+```bash
+npx skills add alchaincyf/huashu-design
+```
+
+当前仓库对 huashu-design 的接入是文档级集成，而不是内置分发：
+
+- TSP 不会把 huashu-design 自动打包进 `skills/`、install profile、npm 包或 overlay 清单。
+- 你需要单独从上游安装和更新该 skill，再在 TSP 任务流里按需调用。
+- 由于上游 README 明确写明企业/商用/工具链集成需先获得授权，本仓库目前只提供接入说明与致谢，不 vendoring 上游 `SKILL.md`、assets、scripts 或 references。
+
 ### 核心依赖
 
 | 依赖 | 用途 |
@@ -171,6 +193,57 @@ TSP 整合了多个社区开源框架的精华能力，而非从零构建：
 - 成本感知：`skills/cost-aware-llm-pipeline/`（任务复杂度分级与模型路由）
 
 完整矩阵见 [docs/runbooks/command-and-capability-matrix.md](docs/runbooks/command-and-capability-matrix.md) 和 [docs/runbooks/runtime-capabilities-overview.md](docs/runbooks/runtime-capabilities-overview.md)。
+
+## 致谢 / Acknowledgements
+
+TSP 的公开能力是在多个社区项目、技能仓库和工程方法论的基础上吸收、裁剪和重组出来的。以下仓库是当前根 README 主叙事里直接引用或明确协同的社区 GitHub：
+
+| 仓库 | 在 TSP 中的关系 | 说明 |
+|------|------|------|
+| [affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code) | 上游能力来源 | ECC harness layer、specialist agents、skills、runtime hooks 与安装工具链的重要参考来源 |
+| [safishamsi/graphify](https://github.com/safishamsi/graphify) | 已吸收并本地化 | 为 brownfield 结构扫描、依赖路径分析与架构问答补充知识图谱能力 |
+| [rtk-ai/rtk](https://github.com/rtk-ai/rtk) | 已集成运行时能力 | CLI 透明命令重写与 token 优化能力来源 |
+| [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md) | 设计资产来源 | 为 `DESIGN.md` 品牌风格扩展提供参考品牌库 |
+| [alchaincyf/huashu-design](https://github.com/alchaincyf/huashu-design) | 外部协同能力 | 提供高保真原型、HTML slides、动画与设计评审能力；当前仅做文档级接入说明，不内置分发 |
+
+### 已吸收并落地的外部能力来源
+
+以下上游项目已经通过 intake / runbook / skill 适配进入当前仓库的公开能力面；对应的采用边界、落地状态与本地化结果见 [docs/runbooks/external-capability-intake.md](docs/runbooks/external-capability-intake.md)。
+
+| 分组 | 上游项目 | 当前在仓库中的落点 |
+|------|------|------|
+| 协作与行为技能 | [anthropics/skills](https://github.com/anthropics/skills), [Colin4k1024/andrej-karpathy-skills](https://github.com/Colin4k1024/andrej-karpathy-skills), [tanweai/pua](https://github.com/tanweai/pua), [obra/superpowers](https://github.com/obra/superpowers), [omkamal/pypict-claude-skill](https://github.com/omkamal/pypict-claude-skill), [testcontainers/testcontainers-java](https://github.com/testcontainers/testcontainers-java) | 浏览器 smoke、Karpathy 行为护栏、PUA 闭环、systematic debugging、pairwise-test-design、Testcontainers 集成测试 |
+| PR、发布与 API 治理 | [qodo-ai/pr-agent](https://github.com/qodo-ai/pr-agent), [reviewdog/reviewdog](https://github.com/reviewdog/reviewdog), [reviewdog/action-eslint](https://github.com/reviewdog/action-eslint), [semantic-release/release-notes-generator](https://github.com/semantic-release/release-notes-generator), [semantic-release/semantic-release](https://github.com/semantic-release/semantic-release), [OpenAPITools/openapi-diff](https://github.com/OpenAPITools/openapi-diff), [stoplightio/spectral](https://github.com/stoplightio/spectral) | AI PR review、reviewdog 门禁、release notes 自动化、API breaking change / lint runbooks |
+| 供应链、安全与 provenance | [actions/dependency-review-action](https://github.com/actions/dependency-review-action), [github/codeql-action](https://github.com/github/codeql-action), [aquasecurity/trivy-action](https://github.com/aquasecurity/trivy-action), [ossf/scorecard-action](https://github.com/ossf/scorecard-action), [anchore/sbom-action](https://github.com/anchore/sbom-action), [actions/attest-build-provenance](https://github.com/actions/attest-build-provenance), [sigstore/cosign-installer](https://github.com/sigstore/cosign-installer), [slsa-framework/slsa-verifier](https://github.com/slsa-framework/slsa-verifier), [sigstore/policy-controller](https://github.com/sigstore/policy-controller), [pact-foundation/pact-jvm](https://github.com/pact-foundation/pact-jvm), [slsa-framework/slsa-github-generator](https://github.com/slsa-framework/slsa-github-generator), [in-toto/attestation](https://github.com/in-toto/attestation), [in-toto/witness](https://github.com/in-toto/witness) | dependency review、CodeQL、Trivy、Scorecard、SBOM、attestation、签名、SLSA 验证、policy controller、contract testing 等发布前后治理 runbooks |
+| 平台治理与基础设施门禁 | [renovatebot/renovate](https://github.com/renovatebot/renovate), [gitleaks/gitleaks](https://github.com/gitleaks/gitleaks), [step-security/harden-runner](https://github.com/step-security/harden-runner), [rhysd/actionlint](https://github.com/rhysd/actionlint), [zizmorcore/zizmor](https://github.com/zizmorcore/zizmor), [open-policy-agent/conftest](https://github.com/open-policy-agent/conftest), [bridgecrewio/checkov](https://github.com/bridgecrewio/checkov), [yannh/kubeconform](https://github.com/yannh/kubeconform), [GitHubSecurityLab/actions-permissions](https://github.com/GitHubSecurityLab/actions-permissions), [kyverno/kyverno](https://github.com/kyverno/kyverno), [helm-unittest/helm-unittest](https://github.com/helm-unittest/helm-unittest) | 依赖升级、secret scanning、runner hardening、workflow lint / audit、policy-as-code、IaC 校验、Kubernetes schema / policy / chart 测试 |
+
+### 技能与工具参考来源
+
+以下项目主要出现在 `skills/`、参考资料或配套文档中，作为具体 skill、范式、工具链或示例来源，同样在此统一致谢：
+
+| 分组 | 上游项目 | 当前用途 |
+|------|------|------|
+| UI/UX 与设计智能 | [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | `ui-ux-promax` 的上游来源与方法库 |
+| 测试与评估 | [google/googletest](https://github.com/google/googletest), [joaquinhuigomez/agent-eval](https://github.com/joaquinhuigomez/agent-eval) | C++ testing / GoogleTest 参考、agent evaluation 方法与任务评测参考 |
+| 仓库分析与记忆 | [haibindev/repo-scan](https://github.com/haibindev/repo-scan), [sreedhargs89/context-keeper](https://github.com/sreedhargs89/context-keeper) | repo-scan、ck / context keeper 相关能力来源 |
+| 多 agent 编排 | [humanplane](https://github.com/humanplane), [standardagents/dmux](https://github.com/standardagents/dmux) | RFC pipeline 分解思路、dmux 多 pane agent orchestration |
+| Agent 开发框架与媒体参考 | [cloudwego/eino](https://github.com/cloudwego/eino), [cloudwego/eino-ext](https://github.com/cloudwego/eino-ext), [video-db/videodb-cookbook](https://github.com/video-db/videodb-cookbook) | ADK framework adapters 的 EINO 参考、VideoDB cookbook 示例 |
+
+### 全仓 README 与文档 GitHub 引用补充清单
+
+以下仓库同样出现在本仓库其他 `README*.md`、skill 文档或参考资料中，主要用于示例、教程、生态说明或补充参考。它们被纳入致谢归档，但不等于 TSP 的核心依赖或正式内置能力：
+
+| 分组 | 仓库 | 主要出现位置 | 用途 |
+|------|------|------|------|
+| GoFrame 生态 | [gogf/gf](https://github.com/gogf/gf) | `skills/goframe-v2/examples/**/README*.MD` | GoFrame 框架本体及 contrib 模块引用 |
+| GoFrame 示例 | [gogf/examples](https://github.com/gogf/examples) | `skills/goframe-v2/examples/**/README*.MD` | 示例仓库、教学与 clone 指引 |
+| 依赖注入 | [samber/do](https://github.com/samber/do) | `skills/goframe-v2/examples/practices/injection/README*.MD` | DI 示例依赖 |
+| JWT | [golang-jwt/jwt](https://github.com/golang-jwt/jwt) | `skills/goframe-v2/examples/httpserver/jwt/README*.MD` | JWT 认证示例依赖 |
+| MongoDB | [mongodb/mongo-go-driver](https://github.com/mongodb/mongo-go-driver) | `skills/goframe-v2/examples/nosql/mongodb/README*.MD` | MongoDB 官方 Go 驱动参考 |
+| Redis | [redis/go-redis](https://github.com/redis/go-redis) | `skills/goframe-v2/examples/nosql/redis/README*.MD` | Redis Go 客户端参考 |
+| 服务治理 | [polarismesh/polaris](https://github.com/polarismesh/polaris) | `skills/goframe-v2/examples/config/polaris/README.MD` | Polaris 服务发现 / 配置生态参考 |
+
+如果后续有新的 README 引用了社区 GitHub 仓库，默认也应同步补入本节，保持主入口文档的致谢口径完整可追溯。
 
 ## BMAD 方法论（当前口径）
 
