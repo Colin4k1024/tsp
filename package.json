@@ -49,6 +49,7 @@
     "workflow:list": "node scripts/workflow-list.js",
     "workflow:help": "node scripts/workflow-help.js",
     "artifact:persist": "node scripts/artifact-persistence.js",
+    "project:progress": "node scripts/project-progress.js",
     "workflow:run": "node scripts/workflow-run.js",
     "workflow:runs": "node scripts/workflow-runs.js",
     "workflow:readiness": "node scripts/workflow-readiness.js",
