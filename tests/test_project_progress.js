@@ -69,6 +69,34 @@ function writeProjectContext(projectRoot, taskName = '2026-04-27-progress-demo',
   );
 }
 
+function writeQuietProjectContext(projectRoot, taskName = '2026-04-27-progress-demo', phase = 'execute') {
+  const memoryDir = path.join(projectRoot, 'docs', 'memory');
+  fs.mkdirSync(memoryDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(memoryDir, 'project-context.md'),
+    [
+      '# Project Context',
+      '',
+      '## 当前活跃任务',
+      `- ${taskName}`,
+      '',
+      '## 当前阶段',
+      `- ${phase}`,
+      '',
+      '## 关键依赖',
+      '- project-progress',
+      '',
+      '## 活跃风险',
+      '- no active risk',
+      '',
+      '## 下一步建议',
+      '- run progress snapshot',
+      '',
+    ].join('\n'),
+    'utf8',
+  );
+}
+
 function makeProject(tempRoot, name) {
   const projectRoot = path.join(tempRoot, name);
   fs.mkdirSync(projectRoot, { recursive: true });
@@ -87,6 +115,64 @@ function makeTask(projectRoot, taskName, files = []) {
     }
     fs.writeFileSync(path.join(taskDir, fileName), `---\nartifact: ${fileName.replace(/\.md$/, '')}\n---\n`, 'utf8');
   }
+  return taskDir;
+}
+
+function makeExecuteReadyTask(projectRoot, taskName) {
+  const taskDir = path.join(projectRoot, 'docs', 'artifacts', taskName);
+  fs.mkdirSync(taskDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(taskDir, 'prd.md'),
+    '---\nartifact: prd\n---\n# PRD\n',
+    'utf8',
+  );
+  fs.writeFileSync(
+    path.join(taskDir, 'delivery-plan.md'),
+    [
+      '---',
+      'artifact: delivery-plan',
+      '---',
+      '# Delivery Plan',
+      '',
+      '## Dynamic Discussion Group',
+      '- backend-engineer',
+      '',
+      '## Requirement Challenge Session',
+      '- accepted',
+      '',
+      '## Design Review Board',
+      '- accepted',
+      '',
+      '## Story Slice Plan',
+      '- slice: monitor strategy / owner: backend-engineer / handoff: qa-engineer',
+      '',
+    ].join('\n'),
+    'utf8',
+  );
+  const handoffDir = path.join(taskDir, 'handoffs');
+  fs.mkdirSync(handoffDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(handoffDir, '001-tech-lead-to-backend-engineer.md'),
+    [
+      '---',
+      'artifact: handoff',
+      'current_phase: handoff-ready',
+      'target_phase: execute',
+      'readiness_status: handoff-ready',
+      'accepted_by: backend-engineer',
+      '---',
+      '# Handoff',
+      '',
+      '- current_phase: handoff-ready',
+      '- target_phase: execute',
+      '- readiness_status: handoff-ready',
+      '- readiness proof: prd and delivery plan are ready',
+      '- downstream challenge record: accepted by backend-engineer',
+      '- accepted',
+      '',
+    ].join('\n'),
+    'utf8',
+  );
   return taskDir;
 }
 
@@ -261,6 +347,148 @@ test('human and JSON CLI output include project and task progress', () => {
     assert.strictEqual(humanResult.status, 0, humanResult.stderr);
     assert.ok(humanResult.stdout.includes('Project progress snapshot'));
     assert.ok(humanResult.stdout.includes('cli-project'));
+  });
+});
+
+test('computes monitoring states for healthy, blocked, stale, at-risk, and closed tasks', () => {
+  withTempDir((tempRoot) => {
+    const healthyRoot = makeProject(tempRoot, 'healthy');
+    const healthyTask = '2026-04-27-healthy-task';
+    writeQuietProjectContext(healthyRoot, healthyTask, 'execute');
+    makeExecuteReadyTask(healthyRoot, healthyTask);
+
+    const blockedRoot = makeProject(tempRoot, 'blocked');
+    const blockedTask = '2026-04-27-blocked-task';
+    writeQuietProjectContext(blockedRoot, blockedTask, 'plan');
+    makeTask(blockedRoot, blockedTask, ['prd.md', 'delivery-plan.md']);
+
+    const staleRoot = makeProject(tempRoot, 'stale');
+    const staleTask = '2026-04-01-stale-task';
+    writeQuietProjectContext(staleRoot, staleTask, 'execute');
+    makeExecuteReadyTask(staleRoot, staleTask);
+
+    const riskRoot = makeProject(tempRoot, 'risk');
+    const riskTask = '2026-04-27-risk-task';
+    writeProjectContext(riskRoot, riskTask, 'execute');
+    makeExecuteReadyTask(riskRoot, riskTask);
+
+    const closedRoot = makeProject(tempRoot, 'closed');
+    const closedTask = '2026-04-01-closed-task';
+    writeProjectContext(closedRoot, closedTask, 'closed');
+    makeTask(closedRoot, closedTask, ['prd.md', 'delivery-plan.md', 'closeout-summary.md']);
+
+    const report = buildReport({
+      registry: path.join(tempRoot, 'missing-registry.json'),
+      projects: [healthyRoot, blockedRoot, staleRoot, riskRoot, closedRoot],
+      scanRoots: [],
+      maxDepth: 2,
+      staleDays: 7,
+      now: new Date('2026-04-28T00:00:00.000Z'),
+    });
+
+    const byProject = Object.fromEntries(report.projects.map((project) => [project.name, project]));
+    assert.strictEqual(byProject.healthy.tasks[0].monitoring.status, 'healthy');
+    assert.strictEqual(byProject.blocked.tasks[0].monitoring.status, 'blocked');
+    assert.strictEqual(byProject.stale.tasks[0].monitoring.status, 'stale');
+    assert.strictEqual(byProject.risk.tasks[0].monitoring.status, 'atRisk');
+    assert.strictEqual(byProject.closed.tasks[0].monitoring.status, 'closed');
+    assert.strictEqual(report.monitoringSummary.inProgressTasks, 4);
+    assert.strictEqual(report.monitoringSummary.blockedTasks, 1);
+    assert.strictEqual(report.monitoringSummary.staleTasks, 1);
+    assert.strictEqual(report.monitoringSummary.atRiskTasks, 1);
+    assert.strictEqual(report.monitoringSummary.highestSeverity, 'critical');
+    assert.strictEqual(report.monitoringSummary.needsAttention.length, 3);
+  });
+});
+
+test('stale-days adjusts the monitoring threshold', () => {
+  withTempDir((tempRoot) => {
+    const projectRoot = makeProject(tempRoot, 'threshold');
+    const taskName = '2026-04-20-threshold-task';
+    writeQuietProjectContext(projectRoot, taskName, 'execute');
+    makeExecuteReadyTask(projectRoot, taskName);
+
+    const baseOptions = {
+      registry: path.join(tempRoot, 'missing-registry.json'),
+      projects: [projectRoot],
+      scanRoots: [],
+      maxDepth: 2,
+      now: new Date('2026-04-28T00:00:00.000Z'),
+    };
+
+    const defaultReport = buildReport({ ...baseOptions, staleDays: 7 });
+    const relaxedReport = buildReport({ ...baseOptions, staleDays: 14 });
+
+    assert.strictEqual(defaultReport.projects[0].tasks[0].monitoring.status, 'stale');
+    assert.strictEqual(relaxedReport.projects[0].tasks[0].monitoring.status, 'healthy');
+  });
+});
+
+test('project-context mismatch marks active tasks at risk', () => {
+  withTempDir((tempRoot) => {
+    const projectRoot = makeProject(tempRoot, 'mismatch');
+    const olderTask = '2026-04-26-older-task';
+    const latestTask = '2026-04-27-latest-task';
+    writeQuietProjectContext(projectRoot, olderTask, 'execute');
+    makeExecuteReadyTask(projectRoot, olderTask);
+    makeExecuteReadyTask(projectRoot, latestTask);
+
+    const report = buildReport({
+      registry: path.join(tempRoot, 'missing-registry.json'),
+      projects: [projectRoot],
+      scanRoots: [],
+      maxDepth: 2,
+      staleDays: 7,
+      now: new Date('2026-04-28T00:00:00.000Z'),
+    });
+
+    const latest = report.projects[0].tasks.find((task) => task.id === latestTask);
+    assert.strictEqual(latest.monitoring.status, 'atRisk');
+    assert.ok(latest.monitoring.signals.some((signal) => signal.code === 'current-task-mismatch'));
+  });
+});
+
+test('CLI reports risks without failing by default and fails when requested', () => {
+  withTempDir((tempRoot) => {
+    const projectRoot = makeProject(tempRoot, 'cli-monitor');
+    const taskName = '2026-04-27-cli-monitor-task';
+    writeQuietProjectContext(projectRoot, taskName, 'plan');
+    makeTask(projectRoot, taskName, ['prd.md', 'delivery-plan.md']);
+
+    const defaultResult = runCli(['--project', projectRoot]);
+    assert.strictEqual(defaultResult.status, 0, defaultResult.stderr);
+    assert.ok(defaultResult.stdout.includes('blocked'));
+
+    const failResult = runCli(['--project', projectRoot, '--fail-on-risk']);
+    assert.strictEqual(failResult.status, 1);
+    assert.ok(failResult.stdout.includes('blocked'));
+  });
+});
+
+test('JSON CLI output includes global and task monitoring details', () => {
+  withTempDir((tempRoot) => {
+    const projectRoot = makeProject(tempRoot, 'json-monitor');
+    const taskName = '2026-04-27-json-monitor-task';
+    writeQuietProjectContext(projectRoot, taskName, 'plan');
+    makeTask(projectRoot, taskName, ['prd.md', 'delivery-plan.md']);
+
+    const result = runCli(['--registry', path.join(tempRoot, 'missing-registry.json'), '--project', projectRoot, '--json']);
+    assert.strictEqual(result.status, 0, result.stderr);
+    const payload = JSON.parse(result.stdout);
+    assert.strictEqual(payload.monitoringSummary.inProgressTasks, 1);
+    assert.strictEqual(payload.monitoringSummary.blockedTasks, 1);
+    assert.strictEqual(payload.projects[0].tasks[0].monitoring.status, 'blocked');
+    assert.ok(Array.isArray(payload.projects[0].tasks[0].monitoring.signals));
+
+    const gateResult = runCli([
+      '--registry',
+      path.join(tempRoot, 'missing-registry.json'),
+      '--project',
+      projectRoot,
+      '--json',
+      '--fail-on-risk',
+    ]);
+    assert.strictEqual(gateResult.status, 1);
   });
 });
 

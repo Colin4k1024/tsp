@@ -10,6 +10,8 @@ const { analyzeTask } = require('./workflow-help');
 const TASK_DIR_PATTERN = /^\d{4}-\d{2}-\d{2}-.+/;
 const DEFAULT_REGISTRY = path.join(os.homedir(), '.claude', 'homunculus', 'projects.json');
 const DEFAULT_MAX_DEPTH = 2;
+const DEFAULT_STALE_DAYS = 7;
+const DAY_MS = 24 * 60 * 60 * 1000;
 const IGNORED_SCAN_DIRS = new Set([
   '.git',
   '.hg',
@@ -50,6 +52,13 @@ const MISSING_LABELS = Object.freeze({
   closeout: 'closeout-summary.md',
 });
 
+const SEVERITY_RANK = Object.freeze({
+  none: 0,
+  info: 1,
+  warning: 2,
+  critical: 3,
+});
+
 function parseArgs(argv) {
   const options = {
     help: false,
@@ -58,6 +67,8 @@ function parseArgs(argv) {
     projects: [],
     scanRoots: [],
     maxDepth: DEFAULT_MAX_DEPTH,
+    failOnRisk: false,
+    staleDays: DEFAULT_STALE_DAYS,
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -68,6 +79,10 @@ function parseArgs(argv) {
     }
     if (arg === '--json') {
       options.json = true;
+      continue;
+    }
+    if (arg === '--fail-on-risk') {
+      options.failOnRisk = true;
       continue;
     }
     if (arg === '--registry' && argv[index + 1]) {
@@ -94,6 +109,15 @@ function parseArgs(argv) {
       index += 1;
       continue;
     }
+    if (arg === '--stale-days' && argv[index + 1]) {
+      const staleDays = Number(argv[index + 1]);
+      if (!Number.isInteger(staleDays) || staleDays < 0) {
+        throw new Error('--stale-days must be a non-negative integer');
+      }
+      options.staleDays = staleDays;
+      index += 1;
+      continue;
+    }
     throw new Error(`Unknown argument: ${arg}`);
   }
 
@@ -109,6 +133,8 @@ function getHelpText() {
     '  --project <path>       Add one project root. Repeatable.',
     '  --scan-root <path>     Scan a directory for Team Skills project roots. Repeatable.',
     '  --max-depth <n>        Max scan depth for --scan-root. Defaults to 2.',
+    '  --stale-days <n>       Mark in-progress tasks stale after n days. Defaults to 7.',
+    '  --fail-on-risk         Exit non-zero when blocked or stale in-progress tasks exist.',
     '  --json                 Emit structured JSON output.',
     '  -h, --help             Show this help message.',
     '',
@@ -340,7 +366,17 @@ function parseListSection(body) {
     .split('\n')
     .map((line) => line.trim().replace(/^[-*•]\s*/, '').trim())
     .filter(Boolean)
-    .filter((line) => !['待补齐', '暂无', 'n/a', 'na', 'none', 'tbd'].includes(line.toLowerCase()));
+    .filter((line) => ![
+      '待补齐',
+      '暂无',
+      'n/a',
+      'na',
+      'none',
+      'tbd',
+      'no active risk',
+      'no active risks',
+      'no active operational risk',
+    ].includes(line.toLowerCase()));
 }
 
 function parseProjectContext(projectRoot) {
@@ -365,17 +401,26 @@ function parseProjectContext(projectRoot) {
   };
 }
 
-function analyzeNextCommand(projectRoot, taskDir) {
+function analyzeNextStep(projectRoot, taskDir) {
   try {
-    return analyzeTask({
+    const result = analyzeTask({
       cwd: projectRoot,
       taskDir,
       json: true,
       help: false,
       preferQuick: false,
-    }).recommendedCommand;
+    });
+    return {
+      recommendedCommand: result.recommendedCommand || null,
+      missingPrerequisites: Array.isArray(result.missingPrerequisites) ? result.missingPrerequisites : [],
+      reason: result.reason || null,
+    };
   } catch (_error) {
-    return null;
+    return {
+      recommendedCommand: null,
+      missingPrerequisites: [],
+      reason: null,
+    };
   }
 }
 
@@ -383,6 +428,7 @@ function inspectTask(projectRoot, taskDir) {
   const task = parseTaskDirName(taskDir);
   const artifacts = inspectArtifacts(taskDir);
   const inferred = inferTaskProgress(artifacts);
+  const nextStep = analyzeNextStep(projectRoot, taskDir);
   return {
     ...task,
     path: taskDir,
@@ -390,8 +436,149 @@ function inspectTask(projectRoot, taskDir) {
     progress: inferred.progress,
     artifacts,
     missing: missingArtifacts(artifacts),
-    recommendedCommand: analyzeNextCommand(projectRoot, taskDir),
+    recommendedCommand: nextStep.recommendedCommand,
+    nextStep,
   };
+}
+
+function highestSeverity(values) {
+  return values.reduce((highest, value) => (
+    SEVERITY_RANK[value] > SEVERITY_RANK[highest] ? value : highest
+  ), 'none');
+}
+
+function ageDaysFromTaskDate(taskDate, now) {
+  if (!taskDate) {
+    return null;
+  }
+  const parsed = new Date(`${taskDate}T00:00:00.000Z`);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+  const current = now instanceof Date ? now : new Date(now || Date.now());
+  const currentDay = Date.UTC(
+    current.getUTCFullYear(),
+    current.getUTCMonth(),
+    current.getUTCDate(),
+  );
+  return Math.floor((currentDay - parsed.getTime()) / DAY_MS);
+}
+
+function requiredEvidenceSignal(task) {
+  if (task.phase === 'untracked' && !task.artifacts.prd) {
+    return {
+      code: 'missing-prd',
+      severity: 'critical',
+      message: 'Task has no prd.md intake evidence.',
+    };
+  }
+  if (task.phase === 'intake' && !task.artifacts.deliveryPlan) {
+    return {
+      code: 'missing-delivery-plan',
+      severity: 'critical',
+      message: 'Task has intake evidence but no delivery-plan.md.',
+    };
+  }
+  if (task.phase === 'plan' && !task.artifacts.handoff) {
+    return {
+      code: 'missing-handoff',
+      severity: 'critical',
+      message: 'Task has a delivery plan but no handoff evidence.',
+    };
+  }
+  return null;
+}
+
+function activeRiskSignals(projectContext) {
+  return (projectContext.risks || []).map((risk) => ({
+    code: 'active-risk',
+    severity: 'warning',
+    message: `Project context risk: ${risk}`,
+  }));
+}
+
+function monitorTask(task, projectContext, projectLatestTaskId, options = {}) {
+  if (task.progress === 100) {
+    return {
+      status: 'closed',
+      severity: 'none',
+      signals: [],
+      recommendedAction: 'Task is closed.',
+    };
+  }
+
+  const signals = [];
+  const evidenceSignal = requiredEvidenceSignal(task);
+  if (evidenceSignal) {
+    signals.push(evidenceSignal);
+  }
+
+  if (task.nextStep && task.nextStep.missingPrerequisites.length > 0) {
+    signals.push({
+      code: 'workflow-prerequisite-gap',
+      severity: 'critical',
+      message: task.nextStep.missingPrerequisites[0],
+    });
+  }
+
+  const staleDays = Number.isInteger(options.staleDays) ? options.staleDays : DEFAULT_STALE_DAYS;
+  const ageDays = ageDaysFromTaskDate(task.date, options.now);
+  if (ageDays !== null && ageDays > staleDays) {
+    signals.push({
+      code: 'stale-task',
+      severity: 'warning',
+      message: `Task has been in progress for ${ageDays} days, above the ${staleDays} day threshold.`,
+    });
+  }
+
+  signals.push(...activeRiskSignals(projectContext));
+
+  if (
+    projectContext.currentTask
+    && projectLatestTaskId
+    && task.id === projectLatestTaskId
+    && projectContext.currentTask !== projectLatestTaskId
+  ) {
+    signals.push({
+      code: 'current-task-mismatch',
+      severity: 'warning',
+      message: `Project context current task is ${projectContext.currentTask}, but the latest artifact task is ${projectLatestTaskId}.`,
+    });
+  }
+
+  const severity = highestSeverity(signals.map((signal) => signal.severity));
+  let status = 'healthy';
+  if (signals.some((signal) => (
+    signal.code === 'missing-prd'
+    || signal.code === 'missing-delivery-plan'
+    || signal.code === 'missing-handoff'
+    || signal.code === 'workflow-prerequisite-gap'
+  ))) {
+    status = 'blocked';
+  } else if (signals.some((signal) => signal.code === 'stale-task')) {
+    status = 'stale';
+  } else if (signals.length > 0) {
+    status = 'atRisk';
+  }
+
+  return {
+    status,
+    severity,
+    signals,
+    recommendedAction: task.recommendedCommand
+      ? `Run ${task.recommendedCommand}.`
+      : 'Review task artifacts and project context.',
+  };
+}
+
+function applyMonitoring(tasks, projectContext, options = {}) {
+  const latestTask = tasks[tasks.length - 1] || null;
+  const latestTaskId = latestTask ? latestTask.id : null;
+
+  return tasks.map((task) => ({
+    ...task,
+    monitoring: monitorTask(task, projectContext, latestTaskId, options),
+  }));
 }
 
 function summarizeTasks(tasks) {
@@ -410,7 +597,7 @@ function summarizeTasks(tasks) {
   };
 }
 
-function inspectProject(project) {
+function inspectProject(project, options = {}) {
   if (!project.root || !exists(project.root)) {
     return {
       ...project,
@@ -433,7 +620,9 @@ function inspectProject(project) {
 
   try {
     const taskDirs = listTaskDirs(project.root);
-    const tasks = taskDirs.map((taskDir) => inspectTask(project.root, taskDir));
+    const currentContext = parseProjectContext(project.root);
+    const inspectedTasks = taskDirs.map((taskDir) => inspectTask(project.root, taskDir));
+    const tasks = applyMonitoring(inspectedTasks, currentContext, options);
     const summary = summarizeTasks(tasks);
     const status = tasks.length === 0
       ? 'untracked'
@@ -443,7 +632,7 @@ function inspectProject(project) {
       ...project,
       status,
       summary,
-      currentContext: parseProjectContext(project.root),
+      currentContext,
       tasks,
     };
   } catch (error) {
@@ -458,9 +647,40 @@ function inspectProject(project) {
   }
 }
 
+function summarizeMonitoring(projects) {
+  const tasksWithProject = projects.flatMap((project) => (
+    (project.tasks || []).map((task) => ({ project, task }))
+  ));
+  const inProgress = tasksWithProject.filter(({ task }) => task.progress < 100);
+  const blocked = inProgress.filter(({ task }) => task.monitoring && task.monitoring.status === 'blocked');
+  const stale = inProgress.filter(({ task }) => task.monitoring && task.monitoring.status === 'stale');
+  const atRisk = inProgress.filter(({ task }) => task.monitoring && task.monitoring.status === 'atRisk');
+  const needsAttention = inProgress
+    .filter(({ task }) => task.monitoring && task.monitoring.status !== 'healthy')
+    .map(({ project, task }) => ({
+      project: project.name,
+      root: project.root,
+      task: task.id,
+      status: task.monitoring.status,
+      severity: task.monitoring.severity,
+      signals: task.monitoring.signals.map((signal) => signal.code),
+      recommendedAction: task.monitoring.recommendedAction,
+    }));
+
+  return {
+    inProgressTasks: inProgress.length,
+    healthyTasks: inProgress.filter(({ task }) => task.monitoring && task.monitoring.status === 'healthy').length,
+    blockedTasks: blocked.length,
+    staleTasks: stale.length,
+    atRiskTasks: atRisk.length,
+    highestSeverity: highestSeverity(needsAttention.map((item) => item.severity)),
+    needsAttention,
+  };
+}
+
 function buildReport(options) {
   const collected = collectProjectEntries(options);
-  const projects = collected.projects.map(inspectProject);
+  const projects = collected.projects.map((project) => inspectProject(project, options));
   const errors = [...collected.errors];
   for (const project of projects) {
     if (project.status === 'error') {
@@ -474,6 +694,7 @@ function buildReport(options) {
 
   return {
     generatedAt: new Date().toISOString(),
+    monitoringSummary: summarizeMonitoring(projects),
     projects,
     errors,
   };
@@ -515,6 +736,9 @@ function formatHumanReport(report) {
       active: String(project.summary.activeTasks),
       closed: String(project.summary.closedTasks),
       avg: `${project.summary.averageProgress}%`,
+      monitor: project.tasks.length
+        ? highestSeverity(project.tasks.map((task) => task.monitoring?.severity || 'none'))
+        : '-',
       current: project.currentContext.currentTask || '-',
       phase: project.currentContext.phase || '-',
       root: project.root || '-',
@@ -526,6 +750,7 @@ function formatHumanReport(report) {
       { key: 'active', label: 'Active' },
       { key: 'closed', label: 'Closed' },
       { key: 'avg', label: 'Avg' },
+      { key: 'monitor', label: 'Monitor' },
       { key: 'current', label: 'Current Task' },
       { key: 'phase', label: 'Context Phase' },
       { key: 'root', label: 'Root' },
@@ -547,6 +772,7 @@ function formatHumanReport(report) {
       task: task.id,
       phase: task.phase,
       progress: `${task.progress}%`,
+      monitor: task.monitoring ? task.monitoring.status : '-',
       next: task.recommendedCommand || '-',
       missing: task.missing.slice(0, 4).join(', ') + (task.missing.length > 4 ? ', ...' : ''),
     }));
@@ -554,6 +780,7 @@ function formatHumanReport(report) {
       { key: 'task', label: 'Task' },
       { key: 'phase', label: 'Phase' },
       { key: 'progress', label: 'Progress' },
+      { key: 'monitor', label: 'Monitor' },
       { key: 'next', label: 'Next' },
       { key: 'missing', label: 'Missing' },
     ]));
@@ -570,6 +797,14 @@ function formatHumanReport(report) {
   return `${lines.join('\n')}\n`;
 }
 
+function shouldFailOnRisk(options, report) {
+  return Boolean(
+    options.failOnRisk
+    && report.monitoringSummary
+    && (report.monitoringSummary.blockedTasks > 0 || report.monitoringSummary.staleTasks > 0),
+  );
+}
+
 function main(argv = process.argv.slice(2)) {
   const options = parseArgs(argv);
   if (options.help) {
@@ -578,6 +813,9 @@ function main(argv = process.argv.slice(2)) {
   }
 
   const report = buildReport(options);
+  if (shouldFailOnRisk(options, report)) {
+    process.exitCode = 1;
+  }
   if (options.json) {
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
     return;
@@ -604,8 +842,11 @@ module.exports = {
   inspectProject,
   loadRegistry,
   main,
+  monitorTask,
   parseArgs,
   parseProjectContext,
   scanProjects,
+  shouldFailOnRisk,
+  summarizeMonitoring,
   summarizeTasks,
 };
