@@ -293,10 +293,12 @@
     {
       "id": "knowledge-graph",
       "kind": "skills",
-      "description": "Optional Graphify-based knowledge graph capability for brownfield structure discovery, architecture Q&A, and evidence capture.",
+      "description": "Optional Graphify and GitNexus code-graph capabilities for brownfield structure discovery, architecture Q&A, impact analysis, and evidence capture.",
       "paths": [
         "skills/graphify",
-        "docs/runbooks/graphify-knowledge-graph-usage.md"
+        "skills/gitnexus",
+        "docs/runbooks/graphify-knowledge-graph-usage.md",
+        "docs/runbooks/gitnexus-code-intelligence-usage.md"
       ],
       "targets": [
         "claude",

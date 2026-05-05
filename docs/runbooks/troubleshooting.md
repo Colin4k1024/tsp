@@ -24,6 +24,7 @@ source_of_truth:
 - 项目级 `CLAUDE.md` 不知道哪些字段是必须的
 - 使用了 custom overlay，但 review 阶段无法说明启用原因和执行记录
 - `npm run graphify:doctor` 失败（Python 版本或 Graphify CLI 缺失）
+- `npm run gitnexus:doctor` 失败（Node 版本、npm/npx 或许可证确认问题）
 
 ## 2. 安装脚本相关问题
 
@@ -200,7 +201,7 @@ Codex 检查点：
 优先按这个顺序处理：
 
 1. 安装或切换到 Python `3.10+`
-2. 在对应环境安装 `graphifyy`
+2. 在对应环境安装 `graphify`
 3. 重新执行 `npm run graphify:doctor`
 4. 用 `graphify --help` 验证 CLI 已可用
 
@@ -209,3 +210,25 @@ Codex 检查点：
 - 仓库只提供 preflight 检查，不会自动安装 Python 或 Graphify
 - 不要在本仓库执行 `graphify codex install` / `graphify claude install` 改写现有 AGENTS/hooks 契约
 - Graphify 详细用法见 [graphify-knowledge-graph-usage.md](graphify-knowledge-graph-usage.md)
+
+## 9. GitNexus 预检查失败
+
+如果你看到下面任一报错：
+
+- Node 版本低于 `20`
+- `npm` 或 `npx` 不可用
+- npm registry 元数据读取失败
+
+优先按这个顺序处理：
+
+1. 在目标项目环境切换到 Node `20+`
+2. 确认 `npm --version` 与 `npx --version` 可正常执行
+3. 重新执行 `npm run gitnexus:doctor`
+4. 若 registry 临时不可用，手动核对 GitNexus 上游许可证和 engine 后再决定是否启用
+
+说明：
+
+- 仓库只提供 preflight 检查，不会自动安装 GitNexus
+- 不要自动执行 `gitnexus setup` 改写全局 MCP/editor 配置
+- 在 TSP 管理仓库执行索引时，使用 `npx --yes gitnexus@latest analyze --skip-agents-md`
+- GitNexus 详细用法见 [gitnexus-code-intelligence-usage.md](gitnexus-code-intelligence-usage.md)

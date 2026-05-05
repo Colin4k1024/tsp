@@ -45,15 +45,16 @@ CLAUDE_HOME_DIR="$HOME/.claude" ./scripts/install-claude.sh
 
 如果还没有定位到问题，继续看 [troubleshooting.md](troubleshooting.md)。
 
-### 2.1 可选能力检查：Graphify
+### 2.1 可选能力检查：Graphify / GitNexus
 
-如果你准备在 brownfield 项目中启用知识图谱能力，安装后可以先做预检查：
+如果你准备在 brownfield 项目中启用代码图谱能力，安装后可以先做预检查：
 
 ```bash
 npm run graphify:doctor
+npm run gitnexus:doctor
 ```
 
-预检查仅验证环境，不会自动安装依赖。若失败，按 [troubleshooting.md](troubleshooting.md) 的 Graphify 章节处理。
+预检查仅验证环境，不会自动安装依赖。Graphify 适合轻量结构证据，GitNexus 适合 MCP 查询、impact 和 detect_changes；若失败，按 [troubleshooting.md](troubleshooting.md) 的对应章节处理。
 
 ## 3. 长期使用建议：准备项目级 CLAUDE.md
 

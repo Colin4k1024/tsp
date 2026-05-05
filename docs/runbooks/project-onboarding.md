@@ -103,12 +103,13 @@ CODEX_HOME_DIR="$HOME/.codex" AGENTS_HOME_DIR="$HOME/.agents" ./scripts/install-
 
 建议在第一次运行 `npm run workflow:readiness` 前完成这一步，否则旧 handoff 会直接触发 gate 失败。
 
-### 3.6 可选知识图谱能力（Graphify）
+### 3.6 可选代码图谱能力（Graphify + GitNexus）
 
-Graphify 在接入阶段用于补齐 brownfield 结构认知，不替代 `/team-*` 主链：
+Graphify 和 GitNexus 在接入阶段用于补齐 brownfield 结构认知，不替代 `/team-*` 主链。Graphify 偏轻量结构扫描，GitNexus 偏 MCP 查询、impact、detect_changes 和多仓证据：
 
 ```bash
 npm run graphify:doctor
+npm run gitnexus:doctor
 ```
 
 推荐在以下场景启用：
@@ -116,6 +117,7 @@ npm run graphify:doctor
 - 老项目接入，模块边界和依赖关系不清晰
 - `/team-plan` 之前需要结构化证据来收口 challenge/design/readiness
 - `/team-execute` 或 `/team-review` 需要明确影响范围与路径
+- 跨模块或跨仓改动需要 GitNexus 的 impact / detect_changes 证据
 
 分发策略：
 
@@ -125,9 +127,10 @@ npm run graphify:doctor
 治理边界：
 
 - 禁止在本仓库执行 `graphify codex install` / `graphify claude install`
+- 禁止自动执行 `gitnexus setup` 或不带 `--skip-agents-md` 的 GitNexus 索引命令
 - 图谱结论需要回落到 handoff 或 artifacts，不形成并行责任链
 
-详细操作见 [graphify-knowledge-graph-usage.md](graphify-knowledge-graph-usage.md)。
+详细操作见 [graphify-knowledge-graph-usage.md](graphify-knowledge-graph-usage.md) 与 [gitnexus-code-intelligence-usage.md](gitnexus-code-intelligence-usage.md)。
 
 ## 4. 选择项目级样例
 

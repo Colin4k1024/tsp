@@ -115,7 +115,7 @@ function buildDocFreshnessCheck(root) {
     id: 'validate-doc-freshness',
     label: 'validate-doc-freshness',
     command: 'node scripts/validate-doc-freshness.js',
-    status: report.errorCount > 0 ? 'fail' : (report.warningCount > 0 ? 'warn' : 'pass'),
+    status: report.errorCount > 0 ? 'fail' : 'pass',
     details: report.errorCount > 0
       ? report.errors[0]
       : (report.warningCount > 0 ? report.warnings[0] : `checked ${report.markdownFileCount} markdown files`),

@@ -66,10 +66,10 @@
         "默认以 `karpathy-guidelines` 的方式先暴露歧义、范围边界与更简单路径，不在入口阶段静默替用户补全高风险假设。",
         "检查现有证据是否齐备：PRD、delivery-plan、arch-design、handoff、execute-log、test-plan、launch-acceptance、deployment-context、release-plan、closeout-summary，以及 `docs/memory/project-context.md`。",
         "若任务边界清晰、影响面小、风险低，优先推荐 `/quick`；否则继续沿 `/team-*` 主链推进。",
-        "若是既有项目（brownfield）且现状上下文不足，优先建议执行 `/update-codemaps` 并启用 `doc-architecture`，把现有模块、集成点、关键数据流和历史包袱回落到 `delivery-plan.md` / `arch-design.md`。",
+        "若是既有项目（brownfield）且现状上下文不足，优先建议执行 `/update-codemaps` 并启用 `doc-architecture`，需要轻量结构证据时选择 Graphify，需要跨模块影响面或 MCP 证据时选择 GitNexus，再把现有模块、集成点、关键数据流和历史包袱回落到 `delivery-plan.md` / `arch-design.md`。",
         "若需求规模较大或涉及多角色并行，实现前先要求把计划切成可独立验收、可独立 handoff 的 story-sized execution units，并确认 `artifact:persist` 已创建对应任务目录与关键 artifact，再进入 `/team-execute`。",
         "若缺少 PRD 或需求边界，推荐 `/team-intake`；若缺少 challenge、design review 或 implementation-readiness，推荐 `/team-plan`；若 readiness proof 与 handoff 齐备，推荐 `/team-execute`；若已完成实现与自测，推荐 `/team-review`；若已获得放行，推荐 `/team-release`；若发布观察窗口结束，推荐 `/team-closeout`。",
-        "若是既有项目且上下文不足，提示先补齐 brownfield / doc-architecture 类上下文，再进入计划或执行。",
+        "若是既有项目且上下文不足，提示先补齐 brownfield / doc-architecture 类上下文；必要时用 Graphify 或 GitNexus 补图谱证据，再进入计划或执行。",
         "输出结构化建议：推荐命令、原因、阻塞项、降级路径，并说明是否需要先运行 `npm run workflow:readiness`。"
       ]
     },
@@ -136,7 +136,7 @@
         "默认把 `karpathy-guidelines` 作为计划收口护栏：要求显式写出假设、更简单备选路径、当前不做项，以及为什么本轮范围已经足够。",
         "按任务特征装配动态讨论分组，先讨论再收敛，避免未经质疑直接进入计划冻结。",
         "若启用 `doc-architecture`，补齐 Service Catalog、Communication Matrix、NFR Summary，并明确其 artifact 回落位置。",
-        "若是既有项目（brownfield），先梳理现有模块边界、外部依赖、历史约束和缺失文档；必要时运行 `/update-codemaps`，再把 brownfield snapshot 回落到 `delivery-plan.md` 与 `arch-design.md`。",
+        "若是既有项目（brownfield），先梳理现有模块边界、外部依赖、历史约束和缺失文档；必要时运行 `/update-codemaps`，需要轻量结构证据时选择 Graphify，需要跨模块影响面或 MCP 证据时选择 GitNexus，再把 brownfield snapshot 回落到 `delivery-plan.md` 与 `arch-design.md`。",
         "若为企业内部应用，锁定应用等级、技术架构等级、关键组件偏离和资产入口要求，并判断是否必须输出 ADR。",
         "为本次任务显式装配 shared 能力、ECC 增强与可选 enterprise overlay 组合，并说明哪些私有 overlay 能力、runbook 或 overlay 仅按场景启用。",
         "若存在多参数、多角色、多配置或多终端组合，提前判断是否需要 `pairwise-test-design` 压缩测试矩阵。",
@@ -468,7 +468,7 @@
     },
     {
       "name": "update-codemaps",
-      "summary": "扫描代码结构并生成 token-lean codemaps，适合作为 brownfield 项目的现状快照与主链前置上下文。",
+      "summary": "扫描代码结构并生成 token-lean codemaps，适合作为 brownfield 项目的现状快照与 Graphify / GitNexus 图谱分析前置上下文。",
       "primary_role": "doc-updater",
       "inputs": [
         "代码仓结构",
@@ -478,13 +478,14 @@
       "outputs": [
         "docs/CODEMAPS/ 下的结构化 codemap",
         ".reports/codemap-diff.txt 差异摘要",
-        "可供 `/team-help` / `/team-plan` 消费的 brownfield context"
+        "可供 `/team-help` / `/team-plan` 消费的 brownfield context",
+        "可供 Graphify / GitNexus 继续深挖的结构化问题清单"
       ],
       "steps": [
         "先识别仓库类型、源码目录、入口文件和主要依赖边界。",
         "为 architecture/backend/frontend/data/dependencies 生成 token-lean 文档，不写实现细节噪音。",
         "若已有 codemap，先比较变更比例；超过阈值时要求人工确认再覆盖。",
-        "把结果作为 brownfield context snapshot 的辅助输入，回落到 `delivery-plan.md` / `arch-design.md`，不要形成平行事实源。"
+        "把结果作为 brownfield context snapshot 的辅助输入；若需要图谱证据，再选择 Graphify 或 GitNexus，并把结论回落到 `delivery-plan.md` / `arch-design.md`，不要形成平行事实源。"
       ]
     },
     {

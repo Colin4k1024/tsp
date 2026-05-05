@@ -71,6 +71,7 @@ source_of_truth:
 |------|------|----------|
 | `doc-architecture` | 文档发现、建模、一致性审计并映射到 artifacts | `/team-intake`、`/team-plan`、`/team-review` |
 | `graphify` | 可选知识图谱能力，用于 brownfield 结构扫描、依赖路径分析与架构问答证据 | `/team-help`、`/team-plan`、`/team-execute` |
+| `gitnexus` | 受控可选代码智能能力，用于 MCP 查询、impact、detect_changes、多仓图谱证据 | `/team-help`、`/team-plan`、`/team-execute`、`/team-review` |
 | `karpathy-guidelines` | 主流程默认行为护栏：先暴露假设、优先简单方案、限定改动边界、先锁成功标准 | `/team-help`、`/team-intake`、`/team-plan`、`/team-execute`、`/team-review`、`/team-release` |
 | `browser-smoke-testing` | 浏览器主路径与 smoke 证据 | `/team-execute`、`/verify`、`/team-release` |
 | `pairwise-test-design` | 组合爆炸压缩 | `/team-plan`、`/team-review` |
@@ -147,10 +148,11 @@ source_of_truth:
 ### 6.4 Brownfield 结构扫描（可选）
 
 1. `/team-help`
-2. `npm run graphify:doctor`
-3. Graphify 执行 `build/query/path/explain`，输出到 `graphify-out/`
-4. `/team-plan` 消费图谱证据收口 challenge/design/readiness
-5. `/team-execute` 与 `/team-review` 持续引用图谱证据，不创建并行责任链
+2. `/update-codemaps` 生成轻量现状快照
+3. 轻量结构证据执行 `npm run graphify:doctor`；深影响面或 MCP 证据执行 `npm run gitnexus:doctor`
+4. Graphify 执行 `build/query/path/explain`，或 GitNexus 执行受控索引后查询 `impact/detect_changes/context`
+5. `/team-plan` 消费图谱证据收口 challenge/design/readiness
+6. `/team-execute` 与 `/team-review` 持续引用图谱证据，不创建并行责任链
 
 ## 7. 下一步看什么
 
