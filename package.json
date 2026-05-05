@@ -41,6 +41,7 @@
     "validate:refs": "node scripts/validate-file-references.js --strict",
     "validate:docs-freshness": "node scripts/validate-doc-freshness.js",
     "graphify:doctor": "node scripts/graphify-preflight.js",
+    "gitnexus:doctor": "node scripts/gitnexus-preflight.js",
     "validate:skill-structure": "node scripts/validate-skill-structure.js",
     "validate:prebuilt": "node scripts/validate-prebuilt.js",
     "validate:tarball": "node scripts/validate-packed-tarball.js",

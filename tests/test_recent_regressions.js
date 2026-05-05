@@ -75,6 +75,106 @@ test('install:claude uses non-interactive npx path', () => {
   );
 });
 
+test('gitnexus doctor script is exposed without adding gitnexus as a dependency', () => {
+  const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
+
+  assert.strictEqual(
+    packageJson.scripts['gitnexus:doctor'],
+    'node scripts/gitnexus-preflight.js',
+    'expected gitnexus:doctor to point at the controlled preflight script'
+  );
+  assert.ok(
+    !Object.prototype.hasOwnProperty.call(packageJson.dependencies || {}, 'gitnexus'),
+    'expected GitNexus to remain an optional external tool, not a production dependency'
+  );
+});
+
+test('gitnexus preflight blocks Node versions below 20', () => {
+  const result = spawnSync('node', ['scripts/gitnexus-preflight.js'], {
+    cwd: path.join(__dirname, '..'),
+    encoding: 'utf8',
+    env: {
+      ...process.env,
+      GITNEXUS_PREFLIGHT_NODE_VERSION: 'v18.19.0',
+      GITNEXUS_PREFLIGHT_NPM_VIEW_JSON: JSON.stringify({
+        version: '1.6.3',
+        license: 'PolyForm-Noncommercial-1.0.0',
+        engines: { node: '>=20.0.0' },
+      }),
+    },
+  });
+  const combinedOutput = `${result.stdout || ''}${result.stderr || ''}`;
+
+  assert.notStrictEqual(result.status, 0, 'expected GitNexus preflight to fail under Node 18');
+  assert.ok(
+    combinedOutput.includes('requires Node >= 20'),
+    'expected GitNexus preflight to explain the Node 20 requirement'
+  );
+});
+
+test('gitnexus preflight keeps integration controlled and license-aware', () => {
+  const result = spawnSync('node', ['scripts/gitnexus-preflight.js'], {
+    cwd: path.join(__dirname, '..'),
+    encoding: 'utf8',
+    env: {
+      ...process.env,
+      GITNEXUS_PREFLIGHT_NODE_VERSION: 'v20.10.0',
+      GITNEXUS_PREFLIGHT_NPM_VIEW_JSON: JSON.stringify({
+        version: '1.6.3',
+        license: 'PolyForm-Noncommercial-1.0.0',
+        engines: { node: '>=20.0.0' },
+      }),
+    },
+  });
+  const combinedOutput = `${result.stdout || ''}${result.stderr || ''}`;
+
+  assert.strictEqual(result.status, 0, combinedOutput);
+  assert.ok(
+    combinedOutput.includes('PolyForm-Noncommercial-1.0.0'),
+    'expected GitNexus preflight to surface the upstream license'
+  );
+  assert.ok(
+    combinedOutput.includes('npx --yes gitnexus@latest analyze --skip-agents-md'),
+    'expected GitNexus preflight to recommend preserving existing AGENTS.md/CLAUDE.md content'
+  );
+  assert.ok(
+    combinedOutput.includes('Do not run `gitnexus setup` automatically'),
+    'expected GitNexus preflight to forbid automatic setup'
+  );
+  assert.ok(
+    !combinedOutput.includes('gitnexus clean --all --force'),
+    'expected GitNexus preflight to avoid destructive cleanup recommendations'
+  );
+});
+
+test('knowledge graph module includes GitNexus optional surface', () => {
+  const modules = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'manifests', 'install-modules.json'), 'utf8'));
+  const knowledgeGraph = modules.modules.find((item) => item.id === 'knowledge-graph');
+
+  assert.ok(knowledgeGraph, 'expected knowledge-graph module to exist');
+  assert.ok(
+    knowledgeGraph.paths.includes('skills/gitnexus'),
+    'expected knowledge-graph module to ship the GitNexus skill'
+  );
+  assert.ok(
+    knowledgeGraph.paths.includes('docs/runbooks/gitnexus-code-intelligence-usage.md'),
+    'expected knowledge-graph module to ship the GitNexus runbook'
+  );
+});
+
+test('brownfield workflow guidance mentions GitNexus and Graphify evidence paths', () => {
+  const teamSkillsData = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'lib', 'team-skills-data.json'), 'utf8');
+
+  assert.ok(
+    teamSkillsData.includes('GitNexus') && teamSkillsData.includes('Graphify'),
+    'expected workflow guidance to mention both GitNexus and Graphify'
+  );
+  assert.ok(
+    teamSkillsData.includes('/update-codemaps'),
+    'expected brownfield guidance to keep /update-codemaps as the first structure snapshot step'
+  );
+});
+
 test('graphify preflight suggests the correct package name', () => {
   const result = spawnSync('node', ['scripts/graphify-preflight.js'], {
     cwd: path.join(__dirname, '..'),

@@ -103,13 +103,14 @@ source_of_truth:
 - 公开安装与分发约定见 [custom-overlay.md](custom-overlay.md)。
 - 任何需要企业内部 runbook、toolkit、examples 或脚本的场景，都应在私有 overlay 环境中完成。
 
-## 5.1 可选知识图谱能力（Graphify）
+## 5.1 可选代码图谱能力（Graphify + GitNexus）
 
-- Graphify 作为可选能力接入，定位是 brownfield 结构扫描、架构问答和依赖路径证据补充。
-- 推荐组合：`/team-help -> npm run graphify:doctor -> graphify build/query/path/explain -> /team-plan`。
-- 输出统一落到 `graphify-out/`，并在 handoff 或 artifacts 中引用关键结论。
-- 不允许在本仓库执行 `graphify codex install` / `graphify claude install` 改写现有 AGENTS/hooks 契约。
-- 详细操作见 [graphify-knowledge-graph-usage.md](graphify-knowledge-graph-usage.md)。
+- Graphify 作为轻量结构证据能力接入，定位是 brownfield 结构扫描、架构问答和依赖路径证据补充。
+- GitNexus 作为受控可选代码智能能力接入，定位是 MCP 查询、impact、detect_changes、多仓分析和更深代码图谱证据。
+- 推荐组合：`/team-help -> /update-codemaps -> npm run graphify:doctor 或 npm run gitnexus:doctor -> 图谱查询 -> /team-plan`。
+- 输出必须在 handoff 或 artifacts 中引用关键结论，不创建平行责任链。
+- 不允许在本仓库执行会改写现有 AGENTS/hooks/MCP 契约的自动 setup 类命令。
+- 详细操作见 [graphify-knowledge-graph-usage.md](graphify-knowledge-graph-usage.md) 与 [gitnexus-code-intelligence-usage.md](gitnexus-code-intelligence-usage.md)。
 
 ## 6. ECC Harness Layer
 
@@ -129,7 +130,7 @@ source_of_truth:
 
 | 类别 | 技能 | 适用场景 |
 |------|------|----------|
-| 调试与验证（结构认知） | `graphify` | brownfield 结构扫描、依赖路径分析、架构问答证据补齐 |
+| 调试与验证（结构认知） | `graphify`、`gitnexus` | brownfield 结构扫描、依赖路径分析、架构问答、MCP 查询、impact / detect_changes 证据补齐 |
 | 调试与验证 | `browser-smoke-testing`、`pairwise-test-design`、`testcontainers-integration-testing`、`systematic-debugging`、`java-unit-test`、`maven-qa`、`mysql-query`、`eval-harness` | 浏览器回归、组合压缩、集成验证、系统化排障、语言/数据库专项、EDD |
 | 编排与效率 | `parallel-execution`、`strategic-compact`、`cost-aware-llm-pipeline`、`harness-audit` | 并行执行、长会话整理、成本控制、平台能力自检 |
 | 学习与记忆 | `error-experience-library`、`continuous-learning` | 错误模式沉淀、instinct 学习与演进 |

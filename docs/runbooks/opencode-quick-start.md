@@ -47,15 +47,16 @@ OPENCODE_CONFIG_DIR=/path/to/opencode ./scripts/install-opencode.sh
 
 OpenCode 公开表面只保留当前 `skills/` 目录和 JS runtime 入口，不再把旧三层 skill 目录或 Python hook 文件名当成现行结构。
 
-### 2.1 可选能力检查：Graphify
+### 2.1 可选能力检查：Graphify / GitNexus
 
-如果你准备在 brownfield 项目中启用知识图谱能力，安装后可以先做预检查：
+如果你准备在 brownfield 项目中启用代码图谱能力，安装后可以先做预检查：
 
 ```bash
 npm run graphify:doctor
+npm run gitnexus:doctor
 ```
 
-预检查仅验证环境，不会自动安装依赖。若失败，按 [troubleshooting.md](troubleshooting.md) 的 Graphify 章节处理。
+预检查仅验证环境，不会自动安装依赖。Graphify 适合轻量结构证据，GitNexus 适合 MCP 查询、impact 和 detect_changes；若失败，按 [troubleshooting.md](troubleshooting.md) 的对应章节处理。
 
 ## 3. AGENTS.md 会写入什么
 
