@@ -148,20 +148,60 @@ function buildPrebuiltCheck(root) {
   };
 }
 
-function buildTarballCheck(options) {
+function packCurrentTarball(root) {
+  const result = spawnSync('npm', ['pack', '--json', '--ignore-scripts'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+
+  if (result.status !== 0) {
+    throw new Error(summarizeOutput(result.stderr || result.stdout) || `npm pack failed with exit ${result.status}`);
+  }
+
+  let data;
   try {
-    const tarballPath = resolveTarballPath({
-      root: options.root,
-      tarball: options.tarball,
-      packJson: options.packJson,
-    });
+    data = JSON.parse(result.stdout);
+  } catch (error) {
+    throw new Error(`Unable to parse npm pack JSON output: ${error.message}`);
+  }
+
+  if (!Array.isArray(data) || !data[0] || typeof data[0].filename !== 'string' || data[0].filename.length === 0) {
+    throw new Error('npm pack JSON output is missing a filename entry.');
+  }
+
+  const tarballPath = path.join(root, data[0].filename);
+  return {
+    tarballPath,
+    cleanup() {
+      fs.rmSync(tarballPath, { force: true });
+    },
+  };
+}
+
+function buildTarballCheck(options) {
+  let cleanup = null;
+  try {
+    const usingExplicitInput = Boolean(options.tarball || options.packJson);
+    const tarballPath = usingExplicitInput
+      ? resolveTarballPath({
+        root: options.root,
+        tarball: options.tarball,
+        packJson: options.packJson,
+      })
+      : (() => {
+        const packed = packCurrentTarball(options.root);
+        cleanup = packed.cleanup;
+        return packed.tarballPath;
+      })();
     const result = validateTarball(tarballPath, validatePrebuilt({ root: options.root }).platforms);
     return {
       id: 'validate-packed-tarball',
       label: 'validate-packed-tarball',
       command: options.packJson
         ? `node scripts/validate-packed-tarball.js --pack-json ${path.relative(options.root, options.packJson)}`
-        : `node scripts/validate-packed-tarball.js --tarball ${path.relative(options.root, tarballPath)}`,
+        : options.tarball
+          ? `node scripts/validate-packed-tarball.js --tarball ${path.relative(options.root, tarballPath)}`
+          : `npm pack --json --ignore-scripts && node scripts/validate-packed-tarball.js --tarball ${path.relative(options.root, tarballPath)}`,
       status: result.missing.length > 0 ? 'fail' : 'pass',
       details: result.missing.length > 0
         ? result.missing[0]
@@ -187,6 +227,8 @@ function buildTarballCheck(options) {
       status: 'skip',
       details: message,
     };
+  } finally {
+    cleanup?.();
   }
 }
 

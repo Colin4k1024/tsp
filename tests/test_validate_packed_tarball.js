@@ -99,6 +99,25 @@ test('resolveTarballPath picks newest tgz in root', () => {
   fs.rmSync(root, { recursive: true, force: true });
 });
 
+test('resolveTarballPath prefers tarball matching current package metadata', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'tarball-package-match-'));
+  const matching = path.join(root, 'colin4k1024-tsp-2.4.1.tgz');
+  const unrelated = path.join(root, 'legacy-package-99.0.0.tgz');
+
+  fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({
+    name: '@colin4k1024/tsp',
+    version: '2.4.1',
+  }), 'utf8');
+  fs.writeFileSync(matching, 'matching');
+  fs.writeFileSync(unrelated, 'unrelated');
+
+  const futureTime = new Date(Date.now() + 10_000);
+  fs.utimesSync(unrelated, futureTime, futureTime);
+
+  assert.strictEqual(resolveTarballPath({ root, tarball: null }), matching);
+  fs.rmSync(root, { recursive: true, force: true });
+});
+
 test('validateTarball passes when all requested prebuilt entries exist', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'tarball-ok-'));
   const tarballPath = path.join(root, 'pkg.tgz');

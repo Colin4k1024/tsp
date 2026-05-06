@@ -65,7 +65,7 @@ if [[ "$PUBLISH" == "true" ]]; then
   echo "    Size: $(( TARBALL_SIZE / 1024 / 1024 ))MB (${TARBALL_SIZE} bytes)"
 
   echo ""
-  echo "🚀  Publishing @colin4k1024/tsp-create@${NEW_VERSION} to npm ..."
+  echo "🚀  Publishing @colin4k1024/tsp@${NEW_VERSION} to npm ..."
   npm publish "${TARBALL}" --access public
   echo "✅  Published to npm."
 

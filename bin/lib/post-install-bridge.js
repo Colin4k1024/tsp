@@ -219,8 +219,8 @@ async function provisionBridge(packageRoot, installRoot, crateDir, dependencies 
   ui.warn(
     `No bundled prebuilt binary found for ${plat}-${arch}.\n` +
     `  The npm package may have been published without prebuilt binaries.\n` +
-    `  Try reinstalling: npx @colin4k1024/tsp-create@latest\n` +
-    `  Or use source mode: npx @colin4k1024/tsp-create --from-source`
+    `  Try reinstalling: npx @colin4k1024/tsp@latest\n` +
+    `  Or use source mode: npx @colin4k1024/tsp --from-source`
   );
   ui.warn('Self-evolution hooks will run in passthrough mode until the binary is provisioned.');
   return null;

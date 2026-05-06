@@ -5,11 +5,11 @@
  * tsp-create — interactive npx installer for the Team Skills Platform.
  *
  * Usage:
- *   npx @colin4k1024/tsp-create                      # interactive wizard
- *   npx @colin4k1024/tsp-create --target claude --profile team
- *   npx @colin4k1024/tsp-create --from-source         # git clone mode
- *   npx @colin4k1024/tsp-create --dry-run
- *   npx @colin4k1024/tsp-create --help
+ *   npx @colin4k1024/tsp                             # interactive wizard
+ *   npx @colin4k1024/tsp --target claude --profile team
+ *   npx @colin4k1024/tsp --from-source                # git clone mode
+ *   npx @colin4k1024/tsp --dry-run
+ *   npx @colin4k1024/tsp --help
  */
 
 const ui = require('./lib/ui');
@@ -83,10 +83,10 @@ function showHelp(exitCode = 0) {
 ${ui.bold('tsp-create')} — Team Skills Platform interactive installer
 
 ${ui.bold('Usage:')}
-  npx @colin4k1024/tsp-create                       Interactive wizard
-  npx @colin4k1024/tsp-create --target claude --profile team
-  npx @colin4k1024/tsp-create --from-source          Clone from git
-  npx @colin4k1024/tsp-create --dry-run              Preview without writing
+  npx @colin4k1024/tsp                              Interactive wizard
+  npx @colin4k1024/tsp --target claude --profile team
+  npx @colin4k1024/tsp --from-source                 Clone from git
+  npx @colin4k1024/tsp --dry-run                     Preview without writing
 
 ${ui.bold('Options:')}
   --target <name>       Target platform (${targetIds})
@@ -150,7 +150,7 @@ async function main() {
       const profileIds = formatInlineList(listPublicInstallProfiles().map((profile) => profile.id));
       ui.warn('stdin is not a TTY — the interactive wizard cannot run.');
       ui.info('Use non-interactive flags instead:');
-      ui.info('  npx @colin4k1024/tsp-create --from-source --target claude --profile team');
+      ui.info('  npx @colin4k1024/tsp --from-source --target claude --profile team');
       ui.info(`Available targets:  ${targetIds}`);
       ui.info(`Available profiles: ${profileIds}`);
       process.exit(1);
@@ -190,7 +190,7 @@ async function main() {
     const profileIds = formatInlineList(listPublicInstallProfiles().map((profile) => profile.id));
     ui.warn('stdin is not a TTY — the interactive wizard cannot run.');
     ui.info('Use non-interactive flags instead:');
-    ui.info('  npx @colin4k1024/tsp-create --target claude --profile team');
+    ui.info('  npx @colin4k1024/tsp --target claude --profile team');
     ui.info('');
     ui.info(`Available targets:  ${targetIds}`);
     ui.info(`Available profiles: ${profileIds}`);

@@ -1,5 +1,25 @@
 # Changelog
 
+## Release v2.4.1 — npm Package Surface Alignment
+
+### v2.4.1 Highlights
+
+- npm 发布版本升级到 `2.4.1`
+- 公开 npm 包口径统一为 `@colin4k1024/tsp`，移除了发布脚本、安装帮助与错误提示中的旧包名引用
+- 开源发布清单同步更新到 `2.4.1`，保持发布文档与实际 npm surface 一致
+
+### v2.4.1 Verification
+
+```bash
+node -p "require('./package.json').name + '@' + require('./package.json').version"
+node bin/tsp-create.js --help
+grep -R "@colin4k1024/tsp" README.md CHANGELOG.md bin scripts docs -n
+```
+
+### v2.4.1 Notes
+
+- CLI 二进制名仍保持 `tsp-create` 与 `tsp-install`，变化仅针对 npm 包名与发布版本。
+
 ## Release v2.4.0 — DESIGN.md Design Execution Layer
 
 ### v2.4.0 Highlights

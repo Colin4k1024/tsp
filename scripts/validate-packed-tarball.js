@@ -59,6 +59,25 @@ function parseArgs(argv) {
   return options;
 }
 
+function expectedTarballFilenameForRoot(root) {
+  const packageJsonPath = path.join(root, 'package.json');
+  if (!fs.existsSync(packageJsonPath)) {
+    return null;
+  }
+
+  try {
+    const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    if (typeof pkg.name !== 'string' || pkg.name.length === 0 || typeof pkg.version !== 'string' || pkg.version.length === 0) {
+      return null;
+    }
+
+    const normalizedName = pkg.name.replace(/^@/, '').replace(/\//g, '-');
+    return `${normalizedName}-${pkg.version}.tgz`;
+  } catch {
+    return null;
+  }
+}
+
 function resolveTarballPath(options) {
   if (options.tarball) {
     return options.tarball;
@@ -90,6 +109,11 @@ function resolveTarballPath(options) {
 
   if (candidates.length === 0) {
     throw new Error(`No .tgz tarball found under ${options.root}; pass --tarball or --pack-json explicitly.`);
+  }
+
+  const expectedTarballFilename = expectedTarballFilenameForRoot(options.root);
+  if (expectedTarballFilename && candidates.includes(expectedTarballFilename)) {
+    return path.join(options.root, expectedTarballFilename);
   }
 
   return path.join(options.root, candidates[0]);
@@ -142,6 +166,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  expectedTarballFilenameForRoot,
   main,
   parseArgs,
   resolveTarballPath,
