@@ -35,6 +35,7 @@ node scripts/install-apply.js --profile full --target codex
 - 内置 React/Next 优先的前端工程规范与 UI/UX 治理能力，用统一规则承接页面、交互和体验质量。
 - 内置 ECC 风格的 specialist agents、快捷 commands、rules packs、runtime hooks、contexts 与 examples，提升整体可用性。
 - npm 安装包内置 `crates/oris-claude-bridge` 与多平台预构建二进制，安装时按用户操作系统自动选择 bridge，无需本机 Rust 工具链。
+- **持续净化原则**：每次大版本升级，目标是尽可能移除当前版本引入的所有补丁程序与临时绕行方案——补丁是现实妥协，不是长期设计；每一轮演进都应让平台比上一版更干净。
 
 ## 框架说明
 
