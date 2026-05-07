@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { spawnSync } = require('child_process');
 
 const { writeInstallState } = require('../install-state');
 const { writeInstallAuditManifest } = require('../install-audit-manifest');
@@ -176,6 +177,32 @@ function buildMergedSettings(plan) {
   };
 }
 
+function runExternalInstall(externalInstall) {
+  const args = [];
+  if (externalInstall.scriptPath) {
+    args.push(externalInstall.scriptPath);
+  } else if (externalInstall.script) {
+    args.push(externalInstall.script);
+  }
+  if (Array.isArray(externalInstall.args)) {
+    args.push(...externalInstall.args);
+  }
+
+  const command = externalInstall.command || 'node';
+  const label = externalInstall.id || externalInstall.moduleId || command;
+  console.log(`Running external install: ${label}`);
+
+  const result = spawnSync(command, args, {
+    cwd: externalInstall.cwd || process.cwd(),
+    encoding: 'utf8',
+    stdio: 'inherit',
+  });
+
+  if (result.status !== 0) {
+    throw new Error(`External install failed: ${label}`);
+  }
+}
+
 function applyInstallPlan(plan) {
   const mergedSettingsPlan = buildMergedSettings(plan);
 
@@ -197,6 +224,10 @@ function applyInstallPlan(plan) {
       JSON.stringify(mergedSettingsPlan.mergedSettings, null, 2) + '\n',
       'utf8'
     );
+  }
+
+  for (const externalInstall of Array.isArray(plan.externalInstalls) ? plan.externalInstalls : []) {
+    runExternalInstall(externalInstall);
   }
 
   writeInstallState(plan.installStatePath, plan.statePreview);

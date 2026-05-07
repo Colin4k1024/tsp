@@ -192,6 +192,9 @@ function printHumanPlan(plan, dryRun, knownRisks = []) {
     }
   }
   console.log(`Operations: ${plan.operations.length}`);
+  if (Array.isArray(plan.externalInstalls) && plan.externalInstalls.length > 0) {
+    console.log(`External installs: ${plan.externalInstalls.length}`);
+  }
 
   if (plan.warnings.length > 0) {
     console.log('\nWarnings:');
@@ -209,6 +212,12 @@ function printHumanPlan(plan, dryRun, knownRisks = []) {
   console.log('\nPlanned file operations:');
   for (const operation of plan.operations) {
     console.log(`- ${operation.sourceRelativePath} -> ${operation.destinationPath}`);
+  }
+  if (Array.isArray(plan.externalInstalls) && plan.externalInstalls.length > 0) {
+    console.log('\nPlanned external installs:');
+    for (const externalInstall of plan.externalInstalls) {
+      console.log(`- ${externalInstall.id}: ${externalInstall.description || externalInstall.script}`);
+    }
   }
 
   if (!dryRun) {

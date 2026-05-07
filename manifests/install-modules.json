@@ -316,6 +316,40 @@
       "stability": "beta"
     },
     {
+      "id": "design-prototyping",
+      "kind": "skills",
+      "description": "Open Design controlled integration for local-first prototypes, decks, DESIGN.md systems, and exportable visual artifacts.",
+      "paths": [
+        "skills/open-design",
+        "docs/runbooks/open-design-integration.md",
+        "scripts/install-open-design.js"
+      ],
+      "externalInstall": {
+        "id": "open-design",
+        "description": "Clone or update nexu-io/open-design into ~/.tsp/open-design and install dependencies when corepack/pnpm are available.",
+        "profiles": [
+          "full"
+        ],
+        "command": "node",
+        "script": "scripts/install-open-design.js",
+        "args": []
+      },
+      "targets": [
+        "claude",
+        "cursor",
+        "antigravity",
+        "codex",
+        "opencode",
+        "codebuddy"
+      ],
+      "dependencies": [
+        "platform-configs"
+      ],
+      "defaultInstall": false,
+      "cost": "medium",
+      "stability": "beta"
+    },
+    {
       "id": "business-content",
       "kind": "skills",
       "description": "Business, writing, market, and investor communication skills.",

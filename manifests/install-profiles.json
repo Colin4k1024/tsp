@@ -69,6 +69,7 @@
         "security",
         "research-apis",
         "knowledge-graph",
+        "design-prototyping",
         "business-content",
         "operator-workflows",
         "social-distribution",
@@ -102,6 +103,7 @@
         "database",
         "workflow-engine",
         "workflow-defaults",
+        "design-prototyping",
         "enhanced-workflows",
         "rtk-optimization"
       ]

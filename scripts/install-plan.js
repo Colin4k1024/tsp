@@ -183,6 +183,23 @@ function printPlan(plan) {
       );
     }
   }
+
+  const externalInstalls = plan.selectedModules
+    .map(module => ({ module, externalInstall: module.externalInstall }))
+    .filter(({ externalInstall }) => externalInstall && typeof externalInstall === 'object' && !Array.isArray(externalInstall))
+    .filter(({ externalInstall }) => {
+      const profiles = Array.isArray(externalInstall.profiles)
+        ? externalInstall.profiles.map(value => String(value).trim()).filter(Boolean)
+        : [];
+      return profiles.length === 0 || profiles.includes(plan.profileId);
+    });
+  if (externalInstalls.length > 0) {
+    console.log('');
+    console.log(`External install plan (${externalInstalls.length}):`);
+    for (const { module, externalInstall } of externalInstalls) {
+      console.log(`- ${externalInstall.id || module.id}: ${externalInstall.description || externalInstall.script}`);
+    }
+  }
 }
 
 function main() {

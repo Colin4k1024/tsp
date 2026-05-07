@@ -146,6 +146,14 @@
       ]
     },
     {
+      "id": "capability:design-prototyping",
+      "family": "capability",
+      "description": "Open Design controlled integration for local-first prototypes, decks, DESIGN.md systems, and exportable design artifacts.",
+      "modules": [
+        "design-prototyping"
+      ]
+    },
+    {
       "id": "capability:content",
       "family": "capability",
       "description": "Business, writing, market, investor communication, and reusable voice-system skills.",

@@ -133,6 +133,56 @@ function createStatePreview(options) {
   return createInstallState(options);
 }
 
+function resolveExternalInstalls(selectedModules, options = {}) {
+  const profileId = options.profileId || null;
+  const sourceRoot = options.sourceRoot || getSourceRoot();
+  const target = options.target || null;
+  const installs = [];
+
+  for (const module of selectedModules) {
+    const externalInstall = module && module.externalInstall;
+    if (!externalInstall || typeof externalInstall !== 'object' || Array.isArray(externalInstall)) {
+      continue;
+    }
+
+    const profileFilter = Array.isArray(externalInstall.profiles)
+      ? externalInstall.profiles.map(value => String(value).trim()).filter(Boolean)
+      : [];
+    if (profileFilter.length > 0 && (!profileId || !profileFilter.includes(profileId))) {
+      continue;
+    }
+
+    const command = typeof externalInstall.command === 'string' && externalInstall.command.trim()
+      ? externalInstall.command.trim()
+      : 'node';
+    const script = typeof externalInstall.script === 'string' && externalInstall.script.trim()
+      ? externalInstall.script.trim()
+      : null;
+    const args = Array.isArray(externalInstall.args)
+      ? externalInstall.args.map(value => String(value))
+      : [];
+
+    if (!script) {
+      throw new Error(`Install module ${module.id} has externalInstall but no script`);
+    }
+
+    installs.push({
+      id: externalInstall.id || module.id,
+      moduleId: module.id,
+      description: externalInstall.description || '',
+      command,
+      script,
+      scriptPath: path.join(sourceRoot, script),
+      args,
+      cwd: sourceRoot,
+      target,
+      profileId,
+    });
+  }
+
+  return installs;
+}
+
 function applyInstallPlan(plan) {
   const { applyInstallPlan: applyPlan } = require('./install/apply');
   return applyPlan(plan);
@@ -617,6 +667,11 @@ function createManifestInstallPlan(options = {}) {
   });
   const adapter = getInstallTargetAdapter(target);
   const operations = plan.operations.flatMap(operation => materializeScaffoldOperation(sourceRoot, operation));
+  const externalInstalls = resolveExternalInstalls(plan.selectedModules, {
+    profileId: plan.profileId,
+    sourceRoot,
+    target,
+  });
   const source = {
     repoVersion: getPackageVersion(sourceRoot),
     repoCommit: getRepoCommit(sourceRoot),
@@ -667,6 +722,7 @@ function createManifestInstallPlan(options = {}) {
     skippedModuleIds: plan.skippedModuleIds,
     excludedModuleIds: plan.excludedModuleIds,
     operations,
+    externalInstalls,
     statePreview,
   };
 }
