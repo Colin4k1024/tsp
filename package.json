@@ -1,6 +1,6 @@
 {
   "name": "@colin4k1024/tsp",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "description": "Open-source Team Skills Platform for role-based AI delivery workflows, shared skills, hooks, commands, and multi-platform installs.",
   "repository": {
     "type": "git",
@@ -71,6 +71,7 @@
     "docs:preview": "vitepress preview docs"
   },
   "bin": {
+    "tsp": "bin/tsp-create.js",
     "tsp-create": "bin/tsp-create.js",
     "tsp-install": "bin/tsp-install.js"
   },
