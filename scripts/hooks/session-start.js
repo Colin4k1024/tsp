@@ -87,7 +87,9 @@ function dedupeRecentSessions(searchDirs) {
  * Priority (highest to lowest):
  *   1. Exact worktree (cwd) match — most recent
  *   2. Same project name match — most recent
- *   3. Fallback to overall most recent (original behavior)
+ *
+ * If neither matches, returns null so that a fresh project never receives
+ * another project's session context.
  *
  * Sessions are already sorted newest-first, so the first match in each
  * category wins.
@@ -107,18 +109,10 @@ function selectMatchingSession(sessions, cwd, currentProject) {
 
   let projectMatch = null;
   let projectMatchContent = null;
-  let fallbackSession = null;
-  let fallbackContent = null;
 
   for (const session of sessions) {
     const content = readFile(session.path);
     if (!content) continue;
-
-    // Cache first readable session+content pair for fallback
-    if (!fallbackSession) {
-      fallbackSession = session;
-      fallbackContent = content;
-    }
 
     // Extract **Worktree:** field
     const worktreeMatch = content.match(/\*\*Worktree:\*\*\s*(.+)$/m);
@@ -145,12 +139,7 @@ function selectMatchingSession(sessions, cwd, currentProject) {
     return { session: projectMatch, content: projectMatchContent, matchReason: 'project' };
   }
 
-  // Fallback: most recent readable session (original behavior)
-  if (fallbackSession) {
-    return { session: fallbackSession, content: fallbackContent, matchReason: 'recency-fallback' };
-  }
-
-  log('[SessionStart] All session files were unreadable');
+  // No match found — do not inject another project's session context
   return null;
 }
 
@@ -186,7 +175,7 @@ async function main() {
         additionalContextParts.push(`Previous session summary:\n${content}`);
       }
     } else {
-      log('[SessionStart] No matching session found');
+      log(`[SessionStart] No session matched current project (${currentProject || cwd}); skipping context injection`);
     }
   }
 
