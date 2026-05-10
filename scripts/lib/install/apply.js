@@ -194,12 +194,12 @@ function runExternalInstall(externalInstall) {
 
   const command = externalInstall.command || 'node';
   const label = externalInstall.id || externalInstall.moduleId || command;
-  console.log(`Running external install: ${label}`);
+  console.error(`Running external install: ${label}`);
 
   const result = spawnSync(command, args, {
     cwd: externalInstall.cwd || process.cwd(),
     encoding: 'utf8',
-    stdio: 'inherit',
+    stdio: ['inherit', process.stderr, process.stderr],
   });
 
   if (result.status !== 0) {
