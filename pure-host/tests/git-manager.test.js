@@ -34,7 +34,6 @@ describe('GitManager', () => {
   describe('isClean', () => {
     test('returns true when nothing to commit', () => {
       const repoDir = initTestRepo();
-      const manager = new GitManager();
       // Sync check first
       const status = spawnSync('git', ['status', '--short'], { cwd: repoDir, encoding: 'utf-8' });
       // Empty status means clean

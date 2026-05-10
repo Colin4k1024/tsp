@@ -2,7 +2,7 @@
 
 面向团队协作与平台治理的开源 Team Skills Platform，用于把单代理执行模式升级成“`Tech Lead` 编排 + 专业角色协作”的虚拟研发团队工作模型，并叠加 ECC 风格的 harness layer、specialist 命令与运行时增强能力。当前平台同时支持 `team mode` 与 `solo mode`，前者强调多人交接，后者强调单人闭环但保留同样的关键门禁。
 
-> English: Team Skills Platform (TSP) is an open-source framework for role-based AI delivery workflows. It packages role prompts, shared skills, commands, rules, hooks, examples, and install tooling for Claude Code, Codex, Cursor, and similar environments. Custom extensions can be layered on top via the overlay mechanism; the public repository ships only public capabilities.
+> English: Team Skills Platform (TSP) is an open-source framework for role-based AI delivery workflows. It packages role prompts, shared skills, commands, rules, hooks, examples, and install tooling for Claude Code, Codex, and OpenCode. Custom extensions can be layered on top via the overlay mechanism; the public repository ships only public capabilities.
 
 ## Quick Start / 最小安装
 
@@ -53,7 +53,7 @@ TSP 采用 **角色 + 技能 + Agent + 规则 + Hooks + Workflow 引擎** 六层
 | 命令面 | `commands/` | 80+ 命令（团队主链 8 个 + specialist + 工具链） |
 | Workflow 引擎 | `workflows/` + `scripts/workflow-*.js` | YAML DAG 工作流，支持依赖解析、状态持久化、失败恢复 |
 
-安装工具链支持 **10 个目标平台**：Claude、Cursor、Antigravity、Codex、Gemini、OpenCode、CodeBuddy、Copilot、Windsurf、Augment。
+安装工具链公开主线支持 **3 个 code agent**：Claude Code、Codex、OpenCode。其他历史 target 保留为隐藏兼容路径，不再作为公开 onboarding 主线。
 
 发布为 npm 包 `@colin4k1024/tsp`，内置 Rust bridge 预构建二进制，安装零依赖。
 
@@ -597,9 +597,6 @@ CODEX_HOME_DIR=/tmp/codex AGENTS_HOME_DIR=/tmp/agents ./scripts/install-codex.sh
 # 安装到 Claude（可通过环境变量覆盖目标目录）
 CLAUDE_HOME_DIR=/tmp/claude ./scripts/install-claude.sh
 
-# 安装到 Cursor（可通过环境变量覆盖目标目录）
-CURSOR_HOME_DIR=/tmp/cursor ./scripts/install-cursor.sh
-
 # 安装到 OpenCode（可通过环境变量覆盖目标目录）
 OPENCODE_CONFIG_DIR=/tmp/opencode ./scripts/install-opencode.sh
 ```
@@ -608,20 +605,18 @@ OPENCODE_CONFIG_DIR=/tmp/opencode ./scripts/install-opencode.sh
 
 无需克隆仓库，直接通过 npx 一键安装到目标平台。npm 包已包含所有平台（macOS/Linux/Windows）的预编译二进制文件，无需 Rust 工具链，无需 GitHub 访问：
 
-- `tsp` 当前公开支持的 targets：`claude`、`cursor`、`antigravity`、`codex`、`gemini`、`opencode`、`codebuddy`、`copilot`、`windsurf`、`augment`
+- `tsp` 当前公开支持的 targets：`claude`（Claude Code）、`codex`、`opencode`；`claude-code` / `claudecode` 是 `claude` 的兼容别名
 - 当前公开支持的 profiles：`core`、`developer`、`security`、`research`、`team`、`full`
 - 自定义能力通过 overlay 机制扩展，不作为公开 `tsp` profile 暴露
 
-支持深度不是所有 target 都完全一致，当前建议按下面理解：
+公开支持深度按三类 code agent 收敛，当前建议按下面理解：
 
 | Support level | Targets | `team` profile depth | Notes |
 |------|---------|----------------------|-------|
-| Recommended | `claude`, `cursor` | 14 / 14 modules | 完整公开 workflow 链路、最强回归覆盖、文档最全 |
-| Strong | `codex`, `opencode` | 10 / 14, 11 / 14 modules | 核心命令和大部分 workflow 可用，但仍有少量 target-specific gap |
-| Partial | `antigravity`, `codebuddy` | 8 / 14, 11 / 14 modules | 安装适配器可用，但 workflow parity / shared-skills 覆盖不完整 |
-| Baseline | `gemini`, `copilot`, `windsurf`, `augment` | 1-2 / 14 modules | 仅提供基础兼容入口和平台配置，不承诺完整 `/team-*` 对齐 |
+| Recommended | `claude`, `codex`, `opencode` | 完整主链；仅跳过 target-intentional runtime gaps | 完整公开 workflow 链路、quick-start、安装验证与回归覆盖 |
+| Hidden compatibility | `cursor`, `antigravity`, `gemini`, `codebuddy`, `copilot`, `windsurf`, `augment` | 不作为公开承诺 | 适配器可继续存在以兼容旧用户，但不进入公开 wizard / release matrix |
 
-当前公开 quick-start / recipes / examples 主要覆盖 `claude`、`cursor`、`codex`、`opencode`。其他 targets 已进入公开 install surface，但应按上表理解为 partial 或 baseline 支持，而不是 full parity。
+当前公开 quick-start / recipes / examples 聚焦 `claude`、`codex`、`opencode`。其他 targets 属于隐藏兼容，不应按 full parity 预期使用。
 
 ```bash
 # 交互式向导（推荐首次使用）
@@ -629,7 +624,7 @@ npx @colin4k1024/tsp
 
 # 非交互式，直接指定目标和 profile
 npx @colin4k1024/tsp --target claude --profile full
-npx @colin4k1024/tsp --target cursor --profile team
+npx @colin4k1024/tsp --target claude-code --profile team
 npx @colin4k1024/tsp --target codex --profile full
 npx @colin4k1024/tsp --target opencode --profile full
 
@@ -652,7 +647,7 @@ npx @colin4k1024/tsp --from-source
 如果你是第一次使用这个平台，建议按下面的顺序进入：
 
 1. 运行 `node scripts/build-platform-artifacts.js` 生成最新产物。
-2. 根据使用端执行对应的安装脚本：`./scripts/install-claude.sh`、`./scripts/install-codex.sh`、`./scripts/install-cursor.sh` 或 `./scripts/install-opencode.sh`。
+2. 根据使用端执行对应的安装脚本：`./scripts/install-claude.sh`、`./scripts/install-codex.sh` 或 `./scripts/install-opencode.sh`。
 3. 打开你的项目仓库，在对话中先跑一次 `/team-help` 判断入口，再按建议进入 `/team-intake`、`/team-plan`、`/team-execute`、`/team-review`、`/team-release` 或 `/team-closeout`。
 4. specialist 命令只负责给出专项结论，最终决策回到 `/handoff` 或 `/team-*` 主链。
 
@@ -660,7 +655,6 @@ npx @colin4k1024/tsp --from-source
 
 - 第一次安装，准备在 Claude 中试跑：看 [docs/runbooks/claude-quick-start.md](docs/runbooks/claude-quick-start.md)
 - 第一次安装，准备在 Codex 中试跑：看 [docs/runbooks/codex-quick-start.md](docs/runbooks/codex-quick-start.md)
-- 想在 Cursor 中上手：看 [docs/runbooks/cursor-quick-start.md](docs/runbooks/cursor-quick-start.md)
 - 想在 OpenCode 中上手：看 [docs/runbooks/opencode-quick-start.md](docs/runbooks/opencode-quick-start.md)
 - 想按场景查 Claude 怎么用：看 [docs/runbooks/claude-usage-scenarios.md](docs/runbooks/claude-usage-scenarios.md)
 - 想按场景查 Codex 怎么用：看 [docs/runbooks/codex-usage-scenarios.md](docs/runbooks/codex-usage-scenarios.md)

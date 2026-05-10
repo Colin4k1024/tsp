@@ -4,7 +4,7 @@ const path = require('path');
 
 const packageRoot = path.resolve(__dirname, '../..');
 const { listInstallProfiles } = require(path.join(packageRoot, 'scripts/lib/install-manifests'));
-const { listInstallTargetAdapters } = require(path.join(packageRoot, 'scripts/lib/install-targets/registry'));
+const { listPublicInstallTargetAdapters } = require(path.join(packageRoot, 'scripts/lib/install-targets/registry'));
 
 const TARGET_METADATA = Object.freeze({
   claude: {
@@ -34,7 +34,7 @@ const TARGET_METADATA = Object.freeze({
   },
   opencode: {
     label: 'OpenCode',
-    installPath: '~/.opencode/',
+    installPath: '~/.config/opencode/',
     scope: 'home-level',
   },
   codebuddy: {
@@ -92,7 +92,7 @@ function titleCase(value) {
 }
 
 function listPublicInstallTargets() {
-  return listInstallTargetAdapters().map((adapter) => {
+  return listPublicInstallTargetAdapters().map((adapter) => {
     const metadata = TARGET_METADATA[adapter.target] || {};
     return {
       id: adapter.target,

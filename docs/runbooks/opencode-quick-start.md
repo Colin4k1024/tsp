@@ -20,9 +20,9 @@ source_of_truth:
 
 ```bash
 node scripts/build-platform-artifacts.js
-./scripts/install-opencode.sh
+node scripts/install-apply.js --profile team --target opencode
 
-# 指定自定义路径
+# 遗留脚本仍可用于指定自定义路径
 OPENCODE_CONFIG_DIR=/path/to/opencode ./scripts/install-opencode.sh
 ```
 
@@ -117,12 +117,11 @@ npm run gitnexus:doctor
 
 ```bash
 node scripts/build-platform-artifacts.js
-./scripts/install-opencode.sh
+node scripts/install-apply.js --profile team --target opencode
 ```
 
 ## 7. 相关文档
 
 - [AGENTS.md](../../AGENTS.md) — 平台总览
 - [claude-quick-start.md](claude-quick-start.md) — Claude 快速上手
-- [cursor-quick-start.md](cursor-quick-start.md) — Cursor 快速上手
 - [team-skills-usage.md](team-skills-usage.md) — 完整使用手册

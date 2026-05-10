@@ -1,8 +1,9 @@
 'use strict';
 
 const { validateInstallModuleIds } = require('../install-manifests');
+const { normalizeInstallTarget } = require('../install-targets/registry');
 
-const LEGACY_INSTALL_TARGETS = ['claude', 'cursor', 'antigravity'];
+const LEGACY_INSTALL_TARGETS = ['claude', 'cursor', 'antigravity', 'codex', 'opencode'];
 
 function dedupeStrings(values) {
   return [...new Set((Array.isArray(values) ? values : []).map(value => String(value).trim()).filter(Boolean))];
@@ -104,7 +105,7 @@ function normalizeInstallRequest(options = {}) {
     ...(Array.isArray(options.legacyLanguages) ? options.legacyLanguages : []),
     ...(Array.isArray(options.languages) ? options.languages : []),
   ]).map(language => language.toLowerCase()));
-  const target = options.target || config?.target || 'claude';
+  const target = normalizeInstallTarget(options.target || config?.target || 'claude');
   const hasManifestBaseSelection = Boolean(profileId) || moduleIds.length > 0 || includeComponentIds.length > 0;
   const usingManifestMode = hasManifestBaseSelection || excludeComponentIds.length > 0;
 

@@ -1,4 +1,189 @@
-const { createInstallTargetAdapter } = require('./helpers');
+const fs = require('fs');
+const path = require('path');
+
+const {
+  createInstallTargetAdapter,
+  createManagedOperation,
+  normalizeRelativePath,
+} = require('./helpers');
+
+const PLUGIN_NAME = require('../team-skills-data.json').plugin.name;
+
+function addOperation(operations, seen, operation) {
+  const key = `${operation.sourceRelativePath}=>${operation.destinationPath}`;
+  if (seen.has(key)) {
+    return;
+  }
+  seen.add(key);
+  operations.push(operation);
+}
+
+function addCopyOperation(operations, seen, moduleId, sourceRelativePath, destinationPath, strategy = 'preserve-relative-path') {
+  addOperation(operations, seen, createManagedOperation({
+    moduleId,
+    sourceRelativePath,
+    destinationPath,
+    strategy,
+  }));
+}
+
+function sourceDir(input, sourceRelativePath) {
+  return path.join(input.repoRoot || '', normalizeRelativePath(sourceRelativePath));
+}
+
+function rootAgentFileName(sourcePath, fileName) {
+  const normalizedSourcePath = normalizeRelativePath(sourcePath);
+  if (normalizedSourcePath === 'agents/specialists' || normalizedSourcePath.startsWith('agents/specialists/')) {
+    return `specialist-${fileName}`;
+  }
+  return fileName;
+}
+
+function addRootSkillOperations(operations, seen, moduleId, sourceRelativePath, input, targetRoot) {
+  const normalizedSourcePath = normalizeRelativePath(sourceRelativePath);
+  if (!normalizedSourcePath.startsWith('skills/')) {
+    return;
+  }
+
+  const absoluteSourceDir = sourceDir(input, normalizedSourcePath);
+  if (!input.repoRoot || !fs.existsSync(absoluteSourceDir) || !fs.statSync(absoluteSourceDir).isDirectory()) {
+    return;
+  }
+
+  if (fs.existsSync(path.join(absoluteSourceDir, 'SKILL.md'))) {
+    addCopyOperation(
+      operations,
+      seen,
+      moduleId,
+      normalizedSourcePath,
+      path.join(targetRoot, 'skills', path.basename(normalizedSourcePath)),
+      'flatten-skill-copy'
+    );
+    return;
+  }
+
+  for (const entry of fs.readdirSync(absoluteSourceDir, { withFileTypes: true }).sort((left, right) => (
+    left.name.localeCompare(right.name)
+  ))) {
+    const nestedSourcePath = path.join(normalizedSourcePath, entry.name);
+    const nestedAbsolutePath = path.join(absoluteSourceDir, entry.name);
+    if (entry.isDirectory() && fs.existsSync(path.join(nestedAbsolutePath, 'SKILL.md'))) {
+      addCopyOperation(
+        operations,
+        seen,
+        moduleId,
+        nestedSourcePath,
+        path.join(targetRoot, 'skills', entry.name),
+        'flatten-skill-copy'
+      );
+    }
+  }
+}
+
+function addRootAgentOperations(operations, seen, moduleId, sourceRelativePath, input, targetRoot) {
+  const normalizedSourcePath = normalizeRelativePath(sourceRelativePath);
+  if (normalizedSourcePath !== 'agents' && !normalizedSourcePath.startsWith('agents/')) {
+    return;
+  }
+
+  const agentDirs = normalizedSourcePath === 'agents'
+    ? ['roles', 'specialists']
+    : [''];
+
+  for (const agentDir of agentDirs) {
+    const sourcePath = agentDir ? path.join(normalizedSourcePath, agentDir) : normalizedSourcePath;
+    const absoluteSourceDir = sourceDir(input, sourcePath);
+    if (!input.repoRoot || !fs.existsSync(absoluteSourceDir)) {
+      continue;
+    }
+
+    const stat = fs.statSync(absoluteSourceDir);
+    if (stat.isFile() && path.extname(absoluteSourceDir) === '.md') {
+      const fileName = rootAgentFileName(path.dirname(sourcePath), path.basename(sourcePath));
+      addCopyOperation(
+        operations,
+        seen,
+        moduleId,
+        sourcePath,
+        path.join(targetRoot, 'agents', fileName),
+        'flatten-agent-copy'
+      );
+      continue;
+    }
+
+    if (!stat.isDirectory()) {
+      continue;
+    }
+
+    for (const entry of fs.readdirSync(absoluteSourceDir, { withFileTypes: true }).sort((left, right) => (
+      left.name.localeCompare(right.name)
+    ))) {
+      if (entry.isFile() && entry.name.endsWith('.md')) {
+        const fileName = rootAgentFileName(sourcePath, entry.name);
+        addCopyOperation(
+          operations,
+          seen,
+          moduleId,
+          path.join(sourcePath, entry.name),
+          path.join(targetRoot, 'agents', fileName),
+          'flatten-agent-copy'
+        );
+      }
+    }
+  }
+}
+
+function planCodexOperations(input, adapter) {
+  const targetRoot = adapter.resolveRoot(input);
+  const pluginRoot = path.join(targetRoot, 'plugins', PLUGIN_NAME);
+  const operations = [];
+  const seen = new Set();
+
+  for (const module of Array.isArray(input.modules) ? input.modules : []) {
+    for (const rawSourcePath of Array.isArray(module.paths) ? module.paths : []) {
+      const sourceRelativePath = normalizeRelativePath(rawSourcePath);
+
+      addCopyOperation(
+        operations,
+        seen,
+        module.id,
+        sourceRelativePath,
+        path.join(pluginRoot, sourceRelativePath),
+        'plugin-copy'
+      );
+
+      if (sourceRelativePath === 'commands' || sourceRelativePath.startsWith('commands/')) {
+        const commandSuffix = sourceRelativePath === 'commands'
+          ? ''
+          : sourceRelativePath.slice('commands/'.length);
+        addCopyOperation(
+          operations,
+          seen,
+          module.id,
+          sourceRelativePath,
+          path.join(targetRoot, 'commands', commandSuffix),
+          'codex-command-copy'
+        );
+      }
+
+      if (sourceRelativePath === 'AGENTS.md') {
+        addCopyOperation(
+          operations,
+          seen,
+          module.id,
+          sourceRelativePath,
+          path.join(targetRoot, 'AGENTS.md'),
+          'codex-agent-index-copy'
+        );
+      }
+
+      addRootSkillOperations(operations, seen, module.id, sourceRelativePath, input, targetRoot);
+      addRootAgentOperations(operations, seen, module.id, sourceRelativePath, input, targetRoot);
+    }
+  }
+
+  return operations;
+}
 
 module.exports = createInstallTargetAdapter({
   id: 'codex-home',
@@ -7,4 +192,5 @@ module.exports = createInstallTargetAdapter({
   rootSegments: ['.codex'],
   installStatePathSegments: ['ecc-install-state.json'],
   nativeRootRelativePath: '.codex',
+  planOperations: planCodexOperations,
 });

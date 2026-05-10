@@ -14,7 +14,7 @@ const os = require('os');
 const ui = require('./ui');
 const { runPostInstallBridge } = require('./post-install-bridge');
 
-const DEFAULT_REPO_URL = 'https://github.com/Colin4k1024/harness-engineering.git';
+const DEFAULT_REPO_URL = 'https://github.com/Colin4k1024/tsp.git';
 const DEFAULT_CLONE_DIR = path.join(os.homedir(), '.tsp-source');
 
 function listMissingProductionDependencies(projectRoot) {
@@ -112,7 +112,7 @@ async function runSourceInstall(intent) {
     try {
       ui.info('Installing claude-mem plugin ...');
       execSync('npx --yes claude-mem install', { stdio: 'inherit' });
-    } catch (e) {
+    } catch (_e) {
       ui.warn('claude-mem install failed — run "npx claude-mem install" manually if needed.');
     }
   }

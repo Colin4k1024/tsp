@@ -1,24 +1,39 @@
 'use strict';
 
 const { resolveInstallPlan } = require('./install-manifests');
-const { listInstallTargetAdapters } = require('./install-targets/registry');
+const { listPublicInstallTargetAdapters } = require('./install-targets/registry');
 
 const SUPPORT_LEVEL_ORDER = Object.freeze(['recommended', 'strong', 'partial', 'baseline']);
+const TARGET_INTENTIONAL_SKIPS = Object.freeze({
+  codex: new Set(['hooks-runtime', 'evolution', 'rtk-optimization']),
+  opencode: new Set(['rtk-optimization']),
+});
 
 function classifyTargetSupportLevel(plan = {}) {
   const selectedModuleIds = Array.isArray(plan.selectedModuleIds) ? plan.selectedModuleIds : [];
   const requestedModuleIds = Array.isArray(plan.requestedModuleIds) ? plan.requestedModuleIds : [];
+  const skippedModuleIds = Array.isArray(plan.skippedModuleIds) ? plan.skippedModuleIds : [];
   const selected = new Set(selectedModuleIds);
   const selectedCount = selected.size;
   const requestedCount = requestedModuleIds.length;
   const hasCommandsCore = selected.has('commands-core');
   const hasTeamWorkflow = selected.has('team-workflow');
   const hasSharedSkills = selected.has('shared-skills');
+  const intentionalSkips = TARGET_INTENTIONAL_SKIPS[plan.target] || new Set();
+  const onlyIntentionalSkips = skippedModuleIds.every(moduleId => intentionalSkips.has(moduleId));
 
-  if (requestedCount > 0 && selectedCount === requestedCount && hasCommandsCore && hasTeamWorkflow && hasSharedSkills) {
+  if (
+    requestedCount > 0
+    && hasCommandsCore
+    && hasTeamWorkflow
+    && hasSharedSkills
+    && (selectedCount === requestedCount || onlyIntentionalSkips)
+  ) {
     return {
       level: 'recommended',
-      reason: 'Full public workflow chain and primary documentation coverage are available.',
+      reason: onlyIntentionalSkips && selectedCount !== requestedCount
+        ? 'Full public workflow chain is available; skipped modules are target-intentional compatibility gaps.'
+        : 'Full public workflow chain and primary documentation coverage are available.',
     };
   }
 
@@ -46,7 +61,7 @@ function collectTargetSupportMatrix(options = {}) {
   const profileId = options.profileId || 'team';
   const repoRoot = options.repoRoot;
 
-  return listInstallTargetAdapters()
+  return listPublicInstallTargetAdapters()
     .map((adapter) => adapter.target)
     .map((target) => {
       const plan = resolveInstallPlan({ profileId, target, repoRoot });

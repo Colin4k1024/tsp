@@ -152,7 +152,7 @@ PRD、Delivery Plan、ADR、Test Plan、Incident Brief，以及上线 / 收口�
 	- 增强工作流（融合 superpowers / gstack / GSD）：discuss-phase（设计讨论）、quick-execution（小范围快速执行）、brainstorming（头脑风暴）、multi-perspective-review（多视角评审）、cross-model-review（跨模型第二意见）、model-profiles（模型路由配置）、quality-gates-taxonomy（门禁分类标准）
 	- 上下文工程与隔离：context-engineering（四层文档 PROJECT/REQUIREMENTS/ROADMAP/STATE + token 预算）、git-worktree-isolation（一任务一 worktree 隔离 + 结构化收口决策）、workflow-forensics（工作流事后调查 + 失败模式识别）
 - 上下文文档模板：位于 `templates/context-docs/`，包含 PROJECT.md、REQUIREMENTS.md、ROADMAP.md、STATE.md 四个模板
-- Node.js 安装工具链：`node scripts/install-apply.js --profile <name> --target <claude|codex|cursor|opencode|copilot|windsurf|augment> [--overlay <id>]...` 支持 10 个安装目标、6 个公开 profile；自定义能力可通过 overlay 叠加
+- Node.js 安装工具链：`node scripts/install-apply.js --profile <name> --target <claude|claude-code|codex|opencode> [--overlay <id>]...` 公开主线聚焦 Claude Code、Codex、OpenCode 三类 code agent；历史 target 保留为隐藏兼容路径。
 - 工程实践手册：[git-pr-workflow.md](docs/runbooks/git-pr-workflow.md)、[ai-pr-review-automation.md](docs/runbooks/ai-pr-review-automation.md)、[reviewdog-pr-gates.md](docs/runbooks/reviewdog-pr-gates.md)、[api-breaking-change-gates.md](docs/runbooks/api-breaking-change-gates.md)、[api-lint-gates.md](docs/runbooks/api-lint-gates.md)、[dependency-review-gates.md](docs/runbooks/dependency-review-gates.md)、[dependency-update-automation.md](docs/runbooks/dependency-update-automation.md)、[codeql-pr-security-gates.md](docs/runbooks/codeql-pr-security-gates.md)、[secret-scanning-gates.md](docs/runbooks/secret-scanning-gates.md)、[actionlint-workflow-gates.md](docs/runbooks/actionlint-workflow-gates.md)、[github-token-permissions-baseline.md](docs/runbooks/github-token-permissions-baseline.md)、[zizmor-workflow-audits.md](docs/runbooks/zizmor-workflow-audits.md)、[checkov-iac-gates.md](docs/runbooks/checkov-iac-gates.md)、[kyverno-policy-gates.md](docs/runbooks/kyverno-policy-gates.md)、[trivy-security-gates.md](docs/runbooks/trivy-security-gates.md)、[kubeconform-schema-gates.md](docs/runbooks/kubeconform-schema-gates.md)、[conftest-policy-gates.md](docs/runbooks/conftest-policy-gates.md)、[helm-unittest-playbook.md](docs/runbooks/helm-unittest-playbook.md)、[kubectl-server-dry-run-gates.md](docs/runbooks/kubectl-server-dry-run-gates.md)、[scorecard-supply-chain-gates.md](docs/runbooks/scorecard-supply-chain-gates.md)、[runner-egress-hardening.md](docs/runbooks/runner-egress-hardening.md)、[sbom-generation-gates.md](docs/runbooks/sbom-generation-gates.md)、[artifact-attestation-gates.md](docs/runbooks/artifact-attestation-gates.md)、[cosign-signing-gates.md](docs/runbooks/cosign-signing-gates.md)、[slsa-verification-gates.md](docs/runbooks/slsa-verification-gates.md)、[slsa-generator-patterns.md](docs/runbooks/slsa-generator-patterns.md)、[in-toto-attestation-framework.md](docs/runbooks/in-toto-attestation-framework.md)、[policy-controller-gates.md](docs/runbooks/policy-controller-gates.md)、[witness-policy-gates.md](docs/runbooks/witness-policy-gates.md)、[contract-testing-playbook.md](docs/runbooks/contract-testing-playbook.md)、[release-notes-automation.md](docs/runbooks/release-notes-automation.md)
 - 可选代码图谱能力：`skills/graphify/` + [graphify-knowledge-graph-usage.md](docs/runbooks/graphify-knowledge-graph-usage.md) 用于轻量 brownfield 结构扫描；`skills/gitnexus/` + [gitnexus-code-intelligence-usage.md](docs/runbooks/gitnexus-code-intelligence-usage.md) 用于受控 MCP 查询、impact、detect_changes 与多仓图谱证据。
 - 能力边界：Graphify / GitNexus 都只作为可选分析能力，不替代 `/team-*` 主链；禁止在本仓库执行会改写现有 AGENTS/hooks/MCP 契约的自动 setup 类命令。
@@ -254,9 +254,9 @@ npm run gitnexus:doctor
 # 安装 team 配置文件（公开角色工作流 + 核心技能）到 Claude
 node scripts/install-apply.js --profile team --target claude
 
-# 安装 full 配置文件（ECC 全量）到其他平台
+# 安装 full 配置文件（ECC 全量）到三类 code agent
+node scripts/install-apply.js --profile full --target claude-code
 node scripts/install-apply.js --profile full --target codex
-node scripts/install-apply.js --profile full --target cursor
 node scripts/install-apply.js --profile full --target opencode
 
 # 预览安装计划（不执行）
@@ -265,10 +265,54 @@ node scripts/install-plan.js --profile team --target claude
 # ─── Python 遗留脚本（仍可用）────────────────────────────
 CODEX_HOME_DIR=/tmp/codex AGENTS_HOME_DIR=/tmp/agents ./scripts/install-codex.sh
 CLAUDE_HOME_DIR=/tmp/claude ./scripts/install-claude.sh
-CURSOR_HOME_DIR=/tmp/cursor ./scripts/install-cursor.sh
 OPENCODE_CONFIG_DIR=/tmp/opencode ./scripts/install-opencode.sh
 ```
 
 更多说明见 [docs/runbooks/team-skills-usage.md](docs/runbooks/team-skills-usage.md)、[docs/runbooks/ecc-harness-usage.md](docs/runbooks/ecc-harness-usage.md)、[docs/runbooks/custom-overlay.md](docs/runbooks/custom-overlay.md)、[docs/runbooks/external-capability-intake.md](docs/runbooks/external-capability-intake.md)、[docs/runbooks/git-pr-workflow.md](docs/runbooks/git-pr-workflow.md)、[docs/runbooks/ai-pr-review-automation.md](docs/runbooks/ai-pr-review-automation.md)、[docs/runbooks/reviewdog-pr-gates.md](docs/runbooks/reviewdog-pr-gates.md)、[docs/runbooks/api-breaking-change-gates.md](docs/runbooks/api-breaking-change-gates.md)、[docs/runbooks/api-lint-gates.md](docs/runbooks/api-lint-gates.md)、[docs/runbooks/dependency-review-gates.md](docs/runbooks/dependency-review-gates.md)、[docs/runbooks/dependency-update-automation.md](docs/runbooks/dependency-update-automation.md)、[docs/runbooks/codeql-pr-security-gates.md](docs/runbooks/codeql-pr-security-gates.md)、[docs/runbooks/secret-scanning-gates.md](docs/runbooks/secret-scanning-gates.md)、[docs/runbooks/actionlint-workflow-gates.md](docs/runbooks/actionlint-workflow-gates.md)、[docs/runbooks/github-token-permissions-baseline.md](docs/runbooks/github-token-permissions-baseline.md)、[docs/runbooks/zizmor-workflow-audits.md](docs/runbooks/zizmor-workflow-audits.md)、[docs/runbooks/checkov-iac-gates.md](docs/runbooks/checkov-iac-gates.md)、[docs/runbooks/kyverno-policy-gates.md](docs/runbooks/kyverno-policy-gates.md)、[docs/runbooks/trivy-security-gates.md](docs/runbooks/trivy-security-gates.md)、[docs/runbooks/kubeconform-schema-gates.md](docs/runbooks/kubeconform-schema-gates.md)、[docs/runbooks/conftest-policy-gates.md](docs/runbooks/conftest-policy-gates.md)、[docs/runbooks/helm-unittest-playbook.md](docs/runbooks/helm-unittest-playbook.md)、[docs/runbooks/kubectl-server-dry-run-gates.md](docs/runbooks/kubectl-server-dry-run-gates.md)、[docs/runbooks/scorecard-supply-chain-gates.md](docs/runbooks/scorecard-supply-chain-gates.md)、[docs/runbooks/runner-egress-hardening.md](docs/runbooks/runner-egress-hardening.md)、[docs/runbooks/sbom-generation-gates.md](docs/runbooks/sbom-generation-gates.md)、[docs/runbooks/artifact-attestation-gates.md](docs/runbooks/artifact-attestation-gates.md)、[docs/runbooks/cosign-signing-gates.md](docs/runbooks/cosign-signing-gates.md)、[docs/runbooks/slsa-verification-gates.md](docs/runbooks/slsa-verification-gates.md)、[docs/runbooks/slsa-generator-patterns.md](docs/runbooks/slsa-generator-patterns.md)、[docs/runbooks/in-toto-attestation-framework.md](docs/runbooks/in-toto-attestation-framework.md)、[docs/runbooks/policy-controller-gates.md](docs/runbooks/policy-controller-gates.md)、[docs/runbooks/witness-policy-gates.md](docs/runbooks/witness-policy-gates.md)、[docs/runbooks/contract-testing-playbook.md](docs/runbooks/contract-testing-playbook.md) 和 [docs/runbooks/release-notes-automation.md](docs/runbooks/release-notes-automation.md)。
 
 主链输出字段定义见 [docs/runbooks/team-command-output-contracts.md](docs/runbooks/team-command-output-contracts.md)，本轮文档核对台账见 [docs/runbooks/document-execution-audit.md](docs/runbooks/document-execution-audit.md)。
+
+
+<claude-mem-context>
+# Memory Context
+
+# [tsp] recent context, 2026-05-10 4:08pm GMT+8
+
+Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision
+Format: ID TIME TYPE TITLE
+Fetch details: get_observations([IDs]) | Search: mem-search skill
+
+Stats: 26 obs (10,727t read) | 1,199,187t work | 99% savings
+
+### Apr 28, 2026
+884 9:03p 🔵 tsp project-progress.js — Global In-Progress Task Monitoring Script Exists
+885 " 🔵 tsp Full Test Suite Fails — Missing npm Dependencies (ajv, js-yaml, sql.js)
+886 9:06p ⚖️ tsp Monitoring Strategy Decision — Report-First Mode with Optional --fail-on-risk Gate
+887 " 🟣 tsp Monitoring Tests Written (RED) — 5 New Test Cases Define Full Monitoring Contract
+### May 5, 2026
+1559 7:26p 🔵 tsp Framework Already Has Graphify Skill for Brownfield Codebase Analysis
+1560 " 🔵 tsp Framework Brownfield Support Architecture — Multiple Complementary Skills
+1561 7:27p 🔵 tsp External Capability Intake Contract — Full Process for Adding GitNexus
+1562 " 🔵 Complete Integration Checklist for New Codebase-Analysis Skill (GitNexus Pattern)
+1569 7:28p 🔵 GitNexus npm Package License Is PolyForm-Noncommercial-1.0.0 — Critical Integration Constraint
+1570 7:30p ⚖️ GitNexus Integration Strategy Approved — Controlled Optional, Coexist with Graphify
+1583 7:51p ⚖️ clawdbot/tsp: GitNexus Integration Requested for Brownfield Codebase Analysis
+1584 " 🔵 tsp @colin4k1024/tsp-create@2.4.0 Package Contents Verified — 1,864 Files, 14.7MB Unpacked
+1587 7:52p 🔵 tsp npm test Results — GitNexus Tests Passing, 1 Release Health Failure
+1588 7:54p 🔴 tsp release-health-summary: buildDocFreshnessCheck Warning Mapped to 'warn' Broke JSON CLI Test
+1591 7:55p 🔵 tsp GitNexus Integration — Full Uncommitted Changeset Confirmed: 21 Modified + 3 New Files
+1616 8:08p ✅ tsp: GitNexus Integration Branch Push to GitHub Initiated
+1617 8:11p 🔵 tsp validate-doc-freshness.js Enforces <claude-mem-context> Ban in AGENTS.md
+1618 " ✅ tsp: codex/gitnexus-controlled-integration Branch Already Fully Pushed
+### May 10, 2026
+2209 3:30p 🔵 tsp repo — 45-file fast-forward pull, tags v2.4.2/v2.4.3, new gitnexus and open-design skills landed
+2210 " 🔵 macOS com.apple.provenance xattr on .git/index blocks git index writes without escalated sandbox permissions
+2211 " 🔴 AGENTS.md stash-pop merge conflict resolved — trivial trailing-newline difference kept upstream version
+2212 3:33p ✅ tsp pull complete — HEAD at v2.4.5 (bdff699), AGENTS.md conflict cleared, stash entry not dropped
+2214 3:44p 🔵 tsp Repository — Full Install Architecture Confirmed
+2215 " 🔵 tsp Install Plan Module Coverage — Per-Target Skipped Modules
+2216 " 🔵 tsp install-platform.js — Legacy Platform Installer vs install-apply.js
+2217 " 🔵 tsp Test Suite — Regression and Quality Gate Coverage
+
+Access 1199k tokens of past work via get_observations([IDs]) or mem-search skill.
+</claude-mem-context>

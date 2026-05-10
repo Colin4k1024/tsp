@@ -9,6 +9,12 @@ const geminiProject = require('./gemini-project');
 const opencodeHome = require('./opencode-home');
 const windsurfProject = require('./windsurf-project');
 
+const PUBLIC_INSTALL_TARGETS = Object.freeze(['claude', 'codex', 'opencode']);
+const TARGET_ALIASES = Object.freeze({
+  'claude-code': 'claude',
+  claudecode: 'claude',
+});
+
 const ADAPTERS = Object.freeze([
   claudeHome,
   cursorProject,
@@ -22,12 +28,25 @@ const ADAPTERS = Object.freeze([
   augmentProject,
 ]);
 
+function normalizeInstallTarget(target) {
+  const normalized = String(target || '').trim().toLowerCase();
+  return TARGET_ALIASES[normalized] || normalized;
+}
+
 function listInstallTargetAdapters() {
   return ADAPTERS.slice();
 }
 
+function listPublicInstallTargetAdapters() {
+  const publicTargets = new Set(PUBLIC_INSTALL_TARGETS);
+  return ADAPTERS.filter(adapter => publicTargets.has(adapter.target));
+}
+
 function getInstallTargetAdapter(targetOrAdapterId) {
-  const adapter = ADAPTERS.find(candidate => candidate.supports(targetOrAdapterId));
+  const normalizedTarget = normalizeInstallTarget(targetOrAdapterId);
+  const adapter = ADAPTERS.find(candidate => (
+    candidate.supports(normalizedTarget) || candidate.supports(targetOrAdapterId)
+  ));
 
   if (!adapter) {
     throw new Error(`Unknown install target adapter: ${targetOrAdapterId}`);
@@ -72,5 +91,8 @@ function planInstallTargetScaffold(options = {}) {
 module.exports = {
   getInstallTargetAdapter,
   listInstallTargetAdapters,
+  listPublicInstallTargetAdapters,
+  normalizeInstallTarget,
+  PUBLIC_INSTALL_TARGETS,
   planInstallTargetScaffold,
 };

@@ -66,16 +66,30 @@ test('CLI accepts --json and emits machine-readable output', () => {
 test('support classifier distinguishes recommended strong partial and baseline targets', () => {
   assert.strictEqual(
     classifyTargetSupportLevel({
+      target: 'claude',
       requestedModuleIds: ['commands-core', 'team-workflow', 'shared-skills'],
       selectedModuleIds: ['commands-core', 'team-workflow', 'shared-skills'],
+      skippedModuleIds: [],
     }).level,
     'recommended'
   );
 
   assert.strictEqual(
     classifyTargetSupportLevel({
+      target: 'codex',
       requestedModuleIds: ['commands-core', 'team-workflow', 'shared-skills', 'hooks-runtime'],
       selectedModuleIds: ['commands-core', 'team-workflow', 'shared-skills'],
+      skippedModuleIds: ['hooks-runtime'],
+    }).level,
+    'recommended'
+  );
+
+  assert.strictEqual(
+    classifyTargetSupportLevel({
+      target: 'unknown',
+      requestedModuleIds: ['commands-core', 'team-workflow', 'shared-skills', 'hooks-runtime'],
+      selectedModuleIds: ['commands-core', 'team-workflow', 'shared-skills'],
+      skippedModuleIds: ['hooks-runtime'],
     }).level,
     'strong'
   );
@@ -97,19 +111,14 @@ test('support classifier distinguishes recommended strong partial and baseline t
   );
 });
 
-test('current repo target matrix matches documented support tiers', () => {
+test('current repo target matrix matches documented public code agent support', () => {
   const matrix = collectTargetSupportMatrix({ repoRoot: ROOT, profileId: 'team' });
   const byTarget = new Map(matrix.map((entry) => [entry.target, entry]));
 
+  assert.deepStrictEqual(matrix.map((entry) => entry.target), ['claude', 'codex', 'opencode']);
   assert.strictEqual(byTarget.get('claude').level, 'recommended');
-  assert.strictEqual(byTarget.get('cursor').level, 'recommended');
-  assert.strictEqual(byTarget.get('codex').level, 'strong');
-  assert.strictEqual(byTarget.get('opencode').level, 'strong');
-  assert.strictEqual(byTarget.get('antigravity').level, 'partial');
-  assert.strictEqual(byTarget.get('codebuddy').level, 'partial');
-  assert.strictEqual(byTarget.get('copilot').level, 'baseline');
-  assert.strictEqual(byTarget.get('windsurf').level, 'baseline');
-  assert.strictEqual(byTarget.get('augment').level, 'baseline');
+  assert.strictEqual(byTarget.get('codex').level, 'recommended');
+  assert.strictEqual(byTarget.get('opencode').level, 'recommended');
 });
 
 console.log(`\nrelease health summary: ${passed} passed, ${failed} failed`);

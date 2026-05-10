@@ -28,6 +28,7 @@ function runInstallApply(args, env) {
   const result = spawnSync('node', ['scripts/install-apply.js', ...args], {
     cwd: ROOT,
     encoding: 'utf8',
+    maxBuffer: 10 * 1024 * 1024,
     env: {
       ...process.env,
       ...env,

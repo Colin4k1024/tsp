@@ -72,10 +72,8 @@ source_of_truth:
 
 ## 5. 当前公开支持口径
 
-- `Recommended`：`claude`、`cursor`
-- `Strong`：`codex`、`opencode`
-- `Partial`：`antigravity`、`codebuddy`
-- `Baseline`：`gemini`、`copilot`、`windsurf`、`augment`
+- `Recommended`：`claude`（Claude Code）、`codex`、`opencode`
+- `Hidden compatibility`：`cursor`、`antigravity`、`gemini`、`codebuddy`、`copilot`、`windsurf`、`augment`
 
 如果 support matrix 发生变化，必须同步更新：
 

@@ -12,6 +12,8 @@
         "claude",
         "cursor",
         "antigravity",
+        "codex",
+        "opencode",
         "codebuddy",
         "copilot",
         "windsurf",
@@ -90,6 +92,7 @@
       "description": "Baseline platform configs, package-manager setup, and MCP catalog.",
       "paths": [
         ".claude-plugin",
+        ".codex-plugin",
         ".cursor",
         ".opencode-plugin",
         "mcp-configs"

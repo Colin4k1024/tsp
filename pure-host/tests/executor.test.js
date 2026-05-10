@@ -1,7 +1,7 @@
 /**
  * Tests for Executor — task execution and verification.
  */
-const { test, describe, mock } = require('node:test');
+const { test, describe } = require('node:test');
 const assert = require('node:assert');
 const { Executor } = require('../lib/executor');
 

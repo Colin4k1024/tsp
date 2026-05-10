@@ -80,13 +80,13 @@ test('community documents exist and README links to them', () => {
     'README should link to the open-source release checklist'
   );
   assert.ok(readme.includes('Support level'), 'README should disclose target support levels');
-  assert.ok(readme.includes('Recommended | `claude`, `cursor`'), 'README should identify primary supported targets');
+  assert.ok(readme.includes('Recommended | `claude`, `codex`, `opencode`'), 'README should identify primary supported code-agent targets');
   assert.ok(
-    readme.includes('Baseline | `gemini`, `copilot`, `windsurf`, `augment`'),
-    'README should identify baseline compatibility targets'
+    readme.includes('Hidden compatibility'),
+    'README should identify hidden compatibility targets'
   );
   assert.ok(
-    readme.includes('quick-start / recipes / examples 主要覆盖 `claude`、`cursor`、`codex`、`opencode`'),
+    readme.includes('公开 quick-start / recipes / examples 聚焦 `claude`、`codex`、`opencode`'),
     'README should disclose where public onboarding depth is concentrated'
   );
   assert.ok(
@@ -123,12 +123,12 @@ test('GitHub community entry points use absolute URLs and current validation com
   const support = fs.readFileSync(path.join(ROOT, 'SUPPORT.md'), 'utf8');
   assert.ok(support.includes('## Target support levels'), 'SUPPORT should document target support levels');
   assert.ok(
-    support.includes('`claude`, `cursor`'),
-    'SUPPORT should call out recommended primary targets'
+    support.includes('`claude`, `codex`, `opencode`'),
+    'SUPPORT should call out recommended primary code-agent targets'
   );
   assert.ok(
-    support.includes('`gemini`, `copilot`, `windsurf`, `augment`'),
-    'SUPPORT should call out baseline compatibility targets'
+    support.includes('Hidden compatibility'),
+    'SUPPORT should call out hidden compatibility targets'
   );
 
   const openSourceChecklist = path.join(ROOT, 'docs', 'runbooks', 'open-source-release-checklist.md');

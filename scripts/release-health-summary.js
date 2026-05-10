@@ -297,7 +297,7 @@ function formatHumanReport(report) {
   }
 
   lines.push('');
-  lines.push('Note: partial/baseline targets are public compatibility paths, not full `/team-*` parity installs.');
+  lines.push('Note: public release health tracks Claude Code, Codex, and OpenCode; other adapters are hidden compatibility paths.');
   return `${lines.join('\n')}\n`;
 }
 

@@ -14,7 +14,7 @@ const {
 } = require('./install-executor');
 const {
   getInstallTargetAdapter,
-  listInstallTargetAdapters,
+  listPublicInstallTargetAdapters,
 } = require('./install-targets/registry');
 
 const DEFAULT_REPO_ROOT = path.join(__dirname, '../..');
@@ -30,7 +30,7 @@ function readPackageVersion(repoRoot) {
 
 function normalizeTargets(targets) {
   if (!Array.isArray(targets) || targets.length === 0) {
-    return listInstallTargetAdapters().map(adapter => adapter.target);
+    return listPublicInstallTargetAdapters().map(adapter => adapter.target);
   }
 
   const normalizedTargets = [];

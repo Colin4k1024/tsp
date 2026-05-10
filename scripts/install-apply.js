@@ -8,12 +8,10 @@
 
 const os = require('os');
 const {
-  SUPPORTED_INSTALL_TARGETS,
   listLegacyCompatibilityLanguages,
   resolveInstallPlan,
 } = require('./lib/install-manifests');
 const {
-  LEGACY_INSTALL_TARGETS,
   normalizeInstallRequest,
   parseInstallArgs,
 } = require('./lib/install/request');
@@ -24,6 +22,7 @@ const {
   uninstallInstalledStates,
 } = require('./lib/install-lifecycle');
 const { deriveInstallManifestPath } = require('./lib/install-audit-manifest');
+const { PUBLIC_INSTALL_TARGETS } = require('./lib/install-targets/registry');
 
 const LIFECYCLE_COMMANDS = new Set(['plan', 'status', 'doctor', 'repair', 'uninstall']);
 
@@ -109,16 +108,19 @@ function evaluateCodexKnownRisk(planLike) {
 
 function getHelpText(command = 'all') {
   const languages = listLegacyCompatibilityLanguages();
+  const publicTargets = [...PUBLIC_INSTALL_TARGETS, 'claude-code', 'claudecode'];
   const planUsage = `
-Usage: install.sh [plan] [--target <${LEGACY_INSTALL_TARGETS.join('|')}>] [--dry-run] [--json] <language> [<language> ...]
-       install.sh [plan] [--target <${SUPPORTED_INSTALL_TARGETS.join('|')}>] [--dry-run] [--json] [--overlay <id>]... --profile <name> [--with <component>]... [--without <component>]...
-       install.sh [plan] [--target <${SUPPORTED_INSTALL_TARGETS.join('|')}>] [--dry-run] [--json] [--overlay <id>]... --modules <id,id,...> [--with <component>]... [--without <component>]...
+Usage: install.sh [plan] [--target <${publicTargets.join('|')}>] [--dry-run] [--json] <language> [<language> ...]
+       install.sh [plan] [--target <${publicTargets.join('|')}>] [--dry-run] [--json] [--overlay <id>]... --profile <name> [--with <component>]... [--without <component>]...
+       install.sh [plan] [--target <${publicTargets.join('|')}>] [--dry-run] [--json] [--overlay <id>]... --modules <id,id,...> [--with <component>]... [--without <component>]...
        install.sh [plan] [--dry-run] [--json] --config <path>
 
 Targets:
-  claude       (default) - Install rules to ~/.claude/rules/
-  cursor       - Install rules, hooks, and bundled Cursor configs to ./.cursor/
-  antigravity  - Install rules, workflows, skills, and agents to ./.agent/
+  claude       (default) - Install Claude Code assets to ~/.claude/
+  codex        - Install Codex assets to ~/.codex/ and register the plugin
+  opencode     - Install OpenCode assets to ~/.config/opencode/
+  claude-code  - Alias for claude
+  claudecode   - Alias for claude
 
 Options:
   --profile <name>    Resolve and install a manifest profile

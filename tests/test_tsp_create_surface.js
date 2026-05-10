@@ -12,7 +12,7 @@ const {
   listPublicInstallProfiles,
   listPublicInstallTargets,
 } = require(path.join(ROOT, 'bin', 'lib', 'install-surface'));
-const { listInstallTargetAdapters } = require(path.join(ROOT, 'scripts', 'lib', 'install-targets', 'registry'));
+const { listPublicInstallTargetAdapters } = require(path.join(ROOT, 'scripts', 'lib', 'install-targets', 'registry'));
 const { listInstallProfiles } = require(path.join(ROOT, 'scripts', 'lib', 'install-manifests'));
 
 let passed = 0;
@@ -32,16 +32,17 @@ function test(name, fn) {
 
 console.log('tsp-create surface tests');
 
-test('public target list tracks the real install target registry', () => {
+test('public target list tracks the public code agent registry', () => {
   const helperTargets = listPublicInstallTargets().map((target) => target.id);
-  const registryTargets = listInstallTargetAdapters().map((adapter) => adapter.target);
+  const registryTargets = listPublicInstallTargetAdapters().map((adapter) => adapter.target);
   assert.deepStrictEqual(helperTargets, registryTargets);
+  assert.deepStrictEqual(helperTargets, ['claude', 'codex', 'opencode']);
 
   const choiceNames = buildTargetChoices().map((choice) => choice.name);
-  assert.ok(choiceNames.some((name) => name.includes('~/.opencode/')), 'OpenCode should display the current install path');
-  assert.ok(choiceNames.some((name) => name.includes('Copilot')), 'Copilot should be exposed in the public wizard');
-  assert.ok(choiceNames.some((name) => name.includes('Windsurf')), 'Windsurf should be exposed in the public wizard');
-  assert.ok(choiceNames.some((name) => name.includes('Augment')), 'Augment should be exposed in the public wizard');
+  assert.ok(choiceNames.some((name) => name.includes('~/.config/opencode/')), 'OpenCode should display the current install path');
+  assert.ok(!choiceNames.some((name) => name.includes('Copilot')), 'Copilot should not be exposed in the public wizard');
+  assert.ok(!choiceNames.some((name) => name.includes('Windsurf')), 'Windsurf should not be exposed in the public wizard');
+  assert.ok(!choiceNames.some((name) => name.includes('Augment')), 'Augment should not be exposed in the public wizard');
 });
 
 test('public profile list tracks the manifest and excludes enterprise profile drift', () => {
@@ -62,10 +63,11 @@ test('help output advertises current public targets and profiles only', () => {
     encoding: 'utf8',
   });
   assert.strictEqual(result.status, 0, `expected --help to succeed, got ${result.status}`);
-  assert.match(result.stdout, /copilot/);
-  assert.match(result.stdout, /windsurf/);
-  assert.match(result.stdout, /augment/);
-  assert.match(result.stdout, /Public install profile \(core  developer  security  research  team  full\)/);
+  assert.match(result.stdout, /Target platform \(claude {2}codex {2}opencode\)/);
+  assert.doesNotMatch(result.stdout, /copilot/);
+  assert.doesNotMatch(result.stdout, /windsurf/);
+  assert.doesNotMatch(result.stdout, /augment/);
+  assert.match(result.stdout, /Public install profile \(core {2}developer {2}security {2}research {2}team {2}full\)/);
   assert.doesNotMatch(result.stdout, /Public install profile \([^)]*enterprise/, 'help output should not advertise enterprise as a public profile');
 });
 

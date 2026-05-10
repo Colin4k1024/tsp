@@ -20,11 +20,15 @@ source_of_truth:
 
 ```bash
 node scripts/build-platform-artifacts.js
-CLAUDE_HOME_DIR="$HOME/.claude" ./scripts/install-claude.sh
+node scripts/install-apply.js --profile team --target claude
+
+# 等价别名，面向 Claude Code 命名习惯
+node scripts/install-apply.js --profile team --target claude-code
 ```
 
 安装脚本会做两件事：
 
+- 把 Claude Code 资产复制到 `~/.claude/`
 - 把完整插件目录复制到 `~/.claude/plugins/team-skills-platform/`
 - 把 `skills/`、`agents/`、`commands/`、`rules/`、`templates/`、`examples/` 等同步到 `~/.claude/` 下的对应目录
 

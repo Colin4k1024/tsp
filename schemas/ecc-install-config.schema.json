@@ -19,12 +19,17 @@
       "type": "string",
       "enum": [
         "claude",
+        "claude-code",
+        "claudecode",
         "cursor",
         "antigravity",
         "codex",
         "gemini",
         "opencode",
-        "codebuddy"
+        "codebuddy",
+        "copilot",
+        "windsurf",
+        "augment"
       ]
     },
     "profile": {

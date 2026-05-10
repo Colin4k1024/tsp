@@ -1,7 +1,11 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { getInstallTargetAdapter, planInstallTargetScaffold } = require('./install-targets/registry');
+const {
+  getInstallTargetAdapter,
+  normalizeInstallTarget,
+  planInstallTargetScaffold,
+} = require('./install-targets/registry');
 
 const DEFAULT_REPO_ROOT = path.join(__dirname, '../..');
 const SUPPORTED_INSTALL_TARGETS = ['claude', 'cursor', 'antigravity', 'codex', 'gemini', 'opencode', 'codebuddy', 'copilot', 'windsurf', 'augment'];
@@ -34,6 +38,21 @@ const LEGACY_COMPAT_BASE_MODULE_IDS_BY_TARGET = Object.freeze({
     'rules-core',
     'agents-core',
     'commands-core',
+  ],
+  codex: [
+    'rules-core',
+    'agents-core',
+    'commands-core',
+    'platform-configs',
+    'workflow-quality',
+  ],
+  opencode: [
+    'rules-core',
+    'agents-core',
+    'commands-core',
+    'hooks-runtime',
+    'platform-configs',
+    'workflow-quality',
   ],
 });
 const LEGACY_LANGUAGE_ALIAS_TO_CANONICAL = Object.freeze({
@@ -334,7 +353,7 @@ function validateInstallModuleIds(moduleIds, options = {}) {
 function listInstallComponents(options = {}) {
   const manifests = loadInstallManifests(options);
   const family = options.family || null;
-  const target = options.target || null;
+  const target = options.target ? normalizeInstallTarget(options.target) : null;
 
   if (family && !Object.hasOwn(COMPONENT_FAMILY_PREFIXES, family)) {
     throw new Error(
@@ -424,7 +443,7 @@ function expandComponentIdsToModuleIds(componentIds, manifests) {
 
 function resolveLegacyCompatibilitySelection(options = {}) {
   const manifests = loadInstallManifests(options);
-  const target = options.target || null;
+  const target = options.target ? normalizeInstallTarget(options.target) : null;
 
   if (target && !SUPPORTED_INSTALL_TARGETS.includes(target)) {
     throw new Error(
@@ -508,7 +527,7 @@ function resolveInstallPlan(options = {}) {
     }
   }
 
-  const target = options.target || null;
+  const target = options.target ? normalizeInstallTarget(options.target) : null;
   if (target && !SUPPORTED_INSTALL_TARGETS.includes(target)) {
     throw new Error(
       `Unknown install target: ${target}. Expected one of ${SUPPORTED_INSTALL_TARGETS.join(', ')}`

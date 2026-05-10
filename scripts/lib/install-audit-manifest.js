@@ -40,6 +40,9 @@ function normalizeOperations(operations) {
     if (operation.ownership && operation.ownership !== 'managed') {
       return false;
     }
+    if (operation.kind === 'merge-json') {
+      return false;
+    }
     return typeof operation.destinationPath === 'string' && operation.destinationPath.length > 0;
   });
 }

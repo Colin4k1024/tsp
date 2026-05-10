@@ -10,7 +10,7 @@ const {
   resolveLegacyCompatibilitySelection,
   resolveInstallPlan,
 } = require('./install-manifests');
-const { getInstallTargetAdapter } = require('./install-targets/registry');
+const { getInstallTargetAdapter, normalizeInstallTarget } = require('./install-targets/registry');
 
 const LANGUAGE_NAME_PATTERN = /^[a-zA-Z0-9_-]+$/;
 const EXCLUDED_GENERATED_SOURCE_SUFFIXES = [
@@ -85,7 +85,8 @@ function listAvailableLanguages(sourceRoot = getSourceRoot()) {
 }
 
 function validateLegacyTarget(target) {
-  if (!LEGACY_INSTALL_TARGETS.includes(target)) {
+  const normalizedTarget = normalizeInstallTarget(target);
+  if (!LEGACY_INSTALL_TARGETS.includes(normalizedTarget)) {
     throw new Error(
       `Unknown install target: ${target}. Expected one of ${LEGACY_INSTALL_TARGETS.join(', ')}`
     );
@@ -502,9 +503,17 @@ function createLegacyInstallPlan(options = {}) {
   const sourceRoot = options.sourceRoot || getSourceRoot();
   const projectRoot = options.projectRoot || process.cwd();
   const homeDir = options.homeDir || process.env.HOME || os.homedir();
-  const target = options.target || 'claude';
+  const target = normalizeInstallTarget(options.target || 'claude');
 
   validateLegacyTarget(target);
+
+  if (target === 'codex' || target === 'opencode') {
+    return createLegacyCompatInstallPlan({
+      ...options,
+      target,
+      legacyLanguages: options.languages || options.legacyLanguages || [],
+    });
+  }
 
   const context = {
     sourceRoot,
@@ -568,7 +577,7 @@ function createLegacyInstallPlan(options = {}) {
 function createLegacyCompatInstallPlan(options = {}) {
   const sourceRoot = options.sourceRoot || getSourceRoot();
   const projectRoot = options.projectRoot || process.cwd();
-  const target = options.target || 'claude';
+  const target = normalizeInstallTarget(options.target || 'claude');
 
   validateLegacyTarget(target);
 
@@ -637,7 +646,7 @@ function materializeScaffoldOperation(sourceRoot, operation) {
 function createManifestInstallPlan(options = {}) {
   const sourceRoot = options.sourceRoot || getSourceRoot();
   const projectRoot = options.projectRoot || process.cwd();
-  const target = options.target || 'claude';
+  const target = normalizeInstallTarget(options.target || 'claude');
   const legacyLanguages = Array.isArray(options.legacyLanguages)
     ? [...options.legacyLanguages]
     : [];

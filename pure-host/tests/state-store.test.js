@@ -5,7 +5,7 @@ const { test, describe, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
-const { StateStore, STATE_FILE } = require('../lib/state-store');
+const { StateStore } = require('../lib/state-store');
 
 const TEST_ROOT = path.join(__dirname, 'test_artifacts');
 const TEST_STATE_FILE = path.join(TEST_ROOT, 'SHARED_TASK_NOTES.md');

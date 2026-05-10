@@ -20,26 +20,29 @@ source_of_truth:
 
 ```bash
 node scripts/build-platform-artifacts.js
-CODEX_HOME_DIR="$HOME/.codex" AGENTS_HOME_DIR="$HOME/.agents" ./scripts/install-codex.sh
+AGENTS_HOME_DIR="$HOME/.agents" node scripts/install-apply.js --profile team --target codex
 ```
 
 安装完成后会：
 
-- 把完整插件复制到 `$CODEX_HOME_DIR/plugins/team-skills-platform/`
+- 把完整插件复制到 `$HOME/.codex/plugins/team-skills-platform/`
+- 把 commands / skills / agents 暴露到 `$HOME/.codex` 的原生入口
+- 在 `$HOME/.codex/config.toml` 注册 `team-skills-platform`
 - 把 marketplace 合并到 `$AGENTS_HOME_DIR/plugins/marketplace.json`
 
 ## 2. 校验安装是否成功
 
 至少确认以下路径存在：
 
-- `$CODEX_HOME_DIR/plugins/team-skills-platform/commands/team-help.md`
-- `$CODEX_HOME_DIR/plugins/team-skills-platform/agents/roles/tech-lead.md`
-- `$CODEX_HOME_DIR/plugins/team-skills-platform/examples/project-CLAUDE.md`
+- `$HOME/.codex/plugins/team-skills-platform/commands/team-help.md`
+- `$HOME/.codex/plugins/team-skills-platform/agents/roles/tech-lead.md`
+- `$HOME/.codex/plugins/team-skills-platform/examples/project-CLAUDE.md`
+- `$HOME/.codex/config.toml` 中含有 `[plugins."team-skills-platform"]`
 - `$AGENTS_HOME_DIR/plugins/marketplace.json` 中含有 `team-skills-platform`
 
 如果命令或 agent 不可用，先检查：
 
-- `CODEX_HOME_DIR` 和 `AGENTS_HOME_DIR` 是否指向了正确目录
+- `HOME` 和 `AGENTS_HOME_DIR` 是否指向了正确目录
 - 是否重新运行了构建脚本
 - 是否误以为 Codex 只需要 `marketplace.json` 而不需要插件目录
 
