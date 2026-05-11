@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  base: '/harness-engineering/',
+  base: '/tsp/',
   title: 'Team Skills Platform',
   description: 'Company-grade role-based Team Skills Platform for AI-assisted development',
   lang: 'zh-CN',
@@ -174,7 +174,7 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/Colin4k1024/harness-engineering' },
+      { icon: 'github', link: 'https://github.com/Colin4k1024/tsp' },
     ],
 
     footer: {

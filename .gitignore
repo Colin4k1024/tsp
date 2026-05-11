@@ -10,6 +10,9 @@ crates/*/target-local-musl/
 bin/prebuilt/
 *.tgz
 
+# Claude worktrees (created by Claude Code sessions)
+.claude/worktrees/
+
 # Sensitive local config
 .npmrc
 .claude/settings.local.json
