@@ -23,6 +23,7 @@
         "workflow-quality",
         "framework-language",
         "database",
+        "knowledge-graph",
         "workflow-engine",
         "workflow-defaults",
         "orchestration"
@@ -101,6 +102,7 @@
         "workflow-quality",
         "framework-language",
         "database",
+        "knowledge-graph",
         "workflow-engine",
         "workflow-defaults",
         "design-prototyping",

@@ -40,7 +40,7 @@
 2. 默认把 `karpathy-guidelines` 作为计划收口护栏：要求显式写出假设、更简单备选路径、当前不做项，以及为什么本轮范围已经足够。
 3. 按任务特征装配动态讨论分组，先讨论再收敛，避免未经质疑直接进入计划冻结。
 4. 若启用 `doc-architecture`，补齐 Service Catalog、Communication Matrix、NFR Summary，并明确其 artifact 回落位置。
-5. 若是既有项目（brownfield），先梳理现有模块边界、外部依赖、历史约束和缺失文档；必要时运行 `/update-codemaps`，需要轻量结构证据时选择 Graphify，需要跨模块影响面或 MCP 证据时选择 GitNexus，再把 brownfield snapshot 回落到 `delivery-plan.md` 与 `arch-design.md`。
+5. 若是既有项目（brownfield），先梳理现有模块边界、外部依赖、历史约束和缺失文档；必要时运行 `/update-codemaps`，默认用 CodeGraph 补 MCP-backed 符号、调用链和影响面证据，需要轻量结构证据时选择 Graphify，需要跨模块或多仓影响面时选择 GitNexus，再把 brownfield snapshot 回落到 `delivery-plan.md` 与 `arch-design.md`。
 6. 若为企业内部应用，锁定应用等级、技术架构等级、关键组件偏离和资产入口要求，并判断是否必须输出 ADR。
 7. 为本次任务显式装配 shared 能力、ECC 增强与可选 enterprise overlay 组合，并说明哪些私有 overlay 能力、runbook 或 overlay 仅按场景启用。
 8. 若存在多参数、多角色、多配置或多终端组合，提前判断是否需要 `pairwise-test-design` 压缩测试矩阵。

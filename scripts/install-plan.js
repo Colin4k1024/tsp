@@ -137,6 +137,30 @@ function printComponents(components) {
   }
 }
 
+function resolvePlanExternalInstalls(plan) {
+  return plan.selectedModules
+    .map(module => ({ module, externalInstall: module.externalInstall }))
+    .filter(({ externalInstall }) => externalInstall && typeof externalInstall === 'object' && !Array.isArray(externalInstall))
+    .filter(({ externalInstall }) => {
+      const profiles = Array.isArray(externalInstall.profiles)
+        ? externalInstall.profiles.map(value => String(value).trim()).filter(Boolean)
+        : [];
+      return profiles.length === 0 || profiles.includes(plan.profileId);
+    })
+    .map(({ module, externalInstall }) => ({
+      id: externalInstall.id || module.id,
+      moduleId: module.id,
+      description: externalInstall.description || '',
+      command: externalInstall.command || 'node',
+      script: externalInstall.script || null,
+      args: Array.isArray(externalInstall.args)
+        ? externalInstall.args.map(value => String(value))
+        : [],
+      target: plan.target || null,
+      profileId: plan.profileId || null,
+    }));
+}
+
 function printPlan(plan) {
   console.log('Install plan:\n');
   console.log(
@@ -184,20 +208,12 @@ function printPlan(plan) {
     }
   }
 
-  const externalInstalls = plan.selectedModules
-    .map(module => ({ module, externalInstall: module.externalInstall }))
-    .filter(({ externalInstall }) => externalInstall && typeof externalInstall === 'object' && !Array.isArray(externalInstall))
-    .filter(({ externalInstall }) => {
-      const profiles = Array.isArray(externalInstall.profiles)
-        ? externalInstall.profiles.map(value => String(value).trim()).filter(Boolean)
-        : [];
-      return profiles.length === 0 || profiles.includes(plan.profileId);
-    });
+  const externalInstalls = resolvePlanExternalInstalls(plan);
   if (externalInstalls.length > 0) {
     console.log('');
     console.log(`External install plan (${externalInstalls.length}):`);
-    for (const { module, externalInstall } of externalInstalls) {
-      console.log(`- ${externalInstall.id || module.id}: ${externalInstall.description || externalInstall.script}`);
+    for (const externalInstall of externalInstalls) {
+      console.log(`- ${externalInstall.id}: ${externalInstall.description || externalInstall.script}`);
     }
   }
 }
@@ -268,6 +284,7 @@ function main() {
       excludeComponentIds: request.excludeComponentIds,
       target: request.target,
     });
+    plan.externalInstalls = resolvePlanExternalInstalls(plan);
 
     if (options.json) {
       console.log(JSON.stringify(plan, null, 2));

@@ -47,7 +47,11 @@ function runInstallApply(args, env) {
     cwd: ROOT,
     encoding: 'utf8',
     maxBuffer: 10 * 1024 * 1024,
-    env: { ...process.env, ...env },
+    env: {
+      ...process.env,
+      TSP_SKIP_EXTERNAL_INSTALLS: '1',
+      ...env,
+    },
   });
   if (result.status !== 0) {
     throw new Error(result.stderr || result.stdout || `install-apply exited with ${result.status}`);

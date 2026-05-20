@@ -399,7 +399,7 @@ function analyzeTask(options) {
     result.reason = routeReason(catalog, '/team-intake', '未检测到任务 artifact 目录，主链应从 intake 开始。');
     result.missingPrerequisites.push('缺少 docs/artifacts/{YYYY-MM-DD}-{slug}/ 任务目录');
     if (brownfieldRepo) {
-      result.brownfieldSuggestions.push('既有项目建议先执行 /update-codemaps；需要轻量结构证据时用 Graphify，需要跨模块影响面或 MCP 证据时用 GitNexus，再进入 /team-plan 补齐 Brownfield Context Snapshot。');
+      result.brownfieldSuggestions.push('既有项目建议先执行 /update-codemaps；默认用 CodeGraph 做 MCP-backed 符号、调用链和影响面证据，需要轻量结构证据时用 Graphify，需要跨模块或多仓影响面时用 GitNexus，再进入 /team-plan 补齐 Brownfield Context Snapshot。');
     }
     if (!projectContext.exists || projectContext.missingSections.length > 0) {
       addProjectContextRemediation(result, null);
@@ -443,7 +443,7 @@ function analyzeTask(options) {
     result.reason = routeReason(catalog, '/team-plan', '已有 PRD，但尚未形成 Delivery Plan。');
     result.missingPrerequisites.push('缺少 delivery-plan.md');
     if (brownfieldRepo) {
-      result.brownfieldSuggestions.push('如果是 brownfield 任务，在 delivery-plan.md 中补齐 Brownfield Context Snapshot；必要时引用 Graphify 或 GitNexus 图谱证据。');
+      result.brownfieldSuggestions.push('如果是 brownfield 任务，在 delivery-plan.md 中补齐 Brownfield Context Snapshot；必要时引用 CodeGraph、Graphify 或 GitNexus 图谱证据。');
     }
     addProjectContextRemediation(result, taskDir);
     return finalizeResult(result, catalog);
@@ -462,7 +462,7 @@ function analyzeTask(options) {
 
   const deliveryPlanText = readText(deliveryPlanPath).toLowerCase();
   if (brownfieldRepo && !deliveryPlanText.includes('brownfield context snapshot')) {
-    result.brownfieldSuggestions.push('建议在 delivery-plan.md 中补齐 Brownfield Context Snapshot；必要时引用 Graphify 或 GitNexus 图谱证据。');
+    result.brownfieldSuggestions.push('建议在 delivery-plan.md 中补齐 Brownfield Context Snapshot；必要时引用 CodeGraph、Graphify 或 GitNexus 图谱证据。');
   }
 
   if (!hasHandoffEvidence && !exists(executeLogPath)) {

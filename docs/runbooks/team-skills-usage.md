@@ -103,14 +103,15 @@ source_of_truth:
 - 公开安装与分发约定见 [custom-overlay.md](custom-overlay.md)。
 - 任何需要企业内部 runbook、toolkit、examples 或脚本的场景，都应在私有 overlay 环境中完成。
 
-## 5.1 可选代码图谱能力（Graphify + GitNexus）
+## 5.1 代码图谱能力（CodeGraph + Graphify + GitNexus）
 
+- CodeGraph 作为默认内置 MCP-backed 代码智能能力接入，定位是 brownfield 符号搜索、调用链、impact 和 focused context。
 - Graphify 作为轻量结构证据能力接入，定位是 brownfield 结构扫描、架构问答和依赖路径证据补充。
 - GitNexus 作为受控可选代码智能能力接入，定位是 MCP 查询、impact、detect_changes、多仓分析和更深代码图谱证据。
-- 推荐组合：`/team-help -> /update-codemaps -> npm run graphify:doctor 或 npm run gitnexus:doctor -> 图谱查询 -> /team-plan`。
+- 推荐组合：`/team-help -> /update-codemaps -> npm run codegraph:doctor -> codegraph init -i -> 图谱查询 -> /team-plan`；需要轻量结构证据时补 Graphify，需要跨模块或多仓影响面时补 GitNexus。
 - 输出必须在 handoff 或 artifacts 中引用关键结论，不创建平行责任链。
-- 不允许在本仓库执行会改写现有 AGENTS/hooks/MCP 契约的自动 setup 类命令。
-- 详细操作见 [graphify-knowledge-graph-usage.md](graphify-knowledge-graph-usage.md) 与 [gitnexus-code-intelligence-usage.md](gitnexus-code-intelligence-usage.md)。
+- TSP 只通过 target-scoped wrapper 调用 CodeGraph installer，不使用 `--target=auto`，也不在安装时运行 `codegraph init -i`。
+- 详细操作见 [codegraph-code-intelligence-usage.md](codegraph-code-intelligence-usage.md)、[graphify-knowledge-graph-usage.md](graphify-knowledge-graph-usage.md) 与 [gitnexus-code-intelligence-usage.md](gitnexus-code-intelligence-usage.md)。
 
 ## 6. ECC Harness Layer
 

@@ -89,6 +89,21 @@ test('gitnexus doctor script is exposed without adding gitnexus as a dependency'
   );
 });
 
+test('codegraph doctor script is exposed with CodeGraph as a production dependency', () => {
+  const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
+
+  assert.strictEqual(
+    packageJson.scripts['codegraph:doctor'],
+    'node scripts/codegraph-preflight.js',
+    'expected codegraph:doctor to point at the controlled preflight script'
+  );
+  assert.strictEqual(
+    packageJson.dependencies['@colbymchenry/codegraph'],
+    '^0.7.12',
+    'expected CodeGraph to be a default production dependency'
+  );
+});
+
 test('gitnexus preflight blocks Node versions below 20', () => {
   const result = spawnSync('node', ['scripts/gitnexus-preflight.js'], {
     cwd: path.join(__dirname, '..'),
@@ -118,6 +133,7 @@ test('gitnexus preflight keeps integration controlled and license-aware', () => 
     encoding: 'utf8',
     env: {
       ...process.env,
+      GITNEXUS_PREFLIGHT_SKIP_COMMANDS: '1',
       GITNEXUS_PREFLIGHT_NODE_VERSION: 'v20.10.0',
       GITNEXUS_PREFLIGHT_NPM_VIEW_JSON: JSON.stringify({
         version: '1.6.3',
@@ -147,11 +163,29 @@ test('gitnexus preflight keeps integration controlled and license-aware', () => 
   );
 });
 
-test('knowledge graph module includes GitNexus optional surface', () => {
+test('knowledge graph module includes CodeGraph default surface and GitNexus optional surface', () => {
   const modules = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'manifests', 'install-modules.json'), 'utf8'));
   const knowledgeGraph = modules.modules.find((item) => item.id === 'knowledge-graph');
 
   assert.ok(knowledgeGraph, 'expected knowledge-graph module to exist');
+  assert.strictEqual(knowledgeGraph.defaultInstall, true, 'expected knowledge-graph to be part of default engineering installs');
+  assert.ok(
+    knowledgeGraph.paths.includes('skills/codegraph'),
+    'expected knowledge-graph module to ship the CodeGraph skill'
+  );
+  assert.ok(
+    knowledgeGraph.paths.includes('docs/runbooks/codegraph-code-intelligence-usage.md'),
+    'expected knowledge-graph module to ship the CodeGraph runbook'
+  );
+  assert.ok(
+    knowledgeGraph.paths.includes('scripts/install-codegraph.js'),
+    'expected knowledge-graph module to ship the CodeGraph installer wrapper'
+  );
+  assert.strictEqual(
+    knowledgeGraph.externalInstall && knowledgeGraph.externalInstall.script,
+    'scripts/install-codegraph.js',
+    'expected knowledge-graph module to run the CodeGraph target-scoped wrapper'
+  );
   assert.ok(
     knowledgeGraph.paths.includes('skills/gitnexus'),
     'expected knowledge-graph module to ship the GitNexus skill'
@@ -166,8 +200,8 @@ test('brownfield workflow guidance mentions GitNexus and Graphify evidence paths
   const teamSkillsData = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'lib', 'team-skills-data.json'), 'utf8');
 
   assert.ok(
-    teamSkillsData.includes('GitNexus') && teamSkillsData.includes('Graphify'),
-    'expected workflow guidance to mention both GitNexus and Graphify'
+    teamSkillsData.includes('CodeGraph') && teamSkillsData.includes('GitNexus') && teamSkillsData.includes('Graphify'),
+    'expected workflow guidance to mention CodeGraph, GitNexus, and Graphify'
   );
   assert.ok(
     teamSkillsData.includes('/update-codemaps'),

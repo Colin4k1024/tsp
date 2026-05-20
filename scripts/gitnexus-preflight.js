@@ -46,6 +46,14 @@ function isNodeSupported(version) {
 }
 
 function detectCommand(command) {
+  if (process.env.GITNEXUS_PREFLIGHT_SKIP_COMMANDS === '1') {
+    return {
+      ok: true,
+      command,
+      output: 'skipped by test fixture',
+    }
+  }
+
   const result = run(command, ['--version'])
   if (result.error || result.status !== 0) {
     return {

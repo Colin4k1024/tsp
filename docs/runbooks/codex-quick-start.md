@@ -48,16 +48,17 @@ AGENTS_HOME_DIR="$HOME/.agents" node scripts/install-apply.js --profile team --t
 
 如果还没有定位到问题，继续看 [troubleshooting.md](troubleshooting.md)。
 
-### 2.1 可选能力检查：Graphify / GitNexus
+### 2.1 代码图谱能力检查：CodeGraph / Graphify / GitNexus
 
 如果你准备在 brownfield 项目中启用代码图谱能力，安装后可以先做预检查：
 
 ```bash
+npm run codegraph:doctor
 npm run graphify:doctor
 npm run gitnexus:doctor
 ```
 
-预检查仅验证环境，不会自动安装依赖。Graphify 适合轻量结构证据，GitNexus 适合 MCP 查询、impact 和 detect_changes；若失败，按 [troubleshooting.md](troubleshooting.md) 的对应章节处理。
+CodeGraph 是默认内置的 MCP-backed 符号、调用链和影响面能力；Graphify 适合轻量结构证据，GitNexus 适合更深 MCP 查询、impact 和 detect_changes。CodeGraph 的 TSP 安装 wrapper 不会使用 `--target=auto`，也不会运行 `codegraph init -i`；目标项目需要索引时再手动初始化。
 
 ## 3. 在 Codex 中的推荐使用方式
 

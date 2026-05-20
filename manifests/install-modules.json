@@ -296,13 +296,24 @@
     {
       "id": "knowledge-graph",
       "kind": "skills",
-      "description": "Optional Graphify and GitNexus code-graph capabilities for brownfield structure discovery, architecture Q&A, impact analysis, and evidence capture.",
+      "description": "Default CodeGraph plus optional Graphify and GitNexus code-graph capabilities for brownfield structure discovery, architecture Q&A, impact analysis, and evidence capture.",
       "paths": [
+        "skills/codegraph",
         "skills/graphify",
         "skills/gitnexus",
+        "docs/runbooks/codegraph-code-intelligence-usage.md",
         "docs/runbooks/graphify-knowledge-graph-usage.md",
-        "docs/runbooks/gitnexus-code-intelligence-usage.md"
+        "docs/runbooks/gitnexus-code-intelligence-usage.md",
+        "scripts/codegraph-preflight.js",
+        "scripts/install-codegraph.js"
       ],
+      "externalInstall": {
+        "id": "codegraph",
+        "description": "Run the upstream CodeGraph installer through a TSP target-scoped wrapper; never uses --target=auto and never initializes project indexes.",
+        "command": "node",
+        "script": "scripts/install-codegraph.js",
+        "args": []
+      },
       "targets": [
         "claude",
         "cursor",
@@ -314,7 +325,7 @@
       "dependencies": [
         "platform-configs"
       ],
-      "defaultInstall": false,
+      "defaultInstall": true,
       "cost": "medium",
       "stability": "beta"
     },

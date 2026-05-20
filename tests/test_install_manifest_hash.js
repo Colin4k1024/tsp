@@ -31,6 +31,7 @@ function runInstallApply(args, env) {
     maxBuffer: 10 * 1024 * 1024,
     env: {
       ...process.env,
+      TSP_SKIP_EXTERNAL_INSTALLS: '1',
       ...env,
     },
   });

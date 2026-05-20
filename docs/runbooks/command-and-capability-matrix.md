@@ -149,8 +149,8 @@ source_of_truth:
 
 1. `/team-help`
 2. `/update-codemaps` 生成轻量现状快照
-3. 轻量结构证据执行 `npm run graphify:doctor`；深影响面或 MCP 证据执行 `npm run gitnexus:doctor`
-4. Graphify 执行 `build/query/path/explain`，或 GitNexus 执行受控索引后查询 `impact/detect_changes/context`
+3. 默认 MCP-backed 符号、调用链和影响面证据执行 `npm run codegraph:doctor`；轻量结构证据执行 `npm run graphify:doctor`；深影响面或多仓证据执行 `npm run gitnexus:doctor`
+4. CodeGraph 执行 `search/context/callers/callees/impact`，Graphify 执行 `build/query/path/explain`，或 GitNexus 执行受控索引后查询 `impact/detect_changes/context`
 5. `/team-plan` 消费图谱证据收口 challenge/design/readiness
 6. `/team-execute` 与 `/team-review` 持续引用图谱证据，不创建并行责任链
 

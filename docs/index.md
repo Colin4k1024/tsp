@@ -45,8 +45,8 @@ features:
     title: BMAD 经验吸收
     details: 已吸收 implementation-readiness、brownfield/document-project、Story Slice Plan 与阶段化 readiness gate，不额外引入第二套平行框架。
   - icon: 🕸️
-    title: Graphify 可选能力
-    details: 提供 brownfield 结构扫描、依赖路径分析与架构问答证据，作为 `/team-*` 主链的可选补充而非替代引擎。
+    title: 代码图谱能力
+    details: CodeGraph 提供默认 MCP-backed 符号、调用链与影响面证据，Graphify / GitNexus 作为更细分的结构与深影响面补充。
   - icon: 🎨
     title: 前端治理
     details: React/Next 优先的工程规范 + UI/UX 设计知识库 + 强制质量门禁，从 intake 到 release 全链路覆盖。

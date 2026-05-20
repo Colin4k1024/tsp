@@ -181,6 +181,16 @@ function buildMergedSettings(plan) {
   };
 }
 
+function buildExternalInstallEnv(externalInstall) {
+  return {
+    ...process.env,
+    ...(externalInstall.env || {}),
+    TSP_INSTALL_TARGET: externalInstall.target || '',
+    TSP_INSTALL_PROFILE: externalInstall.profileId || '',
+    TSP_INSTALL_MODULE_ID: externalInstall.moduleId || '',
+  };
+}
+
 function runExternalInstall(externalInstall) {
   const args = [];
   if (externalInstall.scriptPath) {
@@ -194,10 +204,16 @@ function runExternalInstall(externalInstall) {
 
   const command = externalInstall.command || 'node';
   const label = externalInstall.id || externalInstall.moduleId || command;
+  if (process.env.TSP_SKIP_EXTERNAL_INSTALLS === '1') {
+    console.error(`Skipping external install: ${label}`);
+    return;
+  }
+
   console.error(`Running external install: ${label}`);
 
   const result = spawnSync(command, args, {
     cwd: externalInstall.cwd || process.cwd(),
+    env: buildExternalInstallEnv(externalInstall),
     encoding: 'utf8',
     stdio: ['inherit', process.stderr, process.stderr],
   });
@@ -475,4 +491,6 @@ function applyInstallPlan(plan) {
 
 module.exports = {
   applyInstallPlan,
+  buildExternalInstallEnv,
+  runExternalInstall,
 };

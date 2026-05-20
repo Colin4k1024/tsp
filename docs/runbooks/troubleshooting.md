@@ -23,6 +23,7 @@ source_of_truth:
 - Claude 或 Codex 找不到角色 agent / specialist
 - 项目级 `CLAUDE.md` 不知道哪些字段是必须的
 - 使用了 custom overlay，但 review 阶段无法说明启用原因和执行记录
+- `npm run codegraph:doctor` 失败（Node 版本、CodeGraph 包或 target wrapper 问题）
 - `npm run graphify:doctor` 失败（Python 版本或 Graphify CLI 缺失）
 - `npm run gitnexus:doctor` 失败（Node 版本、npm/npx 或许可证确认问题）
 
@@ -191,7 +192,31 @@ Codex 检查点：
 
 如果问题仍无法定位，建议把当前症状、执行命令和失败点整理成一个最小问题描述，再回到对应 runbook 定位。
 
-## 8. Graphify 预检查失败
+## 8. CodeGraph 预检查失败
+
+如果你看到下面任一报错：
+
+- Node 版本低于 `18` 或高于等于 `25`
+- `@colbymchenry/codegraph` 包不可解析
+- CodeGraph CLI/bin 不可用
+- 当前 TSP target 不是 `claude` / `codex` / `cursor` / `opencode`
+
+优先按这个顺序处理：
+
+1. 切换到 Node `>=18 <25`
+2. 执行 `npm install`，确保默认依赖已安装
+3. 重新执行 `npm run codegraph:doctor`
+4. 若 target 不受上游 installer 支持，接受 wrapper 跳过并手动配置需要的 agent
+
+说明：
+
+- TSP 只通过 `scripts/install-codegraph.js` 以当前 target 调用上游 installer
+- TSP 不使用上游 `--target=auto`
+- TSP 安装流程不运行 `codegraph init -i`；需要索引时在目标项目根目录手动执行
+- 不要提交 `.codegraph/` 数据库
+- CodeGraph 详细用法见 [codegraph-code-intelligence-usage.md](codegraph-code-intelligence-usage.md)
+
+## 9. Graphify 预检查失败
 
 如果你看到下面任一报错：
 
@@ -211,7 +236,7 @@ Codex 检查点：
 - 不要在本仓库执行 `graphify codex install` / `graphify claude install` 改写现有 AGENTS/hooks 契约
 - Graphify 详细用法见 [graphify-knowledge-graph-usage.md](graphify-knowledge-graph-usage.md)
 
-## 9. GitNexus 预检查失败
+## 10. GitNexus 预检查失败
 
 如果你看到下面任一报错：
 

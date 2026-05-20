@@ -4,7 +4,7 @@
 
 ## 用途
 
-扫描代码结构并生成 token-lean codemaps，适合作为 brownfield 项目的现状快照与 Graphify / GitNexus 图谱分析前置上下文。
+扫描代码结构并生成 token-lean codemaps，适合作为 brownfield 项目的现状快照与 CodeGraph / Graphify / GitNexus 图谱分析前置上下文。
 
 ## 主责角色
 
@@ -21,7 +21,7 @@
 - docs/CODEMAPS/ 下的结构化 codemap
 - .reports/codemap-diff.txt 差异摘要
 - 可供 `/team-help` / `/team-plan` 消费的 brownfield context
-- 可供 Graphify / GitNexus 继续深挖的结构化问题清单
+- 可供 CodeGraph / Graphify / GitNexus 继续深挖的结构化问题清单
 
 输出字段定义与交付结构见 [team-command-output-contracts.md](../docs/runbooks/team-command-output-contracts.md)。
 
@@ -30,4 +30,4 @@
 1. 先识别仓库类型、源码目录、入口文件和主要依赖边界。
 2. 为 architecture/backend/frontend/data/dependencies 生成 token-lean 文档，不写实现细节噪音。
 3. 若已有 codemap，先比较变更比例；超过阈值时要求人工确认再覆盖。
-4. 把结果作为 brownfield context snapshot 的辅助输入；若需要图谱证据，再选择 Graphify 或 GitNexus，并把结论回落到 `delivery-plan.md` / `arch-design.md`，不要形成平行事实源。
+4. 把结果作为 brownfield context snapshot 的辅助输入；若需要图谱证据，再选择 CodeGraph、Graphify 或 GitNexus，并把结论回落到 `delivery-plan.md` / `arch-design.md`，不要形成平行事实源。

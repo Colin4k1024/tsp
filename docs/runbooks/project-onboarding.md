@@ -42,7 +42,7 @@ source_of_truth:
 2. 主要交付物：页面、API、流程、数据迁移、发布脚本
 3. 默认参与角色：哪些角色会长期参与这个项目
 4. 额外约束：是否涉及审批流、权限中心、公司领域扩展
-5. 是否需要 brownfield 结构扫描：是否启用 Graphify 作为可选知识图谱能力
+5. 是否需要 brownfield 结构扫描：是否启用 CodeGraph 默认图谱能力，以及是否补充 Graphify / GitNexus
 
 这一阶段不要急着把所有 skills 都装上。平台的原则是按项目选择，而不是全量堆叠。
 
@@ -103,11 +103,12 @@ CODEX_HOME_DIR="$HOME/.codex" AGENTS_HOME_DIR="$HOME/.agents" ./scripts/install-
 
 建议在第一次运行 `npm run workflow:readiness` 前完成这一步，否则旧 handoff 会直接触发 gate 失败。
 
-### 3.6 可选代码图谱能力（Graphify + GitNexus）
+### 3.6 代码图谱能力（CodeGraph + Graphify + GitNexus）
 
-Graphify 和 GitNexus 在接入阶段用于补齐 brownfield 结构认知，不替代 `/team-*` 主链。Graphify 偏轻量结构扫描，GitNexus 偏 MCP 查询、impact、detect_changes 和多仓证据：
+CodeGraph、Graphify 和 GitNexus 在接入阶段用于补齐 brownfield 结构认知，不替代 `/team-*` 主链。CodeGraph 是默认内置 MCP-backed 符号、调用链和影响面能力，Graphify 偏轻量结构扫描，GitNexus 偏深 MCP 查询、impact、detect_changes 和多仓证据：
 
 ```bash
+npm run codegraph:doctor
 npm run graphify:doctor
 npm run gitnexus:doctor
 ```
@@ -117,20 +118,23 @@ npm run gitnexus:doctor
 - 老项目接入，模块边界和依赖关系不清晰
 - `/team-plan` 之前需要结构化证据来收口 challenge/design/readiness
 - `/team-execute` 或 `/team-review` 需要明确影响范围与路径
+- 需要快速查询 symbol、callers/callees、impact 或 focused context 时优先使用 CodeGraph
 - 跨模块或跨仓改动需要 GitNexus 的 impact / detect_changes 证据
 
 分发策略：
 
-- `knowledge-graph` 模块默认在 `research` 和 `full` profile 中
-- 不在 `team` / `enterprise` 默认集中自动开启
+- `knowledge-graph` 模块默认在 `developer`、`team`、`research` 和 `full` profile 中
+- `core` profile 保持轻量，不触发 CodeGraph installer
 
 治理边界：
 
+- TSP 只通过 `scripts/install-codegraph.js` 以当前 target 调用 CodeGraph installer，不使用 `--target=auto`
+- 禁止在 TSP 安装流程中自动执行 `codegraph init -i`
 - 禁止在本仓库执行 `graphify codex install` / `graphify claude install`
 - 禁止自动执行 `gitnexus setup` 或不带 `--skip-agents-md` 的 GitNexus 索引命令
 - 图谱结论需要回落到 handoff 或 artifacts，不形成并行责任链
 
-详细操作见 [graphify-knowledge-graph-usage.md](graphify-knowledge-graph-usage.md) 与 [gitnexus-code-intelligence-usage.md](gitnexus-code-intelligence-usage.md)。
+详细操作见 [codegraph-code-intelligence-usage.md](codegraph-code-intelligence-usage.md)、[graphify-knowledge-graph-usage.md](graphify-knowledge-graph-usage.md) 与 [gitnexus-code-intelligence-usage.md](gitnexus-code-intelligence-usage.md)。
 
 ## 4. 选择项目级样例
 

@@ -140,7 +140,7 @@
     {
       "id": "capability:knowledge-graph",
       "family": "capability",
-      "description": "Optional Graphify and GitNexus code-graph capabilities for repository structure reasoning, dependency paths, and impact analysis.",
+      "description": "Default CodeGraph plus optional Graphify and GitNexus code-graph capabilities for repository structure reasoning, dependency paths, and impact analysis.",
       "modules": [
         "knowledge-graph"
       ]
