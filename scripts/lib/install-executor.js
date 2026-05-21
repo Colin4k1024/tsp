@@ -162,6 +162,10 @@ function resolveExternalInstalls(selectedModules, options = {}) {
     const args = Array.isArray(externalInstall.args)
       ? externalInstall.args.map(value => String(value))
       : [];
+    const failureMode = externalInstall.failureMode === 'warn' ? 'warn' : 'error';
+    const failureHint = typeof externalInstall.failureHint === 'string' && externalInstall.failureHint.trim()
+      ? externalInstall.failureHint.trim()
+      : '';
 
     if (!script) {
       throw new Error(`Install module ${module.id} has externalInstall but no script`);
@@ -175,6 +179,8 @@ function resolveExternalInstalls(selectedModules, options = {}) {
       script,
       scriptPath: path.join(sourceRoot, script),
       args,
+      failureMode,
+      failureHint,
       cwd: sourceRoot,
       target,
       profileId,

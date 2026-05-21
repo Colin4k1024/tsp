@@ -218,7 +218,8 @@ function printHumanPlan(plan, dryRun, knownRisks = []) {
   if (Array.isArray(plan.externalInstalls) && plan.externalInstalls.length > 0) {
     console.log('\nPlanned external installs:');
     for (const externalInstall of plan.externalInstalls) {
-      console.log(`- ${externalInstall.id}: ${externalInstall.description || externalInstall.script}`);
+      const mode = externalInstall.failureMode === 'warn' ? ' [warn-on-failure]' : '';
+      console.log(`- ${externalInstall.id}${mode}: ${externalInstall.description || externalInstall.script}`);
     }
   }
 

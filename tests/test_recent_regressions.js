@@ -99,8 +99,8 @@ test('codegraph doctor script is exposed with CodeGraph as a production dependen
   );
   assert.strictEqual(
     packageJson.dependencies['@colbymchenry/codegraph'],
-    '^0.7.12',
-    'expected CodeGraph to be a default production dependency'
+    '0.7.10',
+    'expected CodeGraph to use a registry-published Node 18-compatible production dependency'
   );
 });
 
@@ -193,6 +193,18 @@ test('knowledge graph module includes CodeGraph default surface and GitNexus opt
   assert.ok(
     knowledgeGraph.paths.includes('docs/runbooks/gitnexus-code-intelligence-usage.md'),
     'expected knowledge-graph module to ship the GitNexus runbook'
+  );
+});
+
+test('Open Design external install is non-blocking for network failures', () => {
+  const modules = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'manifests', 'install-modules.json'), 'utf8'));
+  const designPrototyping = modules.modules.find((item) => item.id === 'design-prototyping');
+
+  assert.ok(designPrototyping, 'expected design-prototyping module to exist');
+  assert.strictEqual(
+    designPrototyping.externalInstall && designPrototyping.externalInstall.failureMode,
+    'warn',
+    'expected Open Design external install to warn instead of blocking core TSP installs'
   );
 });
 

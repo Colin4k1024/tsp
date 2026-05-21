@@ -80,7 +80,7 @@ TSP 整合了多个社区开源框架的精华能力，而非从零构建：
 
 TSP 当前支持把第三方设计能力作为外部扩展接入使用。设计工具负责高保真 artifact，TSP 负责团队协作、角色分工、handoff、quality gate 与发布收口。
 
-[Open Design](https://github.com/nexu-io/open-design) 是当前已纳入安装面导航的受控可选设计工作台：它提供本地优先 web/daemon、coding-agent CLI 调度、31 个设计 skills、设计系统库、sandbox preview 与 HTML/PDF/PPTX/ZIP/MP4 等导出链路。TSP 侧落点是 [skills/open-design/SKILL.md](skills/open-design/SKILL.md) 与 [docs/runbooks/open-design-integration.md](docs/runbooks/open-design-integration.md)，并通过 `design-prototyping` module 进入 `team` / `full` profile。其中 `full` profile 会自动执行 [scripts/install-open-design.js](scripts/install-open-design.js)，把 Open Design clone/update 到 `~/.tsp/open-design`，并在 `corepack` / `pnpm` 可用时安装依赖。TSP 不 vendoring Open Design 源码、daemon、skills、design-systems 或 SQLite 数据。
+[Open Design](https://github.com/nexu-io/open-design) 是当前已纳入安装面导航的受控可选设计工作台：它提供本地优先 web/daemon、coding-agent CLI 调度、31 个设计 skills、设计系统库、sandbox preview 与 HTML/PDF/PPTX/ZIP/MP4 等导出链路。TSP 侧落点是 [skills/open-design/SKILL.md](skills/open-design/SKILL.md) 与 [docs/runbooks/open-design-integration.md](docs/runbooks/open-design-integration.md)，并通过 `design-prototyping` module 进入 `team` / `full` profile。其中 `full` profile 会自动执行 [scripts/install-open-design.js](scripts/install-open-design.js)，把 Open Design clone/update 到 `~/.tsp/open-design`，并在 `corepack` / `pnpm` 可用时安装依赖；如果 GitHub 网络不可达，该步骤只警告并继续完成 TSP 核心安装。TSP 不 vendoring Open Design 源码、daemon、skills、design-systems 或 SQLite 数据。
 
 [huashu-design](https://github.com/alchaincyf/huashu-design) 仍作为文档级协同能力保留：它偏向高保真设计产出，覆盖 HTML 原生交互原型、浏览器演讲幻灯片、时间轴动画、信息图与 5 维度设计评审。
 

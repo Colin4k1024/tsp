@@ -85,6 +85,58 @@
               "beta",
               "stable"
             ]
+          },
+          "externalInstall": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "profiles": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "failureMode": {
+                "type": "string",
+                "enum": [
+                  "error",
+                  "warn"
+                ]
+              },
+              "failureHint": {
+                "type": "string"
+              },
+              "command": {
+                "type": "string",
+                "minLength": 1
+              },
+              "script": {
+                "type": "string",
+                "minLength": 1
+              },
+              "args": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "description",
+              "command",
+              "script",
+              "args"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [

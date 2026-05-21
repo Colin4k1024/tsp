@@ -344,6 +344,8 @@
         "profiles": [
           "full"
         ],
+        "failureMode": "warn",
+        "failureHint": "Open Design is an optional sidecar. TSP core files are still installed; rerun full install when GitHub access is available to refresh ~/.tsp/open-design.",
         "command": "node",
         "script": "scripts/install-open-design.js",
         "args": []

@@ -156,6 +156,8 @@ function resolvePlanExternalInstalls(plan) {
       args: Array.isArray(externalInstall.args)
         ? externalInstall.args.map(value => String(value))
         : [],
+      failureMode: externalInstall.failureMode === 'warn' ? 'warn' : 'error',
+      failureHint: typeof externalInstall.failureHint === 'string' ? externalInstall.failureHint : '',
       target: plan.target || null,
       profileId: plan.profileId || null,
     }));
@@ -213,7 +215,8 @@ function printPlan(plan) {
     console.log('');
     console.log(`External install plan (${externalInstalls.length}):`);
     for (const externalInstall of externalInstalls) {
-      console.log(`- ${externalInstall.id}: ${externalInstall.description || externalInstall.script}`);
+      const mode = externalInstall.failureMode === 'warn' ? ' [warn-on-failure]' : '';
+      console.log(`- ${externalInstall.id}${mode}: ${externalInstall.description || externalInstall.script}`);
     }
   }
 }

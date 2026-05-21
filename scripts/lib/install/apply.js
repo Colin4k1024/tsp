@@ -219,6 +219,11 @@ function runExternalInstall(externalInstall) {
   });
 
   if (result.status !== 0) {
+    if (externalInstall.failureMode === 'warn') {
+      console.error(`Warning: optional external install failed: ${label}`);
+      console.error(externalInstall.failureHint || 'TSP core install will continue; rerun when the external dependency is reachable.');
+      return;
+    }
     throw new Error(`External install failed: ${label}`);
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@colin4k1024/tsp",
-  "version": "2.4.6",
+  "version": "2.4.8",
   "description": "Open-source Team Skills Platform for role-based AI delivery workflows, shared skills, hooks, commands, and multi-platform installs.",
   "repository": {
     "type": "git",
@@ -103,7 +103,7 @@
     "LICENSE"
   ],
   "dependencies": {
-    "@colbymchenry/codegraph": "^0.7.12",
+    "@colbymchenry/codegraph": "0.7.10",
     "@iarna/toml": "^2.2.5",
     "@inquirer/prompts": "^7.5.0",
     "ajv": "^8.18.0",

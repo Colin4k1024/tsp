@@ -144,6 +144,27 @@ test('external install runner can skip side-effecting installers in tests', () =
   });
 });
 
+test('external install runner treats warn-mode failures as non-blocking', () => {
+  withTempDir((dir) => {
+    const scriptPath = path.join(dir, 'fail.js');
+    fs.writeFileSync(scriptPath, 'process.exit(42);', 'utf8');
+
+    assert.doesNotThrow(() => {
+      runExternalInstall({
+        id: 'optional-sidecar',
+        moduleId: 'design-prototyping',
+        command: process.execPath,
+        scriptPath,
+        target: 'claude',
+        profileId: 'full',
+        cwd: dir,
+        failureMode: 'warn',
+        failureHint: 'optional test sidecar',
+      });
+    });
+  });
+});
+
 test('CodeGraph wrapper maps only upstream-supported targets', () => {
   assert.strictEqual(mapTarget('codex'), 'codex');
   assert.strictEqual(mapTarget('claude'), 'claude');
@@ -236,6 +257,34 @@ test('team claude install apply dry run carries CodeGraph external install conte
         && install.profileId === 'team'
     )),
     'expected install-apply dry run to carry CodeGraph target/profile/module context'
+  );
+});
+
+test('full claude install plan marks Open Design as warn-on-failure sidecar', () => {
+  const plan = runInstallPlan(['--profile', 'full', '--target', 'claude', '--json']);
+  const externalInstalls = plan.externalInstalls || [];
+
+  assert.ok(
+    externalInstalls.some((install) => (
+      install.id === 'open-design'
+        && install.moduleId === 'design-prototyping'
+        && install.script === 'scripts/install-open-design.js'
+        && install.failureMode === 'warn'
+    )),
+    'expected full claude plan to keep Open Design optional and non-blocking'
+  );
+});
+
+test('full claude install apply dry run carries Open Design failure hint', () => {
+  const payload = runInstallApply(['--profile', 'full', '--target', 'claude', '--dry-run', '--json']);
+  const externalInstalls = payload.plan.externalInstalls || [];
+  const openDesign = externalInstalls.find((install) => install.id === 'open-design');
+
+  assert.ok(openDesign, 'expected full claude dry run to include Open Design external install');
+  assert.strictEqual(openDesign.failureMode, 'warn');
+  assert.ok(
+    openDesign.failureHint.includes('optional sidecar'),
+    'expected Open Design warning hint to explain the optional sidecar behavior'
   );
 });
 
