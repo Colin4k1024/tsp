@@ -1,62 +1,66 @@
 #!/usr/bin/env node
 'use strict'
 
-const fs = require('fs')
-const path = require('path')
 const { spawnSync } = require('child_process')
-const { buildInstallCommand, mapTarget } = require('./install-codegraph')
+const {
+  buildStandaloneInstallerInfo,
+  findOnPath,
+  mapTarget,
+  resolveCodeGraphBin,
+} = require('./install-codegraph')
 
-const MIN_NODE_MAJOR = 18
-const MAX_NODE_MAJOR_EXCLUSIVE = 25
-const PACKAGE_NAME = '@colbymchenry/codegraph'
-
-function parseNodeVersion(text) {
-  const match = String(text || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)/)
-  if (!match) {
-    return null
+function detectPlatform(platform = process.platform) {
+  if (platform === 'darwin' || platform === 'linux' || platform === 'win32') {
+    return {
+      ok: true,
+      output: platform,
+    }
   }
+
   return {
-    major: Number(match[1]),
-    minor: Number(match[2]),
-    patch: Number(match[3]),
-    raw: `${match[1]}.${match[2]}.${match[3]}`,
+    ok: false,
+    output: `unsupported platform: ${platform}`,
   }
 }
 
-function isNodeSupported(version) {
-  return Boolean(
-    version
-      && version.major >= MIN_NODE_MAJOR
-      && version.major < MAX_NODE_MAJOR_EXCLUSIVE
-  )
-}
-
-function loadPackageMetadata() {
-  if (process.env.CODEGRAPH_PREFLIGHT_PACKAGE_JSON) {
-    return {
-      ok: true,
-      source: 'env',
-      metadata: JSON.parse(process.env.CODEGRAPH_PREFLIGHT_PACKAGE_JSON),
-    }
-  }
-
-  try {
-    const packageJsonPath = require.resolve(`${PACKAGE_NAME}/package.json`)
-    return {
-      ok: true,
-      source: packageJsonPath,
-      metadata: JSON.parse(fs.readFileSync(packageJsonPath, 'utf8')),
-    }
-  } catch (error) {
+function detectDownloader(platform = process.platform) {
+  const installer = buildStandaloneInstallerInfo(platform)
+  if (!installer.supported) {
     return {
       ok: false,
-      source: 'node-resolution',
-      warning: error.message || String(error),
+      output: installer.reason,
     }
+  }
+
+  if (platform === 'win32') {
+    const command = findOnPath('powershell.exe') || findOnPath('powershell') || findOnPath('pwsh')
+    if (!command) {
+      return {
+        ok: false,
+        output: 'PowerShell not found; install PowerShell or provide CODEGRAPH_INSTALL_BIN',
+      }
+    }
+    return {
+      ok: true,
+      output: command,
+    }
+  }
+
+  const curl = findOnPath('curl')
+  if (!curl) {
+    return {
+      ok: false,
+      output: 'curl not found; install curl or provide CODEGRAPH_INSTALL_BIN',
+    }
+  }
+
+  return {
+    ok: true,
+    output: curl,
   }
 }
 
-function detectCli(target) {
+function detectCli() {
   if (process.env.CODEGRAPH_PREFLIGHT_SKIP_CLI === '1') {
     return {
       ok: true,
@@ -65,27 +69,16 @@ function detectCli(target) {
     }
   }
 
-  let install
-  try {
-    install = buildInstallCommand(target || 'codex')
-  } catch (error) {
+  const resolved = resolveCodeGraphBin()
+  if (!resolved) {
     return {
       ok: false,
       command: 'codegraph',
-      output: error.message || String(error),
+      output: 'CodeGraph standalone binary not found',
     }
   }
 
-  if (!install.supported) {
-    return {
-      ok: true,
-      command: '(unsupported target skipped)',
-      output: install.reason,
-    }
-  }
-
-  const args = install.args.slice(0, install.args.length - 4).concat(['--help'])
-  const result = spawnSync(install.command, args, {
+  const result = spawnSync(resolved.command, [...resolved.argsPrefix, '--help'], {
     encoding: 'utf8',
     timeout: 8000,
   })
@@ -93,15 +86,15 @@ function detectCli(target) {
   if (result.error || result.status !== 0) {
     return {
       ok: false,
-      command: install.command,
+      command: resolved.command,
       output: result.error ? result.error.message : `${result.stdout || ''}${result.stderr || ''}`.trim(),
     }
   }
 
   return {
     ok: true,
-    command: install.command,
-    output: 'codegraph --help',
+    command: resolved.command,
+    output: `${resolved.displayCommand} (${resolved.source})`,
   }
 }
 
@@ -110,30 +103,24 @@ function main() {
   console.log('=========================')
 
   const target = process.env.TSP_INSTALL_TARGET || process.env.CODEGRAPH_PREFLIGHT_TARGET || ''
-  const nodeVersion = parseNodeVersion(process.env.CODEGRAPH_PREFLIGHT_NODE_VERSION || process.version)
-  const packageInfo = loadPackageMetadata()
-  const cli = detectCli(target)
+  const platform = detectPlatform()
+  const downloader = detectDownloader()
+  const cli = detectCli()
   const mappedTarget = target ? mapTarget(target) : null
   let hasFailure = false
 
-  if (!nodeVersion) {
+  if (!platform.ok) {
     hasFailure = true
-    console.log(`- Node: unable to detect version (requires >= ${MIN_NODE_MAJOR} and < ${MAX_NODE_MAJOR_EXCLUSIVE})`)
-  } else if (!isNodeSupported(nodeVersion)) {
-    hasFailure = true
-    console.log(`- Node: ${nodeVersion.raw} (requires >= ${MIN_NODE_MAJOR} and < ${MAX_NODE_MAJOR_EXCLUSIVE})`)
+    console.log(`- Platform: ${platform.output}`)
   } else {
-    console.log(`- Node: ${nodeVersion.raw} (ok)`)
+    console.log(`- Platform: ${platform.output} (ok)`)
   }
 
-  if (packageInfo.ok && packageInfo.metadata) {
-    const engine = packageInfo.metadata.engines && packageInfo.metadata.engines.node
-      ? packageInfo.metadata.engines.node
-      : '(not declared)'
-    console.log(`- CodeGraph package: ${packageInfo.metadata.version || '(unknown)'} (license ${packageInfo.metadata.license || '(unknown)'}, node ${engine})`)
-  } else {
+  if (!downloader.ok) {
     hasFailure = true
-    console.log(`- CodeGraph package: unavailable (${packageInfo.warning || 'not installed'})`)
+    console.log(`- Standalone installer dependency: ${downloader.output}`)
+  } else {
+    console.log(`- Standalone installer dependency: ${downloader.output} (ok)`)
   }
 
   if (!cli.ok) {
@@ -154,18 +141,23 @@ function main() {
   }
 
   console.log('\nControlled integration boundaries:')
+  console.log('- TSP installs CodeGraph through the official standalone curl/PowerShell installer when no binary is available.')
   console.log('- TSP calls CodeGraph installer with the current target only; it never uses --target=auto.')
-  console.log('- TSP install does not run `codegraph init -i`; initialize indexes inside target projects only.')
+  console.log('- Claude SessionStart may initialize project indexes automatically; Codex/OpenCode rely on instructions and diagnostics.')
   console.log('- Do not commit `.codegraph/` databases as TSP artifacts.')
 
   if (hasFailure) {
+    const installer = buildStandaloneInstallerInfo()
     console.log('\nFix failed checks before applying the CodeGraph integration.')
+    if (installer.supported) {
+      console.log(`Recommended standalone install: ${installer.display}`)
+    }
+    console.log('Offline fallback: set CODEGRAPH_INSTALL_BIN=/path/to/codegraph')
     process.exit(1)
   }
 
   console.log('\nRecommended next commands:')
   console.log('- npm run codegraph:doctor')
-  console.log('- codegraph init -i')
   console.log('- codegraph status')
 }
 
@@ -174,6 +166,7 @@ if (require.main === module) {
 }
 
 module.exports = {
-  isNodeSupported,
-  parseNodeVersion,
+  detectCli,
+  detectDownloader,
+  detectPlatform,
 }

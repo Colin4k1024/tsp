@@ -305,11 +305,12 @@
         "docs/runbooks/graphify-knowledge-graph-usage.md",
         "docs/runbooks/gitnexus-code-intelligence-usage.md",
         "scripts/codegraph-preflight.js",
-        "scripts/install-codegraph.js"
+        "scripts/install-codegraph.js",
+        "scripts/hooks/codegraph-auto-init.js"
       ],
       "externalInstall": {
         "id": "codegraph",
-        "description": "Run the upstream CodeGraph installer through a TSP target-scoped wrapper; never uses --target=auto and never initializes project indexes.",
+        "description": "Install the upstream CodeGraph standalone CLI when needed, then run the target-scoped CodeGraph installer; never uses --target=auto.",
         "command": "node",
         "script": "scripts/install-codegraph.js",
         "args": []

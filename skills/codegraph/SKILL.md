@@ -3,7 +3,7 @@ name: codegraph
 description: >
   将 CodeGraph 作为默认内置 MCP-backed 代码图谱能力接入，用于 brownfield 符号搜索、
   调用链、影响面和上下文查询。输出必须回落到 `/team-*` 主链和 artifacts。
-origin: colbymchenry/codegraph (default dependency with upstream installer wrapper)
+origin: colbymchenry/codegraph (official standalone installer with target-scoped wrapper)
 ---
 
 # CodeGraph
@@ -22,8 +22,8 @@ origin: colbymchenry/codegraph (default dependency with upstream installer wrapp
 
 ## 默认工作流
 
-1. 先跑 `npm run codegraph:doctor`，确认 Node、CodeGraph 包和当前 target wrapper 可用。
-2. 在消费方目标项目根目录手动初始化索引：
+1. 先跑 `npm run codegraph:doctor`，确认 standalone CodeGraph binary、官方 installer 依赖和当前 target wrapper 可用。
+2. Claude 新项目会通过 `SessionStart` 自动初始化索引；非 Claude 或关闭自动初始化时，在消费方目标项目根目录手动初始化：
    ```bash
    codegraph init -i
    ```
@@ -46,12 +46,13 @@ origin: colbymchenry/codegraph (default dependency with upstream installer wrapp
 ## 边界与禁用项
 
 - TSP 安装时只运行 `scripts/install-codegraph.js` wrapper，不使用上游 `--target=auto`。
-- TSP 安装流程不运行 `codegraph init -i`，避免在平台仓库或消费方仓库隐式写入 `.codegraph/`。
+- Claude `SessionStart` 可在新项目缺少 `.codegraph/codegraph.db` 时静默执行 `codegraph init -i <projectRoot>`；用 `TSP_CODEGRAPH_AUTO_INIT=0` 可关闭。
+- Codex / OpenCode 不做侵入式自动 hook，只依赖全局 MCP 配置、说明和 doctor 诊断。
 - 不提交 `.codegraph/` 数据库或将其作为 TSP artifact。
 - CodeGraph 结论不能绕过 `/team-plan`、`/team-review` 或验证门禁。
 
 ## 推荐组合
 
-- 默认 brownfield 结构证据：`/team-help -> /update-codemaps -> npm run codegraph:doctor -> codegraph init -i -> /team-plan`
+- 默认 brownfield 结构证据：`/team-help -> /update-codemaps -> npm run codegraph:doctor -> Claude 自动初始化或 codegraph init -i -> /team-plan`
 - 快速影响面确认：`/team-execute -> CodeGraph impact/callers/callees -> /handoff -> /team-review`
 - 深度多仓或许可证受限场景：按需选择 GitNexus 或 Graphify，并把结论统一回落到主链。

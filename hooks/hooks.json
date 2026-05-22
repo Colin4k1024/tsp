@@ -232,6 +232,17 @@
         ],
         "description": "Load previous context and detect package manager on new session",
         "id": "session:start"
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/run-with-flags.js\" \"session:codegraph:auto-init\" \"scripts/hooks/codegraph-auto-init.js\" \"minimal,standard,strict\""
+          }
+        ],
+        "description": "Silently initialize CodeGraph for new Claude projects when the index is missing",
+        "id": "session:codegraph:auto-init"
       }
     ],
     "PostToolUse": [

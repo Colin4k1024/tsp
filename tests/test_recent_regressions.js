@@ -89,7 +89,7 @@ test('gitnexus doctor script is exposed without adding gitnexus as a dependency'
   );
 });
 
-test('codegraph doctor script is exposed with CodeGraph as a production dependency', () => {
+test('codegraph doctor script is exposed without a bundled npm CodeGraph dependency', () => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
 
   assert.strictEqual(
@@ -97,10 +97,9 @@ test('codegraph doctor script is exposed with CodeGraph as a production dependen
     'node scripts/codegraph-preflight.js',
     'expected codegraph:doctor to point at the controlled preflight script'
   );
-  assert.strictEqual(
-    packageJson.dependencies['@colbymchenry/codegraph'],
-    '0.7.10',
-    'expected CodeGraph to use a registry-published Node 18-compatible production dependency'
+  assert.ok(
+    !Object.prototype.hasOwnProperty.call(packageJson.dependencies || {}, '@colbymchenry/codegraph'),
+    'expected CodeGraph to be installed through the upstream standalone installer, not bundled as a production dependency'
   );
 });
 
@@ -180,6 +179,10 @@ test('knowledge graph module includes CodeGraph default surface and GitNexus opt
   assert.ok(
     knowledgeGraph.paths.includes('scripts/install-codegraph.js'),
     'expected knowledge-graph module to ship the CodeGraph installer wrapper'
+  );
+  assert.ok(
+    knowledgeGraph.paths.includes('scripts/hooks/codegraph-auto-init.js'),
+    'expected knowledge-graph module to ship the CodeGraph auto-init hook'
   );
   assert.strictEqual(
     knowledgeGraph.externalInstall && knowledgeGraph.externalInstall.script,

@@ -2,10 +2,10 @@
 version: "0.1.0"
 status: active
 created: 2026-05-20
-updated: 2026-05-20
+updated: 2026-05-22
 owner: 工程团队
 doc_tier: runbook
-last_verified: 2026-05-20
+last_verified: 2026-05-22
 source_of_truth:
   - ../../skills/codegraph/SKILL.md
   - ../../README.md
@@ -31,14 +31,24 @@ npm run codegraph:doctor
 
 检查项：
 
-- Node 版本 `>=18 <25`
-- `@colbymchenry/codegraph` 包可解析
-- CodeGraph CLI/bin 可用
+- 当前平台支持官方 standalone installer（macOS / Linux / Windows）
+- macOS / Linux 可用 `curl`，Windows 可用 PowerShell
+- CodeGraph standalone CLI/bin 可用
 - 当前 `TSP_INSTALL_TARGET` 是否能映射到上游支持的 `claude` / `codex` / `cursor` / `opencode`
 
 ## 3. 安装边界
 
-TSP 通过 `scripts/install-codegraph.js` 调用上游 installer，并将当前 TSP target 映射成上游 target：
+TSP 通过 `scripts/install-codegraph.js` 优先复用已有 `codegraph` binary；如果缺失，则调用上游官方 standalone installer：
+
+```bash
+# macOS / Linux
+curl -fsSL https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.sh | sh
+
+# Windows PowerShell
+irm https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.ps1 | iex
+```
+
+随后将当前 TSP target 映射成上游 target：
 
 ```bash
 codegraph install --target=<claude|codex|cursor|opencode> --location=global --yes
@@ -47,17 +57,19 @@ codegraph install --target=<claude|codex|cursor|opencode> --location=global --ye
 明确边界：
 
 - 不使用上游 `--target=auto`
-- 不在 TSP 安装流程里执行 `codegraph init -i`
+- Claude `SessionStart` hook 会在新项目缺少 `.codegraph/codegraph.db` 时静默执行 `codegraph init -i <projectRoot>`
+- Codex / OpenCode 不做侵入式自动 hook，只依赖全局 MCP 配置、说明和 doctor 诊断
+- 可用 `TSP_CODEGRAPH_AUTO_INIT=0` 关闭 Claude 自动初始化
 - 不把 `.codegraph/` 数据库提交到 TSP 或消费方项目
 - unsupported target 只输出跳过说明，不阻断 TSP 安装
 
 ## 4. 推荐工作流
 
 ```text
-/team-help -> /update-codemaps -> npm run codegraph:doctor -> codegraph init -i -> MCP 查询 -> /team-plan 或 /team-review
+/team-help -> /update-codemaps -> npm run codegraph:doctor -> Claude 自动初始化或 codegraph init -i -> MCP 查询 -> /team-plan 或 /team-review
 ```
 
-在目标项目根目录初始化索引：
+非 Claude 或自动初始化关闭时，在目标项目根目录初始化索引：
 
 ```bash
 codegraph init -i

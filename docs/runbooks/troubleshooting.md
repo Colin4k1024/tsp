@@ -23,7 +23,7 @@ source_of_truth:
 - Claude 或 Codex 找不到角色 agent / specialist
 - 项目级 `CLAUDE.md` 不知道哪些字段是必须的
 - 使用了 custom overlay，但 review 阶段无法说明启用原因和执行记录
-- `npm run codegraph:doctor` 失败（Node 版本、CodeGraph 包或 target wrapper 问题）
+- `npm run codegraph:doctor` 失败（standalone binary、curl/PowerShell 或 target wrapper 问题）
 - `npm run graphify:doctor` 失败（Python 版本或 Graphify CLI 缺失）
 - `npm run gitnexus:doctor` 失败（Node 版本、npm/npx 或许可证确认问题）
 
@@ -196,23 +196,23 @@ Codex 检查点：
 
 如果你看到下面任一报错：
 
-- Node 版本低于 `18` 或高于等于 `25`
-- `@colbymchenry/codegraph` 包不可解析
+- 当前平台不支持 CodeGraph standalone installer
+- macOS / Linux 缺少 `curl`，或 Windows PowerShell 不可用
 - CodeGraph CLI/bin 不可用
 - 当前 TSP target 不是 `claude` / `codex` / `cursor` / `opencode`
 
 优先按这个顺序处理：
 
-1. 切换到 Node `>=18 <25`
-2. 执行 `npm install`，确保默认依赖已安装
+1. 按官方方式安装 standalone CodeGraph：`curl -fsSL https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.sh | sh`
+2. 离线或受限环境设置 `CODEGRAPH_INSTALL_BIN=/path/to/codegraph`
 3. 重新执行 `npm run codegraph:doctor`
 4. 若 target 不受上游 installer 支持，接受 wrapper 跳过并手动配置需要的 agent
 
 说明：
 
-- TSP 只通过 `scripts/install-codegraph.js` 以当前 target 调用上游 installer
+- TSP 通过 `scripts/install-codegraph.js` 优先复用已有 binary，缺失时调用上游官方 standalone installer
 - TSP 不使用上游 `--target=auto`
-- TSP 安装流程不运行 `codegraph init -i`；需要索引时在目标项目根目录手动执行
+- Claude `SessionStart` 可在新项目静默运行 `codegraph init -i`；Codex/OpenCode 需要按说明或手动运行
 - 不要提交 `.codegraph/` 数据库
 - CodeGraph 详细用法见 [codegraph-code-intelligence-usage.md](codegraph-code-intelligence-usage.md)
 

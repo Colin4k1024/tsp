@@ -12,6 +12,7 @@ const {
 } = require('../scripts/lib/install/apply');
 const {
   buildInstallCommand,
+  buildStandaloneInstallerInfo,
   mapTarget,
 } = require('../scripts/install-codegraph');
 
@@ -188,21 +189,22 @@ test('CodeGraph wrapper accepts equals-form target arguments', () => {
   assert.ok(output.includes('--target=codex'), output);
 });
 
-test('CodeGraph wrapper never emits target auto for supported dry runs', () => {
+test('CodeGraph wrapper dry run shows standalone bootstrap when binary is absent', () => {
   const result = spawnSync('node', ['scripts/install-codegraph.js', '--target', 'codex', '--dry-run'], {
     cwd: ROOT,
     encoding: 'utf8',
     env: {
       ...process.env,
-      CODEGRAPH_INSTALL_BIN: 'codegraph',
+      CODEGRAPH_INSTALL_FORCE_STANDALONE: '1',
     },
   });
   const output = `${result.stdout || ''}${result.stderr || ''}`;
 
   assert.strictEqual(result.status, 0, output);
+  assert.ok(output.includes('CodeGraph standalone install command:'), output);
+  assert.ok(output.includes('raw.githubusercontent.com/colbymchenry/codegraph/main/install'), output);
   assert.ok(output.includes('--target=codex'), output);
   assert.ok(!output.includes('--target=auto'), output);
-  assert.ok(!output.includes('init -i'), output);
 });
 
 test('CodeGraph wrapper skips unsupported targets without resolving package bin', () => {
@@ -210,6 +212,13 @@ test('CodeGraph wrapper skips unsupported targets without resolving package bin'
 
   assert.strictEqual(install.supported, false);
   assert.ok(install.reason.includes('codebuddy'));
+});
+
+test('CodeGraph standalone installer metadata is available for supported platforms', () => {
+  const installer = buildStandaloneInstallerInfo(process.platform);
+
+  assert.strictEqual(installer.supported, true);
+  assert.ok(installer.display.includes('codegraph'));
 });
 
 test('developer codex install plan includes CodeGraph skill surface', () => {
@@ -223,6 +232,10 @@ test('developer codex install plan includes CodeGraph skill surface', () => {
   assert.ok(
     operations.some((operation) => operation.sourceRelativePath === 'skills/codegraph/SKILL.md'),
     'expected developer codex plan to copy CodeGraph skill'
+  );
+  assert.ok(
+    operations.some((operation) => operation.sourceRelativePath === 'scripts/hooks/codegraph-auto-init.js'),
+    'expected developer codex plan to copy CodeGraph auto-init hook'
   );
 });
 

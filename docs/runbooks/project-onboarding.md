@@ -128,8 +128,9 @@ npm run gitnexus:doctor
 
 治理边界：
 
-- TSP 只通过 `scripts/install-codegraph.js` 以当前 target 调用 CodeGraph installer，不使用 `--target=auto`
-- 禁止在 TSP 安装流程中自动执行 `codegraph init -i`
+- TSP 通过 `scripts/install-codegraph.js` 优先复用已有 `codegraph` binary，缺失时调用 CodeGraph 官方 standalone installer
+- TSP 不使用上游 `--target=auto`
+- Claude `SessionStart` 可在新项目缺少 `.codegraph/codegraph.db` 时静默执行 `codegraph init -i`；Codex/OpenCode 不做侵入式自动 hook
 - 禁止在本仓库执行 `graphify codex install` / `graphify claude install`
 - 禁止自动执行 `gitnexus setup` 或不带 `--skip-agents-md` 的 GitNexus 索引命令
 - 图谱结论需要回落到 handoff 或 artifacts，不形成并行责任链

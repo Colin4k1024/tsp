@@ -58,7 +58,7 @@ npm run graphify:doctor
 npm run gitnexus:doctor
 ```
 
-CodeGraph 是默认内置的 MCP-backed 符号、调用链和影响面能力；Graphify 适合轻量结构证据，GitNexus 适合更深 MCP 查询、impact 和 detect_changes。CodeGraph 的 TSP 安装 wrapper 不会使用 `--target=auto`，也不会运行 `codegraph init -i`；目标项目需要索引时再手动初始化。
+CodeGraph 是默认内置的 MCP-backed 符号、调用链和影响面能力；Graphify 适合轻量结构证据，GitNexus 适合更深 MCP 查询、impact 和 detect_changes。CodeGraph 的 TSP 安装 wrapper 使用官方 standalone installer 且不会使用 `--target=auto`；Codex 当前不做侵入式自动 hook，目标项目需要索引时运行 `codegraph init -i`。
 
 ## 3. 在 Codex 中的推荐使用方式
 
