@@ -3,8 +3,8 @@
   "name": "team-skills-platform",
   "description": "Role-based Team Skills platform with an ECC-style harness skeleton, specialist agents, commands, rules, hooks skeleton, contexts, and curated engineering skills.",
   "owner": {
-    "name": "Engineering Team",
-    "email": "engineering@example.com"
+    "name": "Colin4k1024",
+    "email": "colin4k1024@gmail.com"
   },
   "metadata": {
     "description": "Hybrid role platform plus ECC-style harness skeleton"
@@ -14,13 +14,14 @@
       "name": "team-skills-platform",
       "source": "./",
       "description": "Team-oriented workflow plugin with role agents, 27 specialist agents, ECC-inspired commands, layered rules, and hooks skeleton.",
-      "version": "2.3.0",
+      "version": "2.5.0",
+      "icon": "./assets/icon.png",
       "author": {
-        "name": "Engineering Team",
-        "email": "engineering@example.com"
+        "name": "Colin4k1024",
+        "email": "colin4k1024@gmail.com"
       },
-      "homepage": "https://github.com/affaan-m/everything-claude-code",
-      "repository": "https://github.com/affaan-m/everything-claude-code",
+      "homepage": "https://github.com/Colin4k1024/tsp",
+      "repository": "https://github.com/Colin4k1024/tsp",
       "license": "MIT",
       "keywords": [
         "team-skills",
