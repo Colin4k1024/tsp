@@ -718,86 +718,9 @@ function convertRulesToMdc(rulesDir, targetDir) {
   }
 }
 
-const OPENCODE_AGENTS_MD_MARKER = "<!-- team-skills-platform -->";
-
-function buildOpenCodeAgentsMd(root) {
-  const agentsDir = path.join(root, "agents", "roles");
-  const roleNames = fs.existsSync(agentsDir)
-    ? fs
-        .readdirSync(agentsDir)
-        .filter((name) => name.endsWith(".md"))
-        .map((name) => path.parse(name).name)
-        .sort()
-    : [];
-  const roleDisplay = {
-    "tech-lead": "Tech Lead（技术负责人）",
-    "product-manager": "Product Manager（产品经理）",
-    "project-manager": "Project Manager（项目管理）",
-    architect: "Architect（架构师）",
-    "frontend-engineer": "Frontend Engineer（前端开发）",
-    "backend-engineer": "Backend Engineer（后端开发）",
-    "qa-engineer": "QA Engineer（测试工程师）",
-    "devops-engineer": "DevOps Engineer（运维工程师）",
-  };
-  const lines = [
-    OPENCODE_AGENTS_MD_MARKER,
-    "# Team Skills Platform — OpenCode Agent Index",
-    "",
-    "本文件由安装脚本自动生成。在 OpenCode 中与任何角色交互时，可直接引用下列角色和命令。",
-    "",
-    "## 可用角色",
-    "",
-  ];
-  for (const role of roleNames) {
-    lines.push(`- **${roleDisplay[role] || role}**: \`plugins/team-skills-platform/agents/roles/${role}.md\``);
-  }
-  lines.push(
-    "",
-    "## 核心团队命令",
-    "",
-    "| 命令 | 用途 |",
-    "|------|------|",
-    "| `/team-help` | 根据当前阶段、artifacts 与阻塞项推荐下一步主链命令 |",
-    "| `/team-intake` | 接收需求并锁定目标、范围、约束 |",
-    "| `/team-plan` | 拆解任务、角色分工、依赖与里程碑 |",
-    "| `/team-execute` | 驱动研发角色在边界内实施 |",
-    "| `/team-review` | 做方案、质量、测试和放行评审 |",
-    "| `/team-release` | 做发布准备、上线检查与回滚保障 |",
-    "| `/team-closeout` | 在观察窗口结束后做最终收口与 backlog 回写 |",
-    "| `/handoff` | 在角色间做结构化交接 |",
-    "",
-    "## 插件根路径",
-    "",
-    "`~/.config/opencode/plugins/team-skills-platform/`",
-    "",
-    `<!-- end ${PLUGIN_NAME} -->`,
-  );
-  return `${lines.join("\n")}\n`;
-}
-
-function mergeOpenCodeAgentsMd(targetPath, newContent) {
-  const markerEnd = `<!-- end ${PLUGIN_NAME} -->`;
-  if (!fs.existsSync(targetPath)) {
-    fs.mkdirSync(path.dirname(targetPath), { recursive: true });
-    fs.writeFileSync(targetPath, newContent, "utf8");
-    return;
-  }
-  const existing = fs.readFileSync(targetPath, "utf8");
-  if (existing.includes(OPENCODE_AGENTS_MD_MARKER)) {
-    const startIdx = existing.indexOf(OPENCODE_AGENTS_MD_MARKER);
-    let endIdx = existing.indexOf(markerEnd, startIdx);
-    if (endIdx !== -1) {
-      endIdx += markerEnd.length;
-      if (existing[endIdx] === "\n") {
-        endIdx += 1;
-      }
-      fs.writeFileSync(targetPath, `${existing.slice(0, startIdx)}${newContent}`, "utf8");
-      return;
-    }
-  }
-  const separator = existing.endsWith("\n") ? "\n" : "\n\n";
-  fs.writeFileSync(targetPath, `${existing}${separator}${newContent}`, "utf8");
-}
+const { generateAgentsMd, mergeAgentsMd } = require("./lib/opencode/generate-agents-md");
+const { convertRoleAgents, convertSpecialistAgents } = require("./lib/opencode/convert-agents");
+const { convertHooksPlugin } = require("./lib/opencode/convert-hooks");
 
 function installClaude(root, claudeHome) {
   const pluginDir = path.join(claudeHome, "plugins", PLUGIN_NAME);
@@ -883,6 +806,51 @@ function installCursor(root, cursorHome) {
   console.log(`Converted rules to MDC in ${mdcTarget}`);
 }
 
+function generateOpenCodeConfig(root, opencodeHome) {
+  const configPath = path.join(opencodeHome, "opencode.json");
+
+  // 如果配置文件已存在，保留用户自定义配置
+  let existingConfig = {};
+  if (fs.existsSync(configPath)) {
+    try {
+      existingConfig = JSON.parse(fs.readFileSync(configPath, "utf8"));
+    } catch (error) {
+      console.warn(`Warning: Could not parse existing opencode.json: ${error.message}`);
+    }
+  }
+
+  // 读取插件配置
+  const pluginConfigPath = path.join(root, ".opencode-plugin", "config.json");
+  let pluginConfig = {};
+  if (fs.existsSync(pluginConfigPath)) {
+    try {
+      pluginConfig = JSON.parse(fs.readFileSync(pluginConfigPath, "utf8"));
+    } catch (error) {
+      console.warn(`Warning: Could not read plugin config: ${error.message}`);
+    }
+  }
+
+  // 合并配置
+  const config = {
+    $schema: "https://opencode.ai/config.json",
+    ...existingConfig,
+    // 确保这些字段始终存在
+    instructions: existingConfig.instructions || ["./AGENTS.md"],
+    plugin: existingConfig.plugin || [PLUGIN_NAME],
+    permission: existingConfig.permission || {
+      edit: "allow",
+      bash: "allow",
+    },
+    // 添加插件特定配置
+    ...pluginConfig,
+  };
+
+  // 写入配置文件
+  fs.mkdirSync(path.dirname(configPath), { recursive: true });
+  fs.writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
+  console.log(`Generated OpenCode config at ${configPath}`);
+}
+
 function installOpenCode(root, opencodeHome) {
   const pluginDir = path.join(opencodeHome, "plugins", PLUGIN_NAME);
   fs.mkdirSync(path.dirname(pluginDir), { recursive: true });
@@ -916,25 +884,40 @@ function installOpenCode(root, opencodeHome) {
     }
   }
 
+  // 转换 agents 为 OpenCode 格式（添加 YAML front matter）
+  convertRoleAgents(path.join(root, "agents", "roles"), path.join(pluginDir, "agents", "roles"));
+  convertSpecialistAgents(path.join(root, "agents", "specialists"), path.join(pluginDir, "agents", "specialists"));
+
+  // 复制转换后的 agents 到 opencodeHome/agents/ 目录
   const agentsTarget = path.join(opencodeHome, "agents");
   fs.mkdirSync(agentsTarget, { recursive: true });
-  const agentsSrc = path.join(root, "agents");
-  if (fs.existsSync(agentsSrc)) {
+  const pluginAgentsDir = path.join(pluginDir, "agents");
+  if (fs.existsSync(pluginAgentsDir)) {
     for (const agentSubdir of ["roles", "specialists"]) {
-      const agentSrcDir = path.join(agentsSrc, agentSubdir);
+      const agentSrcDir = path.join(pluginAgentsDir, agentSubdir);
       if (!fs.existsSync(agentSrcDir)) {
         continue;
       }
       for (const name of fs.readdirSync(agentSrcDir)) {
         const src = path.join(agentSrcDir, name);
         if (fs.statSync(src).isFile()) {
-          fs.copyFileSync(src, path.join(agentsTarget, name));
+          const targetName = agentSubdir === "specialists" ? `specialist-${name}` : name;
+          fs.copyFileSync(src, path.join(agentsTarget, targetName));
         }
       }
     }
   }
 
-  mergeOpenCodeAgentsMd(path.join(opencodeHome, "AGENTS.md"), buildOpenCodeAgentsMd(root));
+  // 使用新的 AGENTS.md 生成脚本
+  const agentsMdContent = generateAgentsMd(root);
+  mergeAgentsMd(path.join(opencodeHome, "AGENTS.md"), agentsMdContent);
+
+  // 生成 opencode.json 配置文件
+  generateOpenCodeConfig(root, opencodeHome);
+
+  // 转换 hooks 为 OpenCode 插件格式
+  convertHooksPlugin(root, opencodeHome);
+
   console.log(`Installed OpenCode plugin to ${pluginDir}`);
   console.log(`Updated AGENTS.md at ${path.join(opencodeHome, "AGENTS.md")}`);
   console.log(`Copied commands to ${commandTarget}`);
