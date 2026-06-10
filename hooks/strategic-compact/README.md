@@ -4,11 +4,11 @@
 
 ## 当前状态
 
-✅ **已实现** - 通过 `scripts/hooks/pre_compact.py` 和 `scripts/hooks/suggest_compact.py` 提供完整功能。
+✅ **已实现** - 通过 `scripts/hooks/pre-compact.js` 和 `scripts/hooks/suggest-compact.js` 提供完整功能。
 
 ## 实现细节
 
-### pre_compact.py
+### pre-compact.js
 
 **触发时机**: 上下文压缩前自动调用
 
@@ -25,12 +25,14 @@
 - 总是丢弃的类型：`tool_result`, `search_result`, `exploration_trace`（超过 500 字符时）
 - 其他根据上下文大小决定
 
-### suggest_compact.py
+### suggest-compact.js
 
-**触发时机**: 上下文使用超过 70% 时自动调用
+**触发时机**: `hooks/hooks.json` 的 `pre:all:strategic-compact` 在工具调用前运行；当真实上下文使用超过 70% 时注入 `/compact` 建议。
 
 **功能**:
-- 计算上下文使用率
+- 优先读取 Claude hook 输入里的 `context_window.used_percentage` / `context_window.remaining_percentage`
+- 其次读取 `CLAUDE_CONTEXT_SIZE` / `CLAUDE_CONTEXT_LIMIT`
+- 最后读取 `harness-statusline.js` 写入的 `/tmp/harness-ctx-{session_id}.json`
 - 评估紧迫度：`low` (< 70%) | `medium` (70-85%) | `high` (85-95%) | `critical` (> 95%)
 - 估算可节省的 token
 - 提供具体压缩建议：

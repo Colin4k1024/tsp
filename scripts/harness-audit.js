@@ -203,6 +203,9 @@ function getRepoChecks(rootDir) {
   const commandPrimary = safeRead(rootDir, 'commands/harness-audit.md').trim();
   const commandParity = safeRead(rootDir, '.opencode/commands/harness-audit.md').trim();
   const hooksJson = safeRead(rootDir, 'hooks/hooks.json');
+  const hasStrategicCompactHook =
+    hooksJson.includes('pre:all:strategic-compact') &&
+    hooksJson.includes('scripts/hooks/suggest-compact.js');
 
   return [
     {
@@ -270,10 +273,10 @@ function getRepoChecks(rootDir) {
       category: 'Context Efficiency',
       points: 3,
       scopes: ['repo', 'hooks'],
-      path: 'scripts/hooks/suggest-compact.js',
-      description: 'Suggest-compact automation hook exists',
-      pass: fileExists(rootDir, 'scripts/hooks/suggest-compact.js'),
-      fix: 'Implement scripts/hooks/suggest-compact.js for context pressure hints.',
+      path: 'hooks/hooks.json',
+      description: 'Suggest-compact automation is registered for strategic context pressure hints',
+      pass: fileExists(rootDir, 'scripts/hooks/suggest-compact.js') && hasStrategicCompactHook,
+      fix: 'Register pre:all:strategic-compact in hooks/hooks.json and point it at scripts/hooks/suggest-compact.js.',
     },
     {
       id: 'context-model-route',

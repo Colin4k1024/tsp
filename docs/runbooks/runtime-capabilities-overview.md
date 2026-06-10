@@ -29,7 +29,7 @@ owner: 工程团队
 - `scripts/hooks/session-start-bootstrap.js`：SessionStart bootstrap
 - `scripts/hooks/session-start.js`：加载 `docs/memory/project-context.md`、session summary 等上下文
 - `scripts/hooks/pre-compact.js`：PreCompact 前的高价值状态整理
-- `scripts/hooks/suggest-compact.js`：在长会话中提示人工 compact
+- `scripts/hooks/suggest-compact.js`：在真实上下文使用率超过 70/85/95% 时提示人工 compact
 - `scripts/hooks/session-end.js`：Stop 阶段持久化 session 摘要
 - `scripts/hooks/session-end-marker.js`：SessionEnd 生命周期标记
 - `scripts/hooks/cost-tracker.js`：记录 token / cost 指标
@@ -69,7 +69,7 @@ owner: 工程团队
 ### 3.4 Compact readiness
 
 - 触发点：`suggest-compact.js`、`pre-compact.js`
-- 作用：在进入 compact 前整理状态，在高上下文压力下给出压缩提示
+- 作用：在进入 compact 前整理状态，在高上下文压力下基于 `context_window` 给出压缩提示
 - 用户侧影响：长任务中更容易知道什么时候该手动 compact，而不是在主链中段突然失去上下文
 
 ### 3.5 MCP health
@@ -89,7 +89,7 @@ owner: 工程团队
 3. 用户通过 `/team-help` 判断当前该进入哪条主链命令
 4. `/team-intake`、`/team-plan`、`/team-execute` 等命令通过 `artifact:persist` 把正式输出落到 `docs/artifacts/`
 5. PreToolUse / PostToolUse 期间，`governance-capture.js`、`mcp-health-check.js`、质量与观察类 hooks 持续提供后台信号
-6. 长会话中，`suggest-compact.js` 给出 compact 提示，`pre-compact.js` 在真正 compact 前整理关键状态
+6. 长会话中，`suggest-compact.js` 根据真实上下文压力给出 compact 提示，`pre-compact.js` 在真正 compact 前整理关键状态
 7. Stop：`session-end.js`、`cost-tracker.js` 等 JS hooks 在响应结束后持久化摘要与指标
 8. SessionEnd：`session-end-marker.js` 记录生命周期收尾
 

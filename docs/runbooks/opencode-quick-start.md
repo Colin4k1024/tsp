@@ -102,6 +102,7 @@ AGENTS.md 中包含所有角色的索引，您可以直接引用：
 
 TSP 提供了以下核心团队命令：
 
+- `/team-help` - 根据当前阶段、artifacts 与阻塞项推荐下一步主链命令
 - `/team-intake` - 接收需求并锁定目标、范围、约束
 - `/team-plan` - 拆解任务、角色分工、依赖与里程碑
 - `/team-execute` - 驱动研发角色在边界内实施
@@ -109,6 +110,8 @@ TSP 提供了以下核心团队命令：
 - `/team-release` - 做发布准备、上线检查与回滚保障
 - `/team-closeout` - 在观察窗口结束后做最终收口与 backlog 回写
 - `/handoff` - 在角色间做结构化交接
+
+团队命令产出的 PRD、计划、执行记录、评审和发布材料必须通过 `artifact:persist` 落盘到消费方项目的 `docs/artifacts/`、`docs/adr/` 或 `docs/memory/`，不要只停留在对话里。
 
 ### 4. 加载技能
 
@@ -239,9 +242,9 @@ rm -rf ~/.config/opencode
 
 - [OpenCode 官方文档](https://opencode.ai/docs/zh-cn)
 - [TSP 项目主页](https://github.com/colin4k1024/tsp)
-- [TSP 角色定义](../roles/)
-- [TSP 技能列表](../skills/)
-- [TSP 命令列表](../commands/)
+- [TSP 角色定义](../../roles/)
+- [TSP 技能列表](../../skills/)
+- [TSP 命令列表](../../commands/)
 
 ## 支持
 

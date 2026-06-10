@@ -69,15 +69,16 @@
         "id": "pre:write:doc-file-warning"
       },
       {
-        "matcher": "Edit|Write",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/run-with-flags.js\" \"pre:edit-write:suggest-compact\" \"scripts/hooks/suggest-compact.js\" \"standard,strict\""
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/run-with-flags.js\" \"pre:all:strategic-compact\" \"scripts/hooks/suggest-compact.js\" \"standard,strict\"",
+            "timeout": 10
           }
         ],
-        "description": "Suggest manual compaction at logical intervals",
-        "id": "pre:edit-write:suggest-compact"
+        "description": "Suggest strategic context compaction when context usage crosses 70/85/95% thresholds",
+        "id": "pre:all:strategic-compact"
       },
       {
         "matcher": "*",

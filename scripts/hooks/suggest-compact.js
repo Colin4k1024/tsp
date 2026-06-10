@@ -2,79 +2,347 @@
 /**
  * Strategic Compact Suggester
  *
- * Cross-platform (Windows, macOS, Linux)
- *
- * Runs on PreToolUse or periodically to suggest manual compaction at logical intervals
- *
- * Why manual over auto-compact:
- * - Auto-compact happens at arbitrary points, often mid-task
- * - Strategic compacting preserves context through logical phases
- * - Compact after exploration, before execution
- * - Compact after completing a milestone, before starting next
+ * Suggests `/compact` from real context pressure instead of tool-call count.
+ * Supports direct hook execution and run-with-flags.js require() mode.
  */
+
+'use strict';
 
 const fs = require('fs');
 const path = require('path');
-const {
-  getTempDir,
-  writeFile,
-  log
-} = require('../lib/utils');
+const os = require('os');
+const crypto = require('crypto');
 
-async function main() {
-  // Track tool call count (increment in a temp file)
-  // Use a session-specific counter file based on session ID from environment
-  // or parent PID as fallback
-  const sessionId = (process.env.CLAUDE_SESSION_ID || 'default').replace(/[^a-zA-Z0-9_-]/g, '') || 'default';
-  const counterFile = path.join(getTempDir(), `claude-tool-count-${sessionId}`);
-  const rawThreshold = parseInt(process.env.COMPACT_THRESHOLD || '50', 10);
-  const threshold = Number.isFinite(rawThreshold) && rawThreshold > 0 && rawThreshold <= 10000
-    ? rawThreshold
-    : 50;
+const AUTO_COMPACT_BUFFER_PCT = 16.5;
+const DEFAULT_CONTEXT_LIMIT = 200000;
+const DEFAULT_DEBOUNCE_CALLS = 8;
+const STALE_BRIDGE_SECONDS = 60;
 
-  let count = 1;
+const URGENCY = [
+  [95, 'critical'],
+  [85, 'high'],
+  [70, 'medium'],
+  [0, 'low'],
+];
 
-  // Read existing count or start at 1
-  // Use fd-based read+write to reduce (but not eliminate) race window
-  // between concurrent hook invocations
-  try {
-    const fd = fs.openSync(counterFile, 'a+');
-    try {
-      const buf = Buffer.alloc(64);
-      const bytesRead = fs.readSync(fd, buf, 0, 64, 0);
-      if (bytesRead > 0) {
-        const parsed = parseInt(buf.toString('utf8', 0, bytesRead).trim(), 10);
-        // Clamp to reasonable range — corrupted files could contain huge values
-        // that pass Number.isFinite() (e.g., parseInt('9'.repeat(30)) => 1e+29)
-        count = (Number.isFinite(parsed) && parsed > 0 && parsed <= 1000000)
-          ? parsed + 1
-          : 1;
-      }
-      // Truncate and write new value
-      fs.ftruncateSync(fd, 0);
-      fs.writeSync(fd, String(count), 0);
-    } finally {
-      fs.closeSync(fd);
-    }
-  } catch {
-    // Fallback: just use writeFile if fd operations fail
-    writeFile(counterFile, String(count));
+function toNumber(value) {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string' && value.trim()) {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) return parsed;
   }
-
-  // Suggest compact after threshold tool calls
-  if (count === threshold) {
-    log(`[StrategicCompact] ${threshold} tool calls reached - consider /compact if transitioning phases`);
-  }
-
-  // Suggest at regular intervals after threshold (every 25 calls from threshold)
-  if (count > threshold && (count - threshold) % 25 === 0) {
-    log(`[StrategicCompact] ${count} tool calls - good checkpoint for /compact if context is stale`);
-  }
-
-  process.exit(0);
+  return null;
 }
 
-main().catch(err => {
-  console.error('[StrategicCompact] Error:', err.message);
-  process.exit(0);
-});
+function clampPct(value) {
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+function normalizeRemainingToUsed(remainingPct) {
+  const usableRemaining = Math.max(
+    0,
+    ((remainingPct - AUTO_COMPACT_BUFFER_PCT) / (100 - AUTO_COMPACT_BUFFER_PCT)) * 100
+  );
+  return clampPct(100 - usableRemaining);
+}
+
+function getUrgency(usagePct) {
+  for (const [threshold, label] of URGENCY) {
+    if (usagePct >= threshold) return label;
+  }
+  return 'low';
+}
+
+function getHookEventName(data) {
+  const event = data.hook_event_name || data.hookEventName || data.event;
+  return typeof event === 'string' && event.trim() ? event.trim() : 'PreToolUse';
+}
+
+function sessionKey(data) {
+  const raw = data.session_id || process.env.CLAUDE_SESSION_ID;
+  if (typeof raw === 'string' && raw.trim()) {
+    return raw.replace(/[^a-zA-Z0-9_-]/g, '').slice(-64) || 'default';
+  }
+
+  const cwd = data.cwd || process.cwd();
+  return crypto.createHash('sha256').update(String(cwd)).digest('hex').slice(0, 16);
+}
+
+function readBridgeMetrics(sessionId) {
+  if (!sessionId) return null;
+
+  const bridgePath = path.join(os.tmpdir(), `harness-ctx-${sessionId}.json`);
+  if (!fs.existsSync(bridgePath)) return null;
+
+  try {
+    const bridge = JSON.parse(fs.readFileSync(bridgePath, 'utf8'));
+    const now = Math.floor(Date.now() / 1000);
+    if (bridge.timestamp && now - bridge.timestamp > STALE_BRIDGE_SECONDS) return null;
+
+    const usagePct = toNumber(bridge.used_pct);
+    const remainingPct = toNumber(bridge.remaining_percentage);
+    if (usagePct == null && remainingPct == null) return null;
+
+    return {
+      usagePct: usagePct != null ? clampPct(usagePct) : normalizeRemainingToUsed(remainingPct),
+      remainingPct,
+      source: 'bridge',
+    };
+  } catch (_) {
+    return null;
+  }
+}
+
+function resolveContextMetrics(data) {
+  const contextLimit = toNumber(process.env.CLAUDE_CONTEXT_LIMIT) || DEFAULT_CONTEXT_LIMIT;
+  const cw = data.context_window && typeof data.context_window === 'object' ? data.context_window : {};
+
+  const stdinUsed = toNumber(cw.used_percentage);
+  if (stdinUsed != null) {
+    const usagePct = clampPct(stdinUsed);
+    return {
+      usagePct,
+      remainingPct: toNumber(cw.remaining_percentage),
+      contextLimit,
+      contextSize: Math.round((usagePct / 100) * contextLimit),
+      source: 'stdin.used_percentage',
+    };
+  }
+
+  const stdinRemaining = toNumber(cw.remaining_percentage);
+  if (stdinRemaining != null) {
+    const usagePct = normalizeRemainingToUsed(stdinRemaining);
+    return {
+      usagePct,
+      remainingPct: clampPct(stdinRemaining),
+      contextLimit,
+      contextSize: Math.round((usagePct / 100) * contextLimit),
+      source: 'stdin.remaining_percentage',
+    };
+  }
+
+  const envSize = toNumber(process.env.CLAUDE_CONTEXT_SIZE);
+  if (envSize != null && envSize > 0) {
+    const usagePct = clampPct((envSize / contextLimit) * 100);
+    return {
+      usagePct,
+      remainingPct: null,
+      contextLimit,
+      contextSize: envSize,
+      source: 'env',
+    };
+  }
+
+  const bridge = readBridgeMetrics(sessionKey(data));
+  if (bridge) {
+    return {
+      ...bridge,
+      contextLimit,
+      contextSize: Math.round((bridge.usagePct / 100) * contextLimit),
+    };
+  }
+
+  return null;
+}
+
+function buildSuggestions(usagePct, contextSize) {
+  const suggestions = [];
+  let savings = 0;
+
+  if (usagePct >= 85) {
+    const saved = Math.round(contextSize * 0.15);
+    suggestions.push({
+      action: 'summarize',
+      target: 'early conversation history',
+      reason: 'Preserve decisions and pending work, compress exploration traces',
+      estimated_tokens_saved: saved,
+    });
+    savings += saved;
+  }
+
+  if (usagePct >= 70) {
+    const saved = Math.round(contextSize * 0.10);
+    suggestions.push({
+      action: 'discard',
+      target: 'large tool outputs and search traces',
+      reason: 'Keep file paths and conclusions, drop bulky intermediate output',
+      estimated_tokens_saved: saved,
+    });
+    savings += saved;
+  }
+
+  if (usagePct >= 70) {
+    const saved = Math.round(contextSize * 0.08);
+    suggestions.push({
+      action: 'reorganize',
+      target: 'role and specialist outputs',
+      reason: 'Move decisions, handoff state, and validation results into the compact summary',
+      estimated_tokens_saved: saved,
+    });
+    savings += saved;
+  }
+
+  return { suggestions, savings };
+}
+
+function buildReorganizationPlan(urgency) {
+  return {
+    phase_1: {
+      action: 'capture_decisions',
+      description: 'Keep decisions, constraints, current branch, changed files, and validation results.',
+    },
+    phase_2: {
+      action: 'capture_next_steps',
+      description: 'Keep active task, pending todos, blockers, and the next command to run.',
+    },
+    phase_3: {
+      action: 'compress_history',
+      description: 'Summarize early exploration and long tool outputs to conclusions plus file paths.',
+    },
+    phase_4: {
+      action: urgency === 'critical' ? 'compact_now' : 'compact_at_logical_break',
+      description: urgency === 'critical'
+        ? 'Stop broad work and ask the user to run /compact now.'
+        : 'Finish the current small step, then run /compact before more exploration.',
+    },
+  };
+}
+
+function shouldEmit(sessionId, urgency, usagePct) {
+  if (process.env.STRATEGIC_COMPACT_DISABLE_DEBOUNCE === '1') return true;
+  if (!sessionId) return true;
+
+  const debounceCalls =
+    toNumber(process.env.STRATEGIC_COMPACT_DEBOUNCE_CALLS) || DEFAULT_DEBOUNCE_CALLS;
+  const statePath = path.join(os.tmpdir(), `harness-strategic-compact-${sessionId}.json`);
+  const nextState = {
+    lastUrgency: urgency,
+    lastUsagePct: usagePct,
+    callsSinceEmit: 0,
+    updatedAt: new Date().toISOString(),
+  };
+
+  try {
+    let previous = null;
+    if (fs.existsSync(statePath)) {
+      previous = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+    }
+
+    const callsSinceEmit = (previous?.callsSinceEmit || 0) + 1;
+    const severityOrder = { low: 0, medium: 1, high: 2, critical: 3 };
+    const escalated = severityOrder[urgency] > severityOrder[previous?.lastUrgency || 'low'];
+    const usageJumped = usagePct - (previous?.lastUsagePct || 0) >= 8;
+    const repeatDue = callsSinceEmit >= debounceCalls;
+
+    if (!previous || escalated || usageJumped || repeatDue) {
+      fs.writeFileSync(statePath, JSON.stringify(nextState));
+      return true;
+    }
+
+    fs.writeFileSync(statePath, JSON.stringify({
+      ...nextState,
+      callsSinceEmit,
+      lastUrgency: previous.lastUrgency || urgency,
+      lastUsagePct: previous.lastUsagePct || usagePct,
+    }));
+    return false;
+  } catch (_) {
+    return true;
+  }
+}
+
+function buildContextMessage({ usagePct, remainingPct, urgency, savings, suggestions, source }) {
+  const remainingPart = remainingPct == null ? '' : ` | remaining: ${clampPct(remainingPct)}%`;
+  const actionByUrgency = {
+    medium: 'Finish the current small step, then run `/compact` before more broad reading or implementation.',
+    high: 'Stop new exploration, preserve decisions/todos/validation results, and ask the user to run `/compact`.',
+    critical: 'Context is nearly exhausted. Do not start new tool chains; ask the user to run `/compact` now.',
+  };
+
+  return [
+    '## Strategic Compact Triggered',
+    `- Context usage: ${usagePct}%${remainingPart} | urgency: ${urgency} | source: ${source}`,
+    `- Action: ${actionByUrgency[urgency] || actionByUrgency.medium}`,
+    `- Estimated savings: ~${savings} tokens`,
+    ...suggestions.map(item => `- ${item.action}: ${item.target} - ${item.reason}`),
+  ].join('\n');
+}
+
+function buildHookOutput(rawInput) {
+  let data = {};
+  try {
+    data = JSON.parse(rawInput || '{}');
+  } catch (_) {
+    return null;
+  }
+
+  const metrics = resolveContextMetrics(data);
+  if (!metrics) return null;
+
+  const urgency = getUrgency(metrics.usagePct);
+  if (urgency === 'low') return null;
+
+  const sessionId = sessionKey(data);
+  if (!shouldEmit(sessionId, urgency, metrics.usagePct)) return null;
+
+  const { suggestions, savings } = buildSuggestions(metrics.usagePct, metrics.contextSize);
+  const reorganizationPlan = buildReorganizationPlan(urgency);
+  const hookEventName = getHookEventName(data);
+  const additionalContext = buildContextMessage({
+    usagePct: metrics.usagePct,
+    remainingPct: metrics.remainingPct,
+    urgency,
+    savings,
+    suggestions,
+    source: metrics.source,
+  });
+
+  return {
+    hookSpecificOutput: {
+      hookEventName,
+      additionalContext,
+    },
+    compactSuggestion: {
+      should_compact: true,
+      urgency,
+      context_usage_ratio: metrics.usagePct,
+      context_source: metrics.source,
+      estimated_token_savings: savings,
+      suggestions,
+      reorganization_plan: reorganizationPlan,
+    },
+  };
+}
+
+function run(rawInput) {
+  const output = buildHookOutput(rawInput);
+  if (!output) return { exitCode: 0 };
+  return { stdout: JSON.stringify(output), exitCode: 0 };
+}
+
+function main() {
+  let input = '';
+  const stdinTimeout = setTimeout(() => process.exit(0), 8000);
+  process.stdin.setEncoding('utf8');
+  process.stdin.on('data', chunk => { input += chunk; });
+  process.stdin.on('end', () => {
+    clearTimeout(stdinTimeout);
+    try {
+      const output = buildHookOutput(input);
+      if (output) process.stdout.write(JSON.stringify(output));
+    } catch (_) {
+      process.exit(0);
+    }
+  });
+}
+
+if (require.main === module) {
+  main();
+}
+
+module.exports = {
+  run,
+  buildHookOutput,
+  resolveContextMetrics,
+  normalizeRemainingToUsed,
+};
