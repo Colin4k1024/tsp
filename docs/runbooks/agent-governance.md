@@ -2,10 +2,10 @@
 version: "1.0.0"
 status: active
 created: 2026-04-02
-updated: 2026-04-17
+updated: 2026-06-10
 owner: 工程团队
 doc_tier: governance
-last_verified: 2026-04-17
+last_verified: 2026-06-10
 source_of_truth:
   - ../../AGENTS.md
   - ./sub-agent-invocation-map.md

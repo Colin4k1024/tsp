@@ -2,10 +2,10 @@
 version: "2.3.0"
 status: active
 created: 2026-04-17
-updated: 2026-04-18
+updated: 2026-06-10
 owner: 工程团队
 doc_tier: redirect
-last_verified: 2026-04-18
+last_verified: 2026-06-10
 source_of_truth:
   - ../runbooks/team-skills-usage.md
   - ../runbooks/command-and-capability-matrix.md

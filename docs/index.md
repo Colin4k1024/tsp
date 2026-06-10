@@ -1,10 +1,10 @@
 ---
 layout: home
 status: active
-updated: 2026-04-17
+updated: 2026-06-10
 owner: 工程团队
 doc_tier: entry
-last_verified: 2026-04-17
+last_verified: 2026-06-10
 source_of_truth:
   - ../README.md
   - ../AGENTS.md
