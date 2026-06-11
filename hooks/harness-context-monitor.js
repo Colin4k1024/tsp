@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+// DEPRECATED: This hook's functionality has been merged into suggest-compact.js.
+// The strategic-compact hook now covers all thresholds (65/70/85/95%).
+// This file is retained for backward compatibility but is no longer registered in hooks.json.
+//
 // harness-context-monitor.js — PostToolUse hook (all tools)
 // Reads context metrics from the bridge file written by harness-statusline.js
 // and injects advisory warnings into agent context when usage is high.

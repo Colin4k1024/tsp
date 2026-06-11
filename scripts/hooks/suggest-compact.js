@@ -16,12 +16,13 @@ const crypto = require('crypto');
 const AUTO_COMPACT_BUFFER_PCT = 16.5;
 const DEFAULT_CONTEXT_LIMIT = 200000;
 const DEFAULT_DEBOUNCE_CALLS = 8;
-const STALE_BRIDGE_SECONDS = 60;
+const STALE_BRIDGE_SECONDS = 120;
 
 const URGENCY = [
   [95, 'critical'],
   [85, 'high'],
   [70, 'medium'],
+  [65, 'advisory'],
   [0, 'low'],
 ];
 
@@ -64,8 +65,11 @@ function sessionKey(data) {
     return raw.replace(/[^a-zA-Z0-9_-]/g, '').slice(-64) || 'default';
   }
 
+  // Use PID + cwd hash to differentiate sessions in the same directory
+  const pidKey = `pid-${process.pid}`;
   const cwd = data.cwd || process.cwd();
-  return crypto.createHash('sha256').update(String(cwd)).digest('hex').slice(0, 16);
+  const cwdHash = crypto.createHash('sha256').update(String(cwd)).digest('hex').slice(0, 16);
+  return `${pidKey}-${cwdHash}`;
 }
 
 function readBridgeMetrics(sessionId) {
@@ -95,7 +99,30 @@ function readBridgeMetrics(sessionId) {
 
 function resolveContextMetrics(data) {
   const contextLimit = toNumber(process.env.CLAUDE_CONTEXT_LIMIT) || DEFAULT_CONTEXT_LIMIT;
-  const cw = data.context_window && typeof data.context_window === 'object' ? data.context_window : {};
+  let cw = {};
+  if (data.context_window && typeof data.context_window === 'object') {
+    cw = data.context_window;
+  } else if (data.context_window != null) {
+    // Malformed: context_window is present but not an object.
+    // Attempt to extract a numeric value (some Claude Code versions
+    // may pass context_size as a bare number).
+    const numericValue = toNumber(data.context_window);
+    if (numericValue != null && numericValue > 0) {
+      const usagePct = clampPct((numericValue / contextLimit) * 100);
+      return {
+        usagePct,
+        remainingPct: null,
+        contextLimit,
+        contextSize: numericValue,
+        source: 'stdin.context_window_raw',
+      };
+    }
+    if (process.env.STRATEGIC_COMPACT_DEBUG === '1') {
+      process.stderr.write(
+        `[strategic-compact] context_window is ${typeof data.context_window}: ${JSON.stringify(data.context_window).slice(0, 100)}\n`
+      );
+    }
+  }
 
   const stdinUsed = toNumber(cw.used_percentage);
   if (stdinUsed != null) {
@@ -215,12 +242,6 @@ function shouldEmit(sessionId, urgency, usagePct) {
   const debounceCalls =
     toNumber(process.env.STRATEGIC_COMPACT_DEBOUNCE_CALLS) || DEFAULT_DEBOUNCE_CALLS;
   const statePath = path.join(os.tmpdir(), `harness-strategic-compact-${sessionId}.json`);
-  const nextState = {
-    lastUrgency: urgency,
-    lastUsagePct: usagePct,
-    callsSinceEmit: 0,
-    updatedAt: new Date().toISOString(),
-  };
 
   try {
     let previous = null;
@@ -229,22 +250,38 @@ function shouldEmit(sessionId, urgency, usagePct) {
     }
 
     const callsSinceEmit = (previous?.callsSinceEmit || 0) + 1;
-    const severityOrder = { low: 0, medium: 1, high: 2, critical: 3 };
+    const severityOrder = { low: 0, advisory: 1, medium: 2, high: 3, critical: 4 };
     const escalated = severityOrder[urgency] > severityOrder[previous?.lastUrgency || 'low'];
     const usageJumped = usagePct - (previous?.lastUsagePct || 0) >= 8;
     const repeatDue = callsSinceEmit >= debounceCalls;
 
     if (!previous || escalated || usageJumped || repeatDue) {
-      fs.writeFileSync(statePath, JSON.stringify(nextState));
+      fs.writeFileSync(statePath, JSON.stringify({
+        lastUrgency: urgency,
+        lastUsagePct: usagePct,
+        callsSinceEmit: 0,
+        updatedAt: new Date().toISOString(),
+      }));
       return true;
     }
 
-    fs.writeFileSync(statePath, JSON.stringify({
-      ...nextState,
-      callsSinceEmit,
-      lastUrgency: previous.lastUrgency || urgency,
-      lastUsagePct: previous.lastUsagePct || usagePct,
-    }));
+    // Only write if callsSinceEmit actually changed
+    if (callsSinceEmit > 1) {
+      fs.writeFileSync(statePath, JSON.stringify({
+        lastUrgency: previous.lastUrgency || urgency,
+        lastUsagePct: previous.lastUsagePct || usagePct,
+        callsSinceEmit,
+        updatedAt: new Date().toISOString(),
+      }));
+    }
+
+    if (process.env.STRATEGIC_COMPACT_DEBUG === '1') {
+      process.stderr.write(
+        `[strategic-compact] debounce suppressed: callsSinceEmit=${callsSinceEmit}, ` +
+        `urgency=${urgency}, lastUrgency=${previous?.lastUrgency}\n`
+      );
+    }
+
     return false;
   } catch (_) {
     return true;
@@ -254,6 +291,7 @@ function shouldEmit(sessionId, urgency, usagePct) {
 function buildContextMessage({ usagePct, remainingPct, urgency, savings, suggestions, source }) {
   const remainingPart = remainingPct == null ? '' : ` | remaining: ${clampPct(remainingPct)}%`;
   const actionByUrgency = {
+    advisory: 'Context usage is approaching the compaction threshold. Be mindful of context budget; avoid starting large new explorations.',
     medium: 'Finish the current small step, then run `/compact` before more broad reading or implementation.',
     high: 'Stop new exploration, preserve decisions/todos/validation results, and ask the user to run `/compact`.',
     critical: 'Context is nearly exhausted. Do not start new tool chains; ask the user to run `/compact` now.',
@@ -273,14 +311,38 @@ function buildHookOutput(rawInput) {
   try {
     data = JSON.parse(rawInput || '{}');
   } catch (_) {
+    if (process.env.STRATEGIC_COMPACT_DEBUG === '1') {
+      process.stderr.write('[strategic-compact] failed to parse stdin JSON\n');
+    }
     return null;
   }
 
   const metrics = resolveContextMetrics(data);
-  if (!metrics) return null;
+  if (!metrics) {
+    if (process.env.STRATEGIC_COMPACT_DEBUG === '1') {
+      const sessionId = sessionKey(data);
+      const bridgePath = path.join(os.tmpdir(), `harness-ctx-${sessionId}.json`);
+      const bridgeExists = fs.existsSync(bridgePath);
+      process.stderr.write(
+        `[strategic-compact] no metrics available. ` +
+        `context_window=${JSON.stringify(data.context_window || 'missing')}, ` +
+        `session=${sessionId}, bridge_exists=${bridgeExists}, ` +
+        `env_size=${process.env.CLAUDE_CONTEXT_SIZE || 'unset'}, ` +
+        `env_limit=${process.env.CLAUDE_CONTEXT_LIMIT || 'unset'}\n`
+      );
+    }
+    return null;
+  }
 
   const urgency = getUrgency(metrics.usagePct);
-  if (urgency === 'low') return null;
+  if (urgency === 'low') {
+    if (process.env.STRATEGIC_COMPACT_DEBUG === '1') {
+      process.stderr.write(
+        `[strategic-compact] below threshold: ${metrics.usagePct}% (source: ${metrics.source})\n`
+      );
+    }
+    return null;
+  }
 
   const sessionId = sessionKey(data);
   if (!shouldEmit(sessionId, urgency, metrics.usagePct)) return null;

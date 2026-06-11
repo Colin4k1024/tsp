@@ -88,8 +88,126 @@ test('hooks.json registers strategic compact for all tools', () => {
 
   assert.ok(entry, 'expected pre:all:strategic-compact hook entry');
   assert.strictEqual(entry.matcher, '*');
-  assert.ok(entry.description.includes('70/85/95'));
+  assert.ok(entry.description.includes('65/70/85/95'));
   assert.ok(entry.hooks.some(hook => hook.command.includes('scripts/hooks/suggest-compact.js')));
+});
+
+test('hooks.json has harness-statusline before strategic-compact', () => {
+  const payload = JSON.parse(fs.readFileSync(HOOKS_JSON, 'utf8'));
+  const preToolUse = payload.hooks.PreToolUse || [];
+  const statuslineIdx = preToolUse.findIndex(item => item.id === 'pre:all:harness-statusline');
+  const compactIdx = preToolUse.findIndex(item => item.id === 'pre:all:strategic-compact');
+
+  assert.ok(statuslineIdx >= 0, 'expected harness-statusline entry');
+  assert.ok(compactIdx >= 0, 'expected strategic-compact entry');
+  assert.ok(statuslineIdx < compactIdx, 'harness-statusline must run before strategic-compact');
+});
+
+test('emits compact suggestion from bridge file when context_window is missing', () => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'strategic-compact-bridge-test-'));
+  try {
+    // Write a bridge file with high usage
+    const sessionBridge = 'bridge-test-session';
+    const bridgePath = path.join(tempDir, `harness-ctx-${sessionBridge}.json`);
+    fs.writeFileSync(bridgePath, JSON.stringify({
+      session_id: sessionBridge,
+      remaining_percentage: 20,
+      used_pct: 77,
+      timestamp: Math.floor(Date.now() / 1000),
+    }));
+
+    const result = spawnSync(process.execPath, [SCRIPT], {
+      input: JSON.stringify({
+        hook_event_name: 'PreToolUse',
+        session_id: sessionBridge,
+        // No context_window — should fall back to bridge file
+      }),
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        TMPDIR: tempDir,
+        TMP: tempDir,
+        TEMP: tempDir,
+        STRATEGIC_COMPACT_DISABLE_DEBOUNCE: '1',
+      },
+    });
+
+    assert.strictEqual(result.status, 0);
+    assert.ok(result.stdout.trim(), 'expected hook output from bridge file');
+
+    const output = JSON.parse(result.stdout);
+    assert.strictEqual(output.compactSuggestion.should_compact, true);
+    assert.strictEqual(output.compactSuggestion.context_source, 'bridge');
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test('handles malformed context_window (number) without crashing', () => {
+  const result = runSuggestCompact({
+    hook_event_name: 'PreToolUse',
+    session_id: 'compact-test-malformed',
+    context_window: 200000,
+  });
+
+  assert.strictEqual(result.status, 0);
+  // Should either emit (if usage is high) or stay silent (if low)
+  // The key assertion is that it doesn't crash
+});
+
+test('handles malformed context_window (string) without crashing', () => {
+  const result = runSuggestCompact({
+    hook_event_name: 'PreToolUse',
+    session_id: 'compact-test-malformed-str',
+    context_window: '200000',
+  });
+
+  assert.strictEqual(result.status, 0);
+});
+
+test('emits advisory at 65% threshold', () => {
+  // remaining_percentage: 46 -> after buffer normalization ≈ 65% used
+  // Formula: usableRemaining = ((46 - 16.5) / (100 - 16.5)) * 100 ≈ 35.3
+  // usedPct = 100 - 35.3 ≈ 64.7 -> rounds to 65
+  const result = runSuggestCompact({
+    hook_event_name: 'PreToolUse',
+    session_id: 'compact-test-advisory',
+    context_window: {
+      remaining_percentage: 46,
+    },
+  });
+
+  assert.strictEqual(result.status, 0);
+  assert.ok(result.stdout.trim(), 'expected advisory output');
+
+  const output = JSON.parse(result.stdout);
+  assert.strictEqual(output.compactSuggestion.urgency, 'advisory');
+});
+
+test('diagnostic mode outputs to stderr when STRATEGIC_COMPACT_DEBUG=1', () => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'strategic-compact-debug-test-'));
+  try {
+    const result = spawnSync(process.execPath, [SCRIPT], {
+      input: JSON.stringify({
+        hook_event_name: 'PreToolUse',
+        session_id: 'debug-test',
+        // No context_window, no bridge file — should trigger diagnostic
+      }),
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        TMPDIR: tempDir,
+        TMP: tempDir,
+        TEMP: tempDir,
+        STRATEGIC_COMPACT_DEBUG: '1',
+      },
+    });
+
+    assert.strictEqual(result.status, 0);
+    assert.ok(result.stderr.includes('[strategic-compact]'), 'expected diagnostic output in stderr');
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
 });
 
 if (failed > 0) {

@@ -73,11 +73,22 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/harness-statusline.js\""
+          }
+        ],
+        "description": "Display current role and context usage statusline (must run before strategic-compact to write bridge file)",
+        "id": "pre:all:harness-statusline"
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/run-with-flags.js\" \"pre:all:strategic-compact\" \"scripts/hooks/suggest-compact.js\" \"standard,strict\"",
             "timeout": 10
           }
         ],
-        "description": "Suggest strategic context compaction when context usage crosses 70/85/95% thresholds",
+        "description": "Suggest strategic context compaction when context usage crosses 65/70/85/95% thresholds",
         "id": "pre:all:strategic-compact"
       },
       {
@@ -151,28 +162,6 @@
         ],
         "description": "Check MCP server health before MCP tool execution and block unhealthy MCP calls",
         "id": "pre:mcp-health-check"
-      },
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/harness-statusline.js\""
-          }
-        ],
-        "description": "Display current role and context usage statusline",
-        "id": "pre:all:harness-statusline"
-      },
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/harness-context-monitor.js\""
-          }
-        ],
-        "description": "Monitor context budget, warn at 35%/25% thresholds",
-        "id": "pre:all:harness-context-monitor"
       },
       {
         "matcher": "Bash",
