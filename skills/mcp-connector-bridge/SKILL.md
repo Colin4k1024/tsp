@@ -1,3 +1,9 @@
+---
+name: mcp-connector-bridge
+description: "Active MCP connector polling that integrates external tools (issue trackers, error monitoring, CI) into the heartbeat loop for cross-system discovery."
+origin: ECC
+---
+
 # MCP Connector Bridge
 
 Active MCP connector polling that integrates external tools into the heartbeat loop.

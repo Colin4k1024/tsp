@@ -1,3 +1,9 @@
+---
+name: loop-heartbeat
+description: "Scheduled discovery automation that runs scans on a heartbeat interval, classifies findings, and routes them to goals or triage inbox."
+origin: ECC
+---
+
 # Loop Heartbeat
 
 Scheduled discovery automation that runs scans, finds issues, and routes findings

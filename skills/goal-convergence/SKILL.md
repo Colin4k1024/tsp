@@ -1,3 +1,9 @@
+---
+name: goal-convergence
+description: "Goal-oriented autonomous loop with external completion oracle. Keeps iterating until verifiable stopping conditions are met, checked by a separate model."
+origin: ECC
+---
+
 # Goal Convergence
 
 Goal-oriented autonomous loop with external completion oracle.

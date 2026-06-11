@@ -1,3 +1,9 @@
+---
+name: rework-loop
+description: "Structured rework with git blame attribution for failed goal iterations. Maps failures to responsible changes and routes targeted fix briefs."
+origin: ECC
+---
+
 # Rework Loop
 
 Structured rework with blame attribution for failed goal iterations.
