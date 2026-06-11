@@ -239,6 +239,17 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/session-start-goal-resume.js\""
+          }
+        ],
+        "description": "Check for active goals from previous sessions and inject resume reminder",
+        "id": "session:goal-resume"
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/run-with-flags.js\" \"session:codegraph:auto-init\" \"scripts/hooks/codegraph-auto-init.js\" \"minimal,standard,strict\""
           }
         ],

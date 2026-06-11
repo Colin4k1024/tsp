@@ -1,0 +1,172 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ECC Goal Definition",
+  "description": "Schema for goal-oriented autonomous loop with external completion oracle",
+  "type": "object",
+  "properties": {
+    "goalId": {
+      "type": "string",
+      "pattern": "^goal-[a-z0-9]{8}$",
+      "description": "Unique goal identifier"
+    },
+    "objective": {
+      "type": "string",
+      "minLength": 5,
+      "description": "Natural language description of the goal"
+    },
+    "stoppingConditions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["test_pass", "lint_clean", "coverage_threshold", "build_pass", "custom_command"],
+            "description": "Type of stopping condition"
+          },
+          "command": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Shell command to evaluate the condition"
+          },
+          "threshold": {
+            "type": "number",
+            "description": "Numeric threshold for the condition (e.g., coverage percentage)"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of what this condition checks"
+          }
+        },
+        "required": ["type", "command"],
+        "additionalProperties": false
+      }
+    },
+    "budget": {
+      "type": "object",
+      "properties": {
+        "maxIterations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 15,
+          "description": "Maximum maker iterations before escalation"
+        },
+        "maxDuration": {
+          "type": "string",
+          "pattern": "^[0-9]+(m|h)$",
+          "default": "2h",
+          "description": "Maximum wall-clock time (e.g., '30m', '2h')"
+        },
+        "maxDollars": {
+          "type": "number",
+          "minimum": 0.1,
+          "default": 10,
+          "description": "Maximum cost in USD before pausing"
+        }
+      },
+      "additionalProperties": false
+    },
+    "oracle": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string",
+          "default": "haiku",
+          "description": "Model to use for completion verification (must differ from maker)"
+        },
+        "allowedTools": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["Read", "Bash"],
+          "description": "Tools the oracle can use (read-only by convention)"
+        },
+        "prompt": {
+          "type": "string",
+          "description": "Custom oracle prompt override (optional)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "string",
+      "enum": ["active", "paused", "converged", "escalated", "failed"],
+      "default": "active",
+      "description": "Current goal lifecycle state"
+    },
+    "currentIteration": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "iteration": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "makerSummary": {
+            "type": "string",
+            "description": "Brief summary of what the maker did this iteration"
+          },
+          "oracleVerdict": {
+            "type": "string",
+            "enum": ["pass", "fail", "partial"],
+            "description": "Oracle's assessment of stopping conditions"
+          },
+          "failReasons": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Specific reasons for failure"
+          },
+          "nextHint": {
+            "type": "string",
+            "description": "Oracle's guidance for the next iteration"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "costDollars": {
+            "type": "number",
+            "description": "Cost of this iteration"
+          }
+        },
+        "required": ["iteration", "oracleVerdict", "timestamp"],
+        "additionalProperties": false
+      }
+    },
+    "escalation": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string",
+          "enum": ["budget_exhausted", "repeated_failure", "oracle_uncertain", "manual"],
+          "description": "Why the goal was escalated"
+        },
+        "details": {
+          "type": "string"
+        },
+        "escalatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["goalId", "objective", "stoppingConditions", "state"],
+  "additionalProperties": false
+}
