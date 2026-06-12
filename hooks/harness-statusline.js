@@ -52,22 +52,45 @@ process.stdin.on('end', () => {
     if (remaining != null) {
       const usableRemaining = Math.max(0, ((remaining - AUTO_COMPACT_BUFFER_PCT) / (100 - AUTO_COMPACT_BUFFER_PCT)) * 100);
       usedPct = Math.max(0, Math.min(100, Math.round(100 - usableRemaining)));
+    } else if (data.transcript_path) {
+      // Parse actual token usage from transcript JSONL (CCometixLine approach)
+      try {
+        const { resolveTranscriptMetrics } = require('../scripts/lib/transcript-usage');
+        const modelId = (data.model && data.model.id) || process.env.CLAUDE_MODEL || null;
+        const metrics = resolveTranscriptMetrics(data.transcript_path, modelId);
+        if (metrics) {
+          usedPct = Math.max(0, Math.min(100, Math.round(metrics.usagePct)));
+        }
+      } catch (_) { /* ignore */ }
 
-      // Write bridge file for harness-context-monitor.js
-      if (session) {
+      // Final fallback: file size estimate
+      if (usedPct == null) {
         try {
-          const bridgePath = path.join(os.tmpdir(), `harness-ctx-${session}.json`);
-          fs.writeFileSync(bridgePath, JSON.stringify({
-            session_id: session,
-            remaining_percentage: remaining,
-            used_pct: usedPct,
-            active_role: activeRole,
-            timestamp: Math.floor(Date.now() / 1000),
-          }));
+          const stat = fs.statSync(data.transcript_path);
+          const estimatedTokens = Math.round(stat.size * 0.25);
+          if (estimatedTokens > 0) {
+            usedPct = Math.max(0, Math.min(100, Math.round((estimatedTokens / 200000) * 100)));
+          }
         } catch (_) { /* ignore */ }
       }
+    }
 
-      // Build progress bar (10 segments)
+    // Write bridge file for downstream hooks (suggest-compact, context-monitor)
+    if (usedPct != null && session) {
+      try {
+        const bridgePath = path.join(os.tmpdir(), `harness-ctx-${session}.json`);
+        fs.writeFileSync(bridgePath, JSON.stringify({
+          session_id: session,
+          remaining_percentage: remaining != null ? remaining : null,
+          used_pct: usedPct,
+          active_role: activeRole,
+          timestamp: Math.floor(Date.now() / 1000),
+        }));
+      } catch (_) { /* ignore */ }
+    }
+
+    // Build progress bar (10 segments)
+    if (usedPct != null) {
       const filled = Math.floor(usedPct / 10);
       const bar = '█'.repeat(filled) + '░'.repeat(10 - filled);
       if (usedPct < 50) {

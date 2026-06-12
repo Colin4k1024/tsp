@@ -68,7 +68,7 @@
 - specialist agents 位于 `agents/specialists/`（已合入 ECC 全量 specialist agent 集）
 - ECC 精选技能位于 `skills/`，150+ 平铺技能目录位于 `skills/`，总计 200+ skills
 - 公司领域扩展技能位于 `skills/`（canonical source）
-- Node.js 安装工具链：`node scripts/install-apply.js --profile <name> --target <platform>`，支持 10 个安装目标（claude/cursor/antigravity/codex/gemini/opencode/codebuddy/copilot/windsurf/augment）、`team`、`full` 等 profile
+- Node.js 安装工具链：`node scripts/install-apply.js --profile <name> --target <platform>`，支持 11 个安装目标（claude/cursor/antigravity/codex/gemini/opencode/cangming/codebuddy/copilot/windsurf/augment）、`team`、`full` 等 profile
 - common / language rules 位于 `rules/common/` 与各语言子目录（kotlin/rust/swift/cpp/csharp/php/perl/zh 等）
 - hooks、contexts、examples、mcp-configs 提供可扩展运行时入口
 

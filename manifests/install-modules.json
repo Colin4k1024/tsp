@@ -14,6 +14,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy",
         "copilot",
         "windsurf",
@@ -39,6 +40,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [],
@@ -59,6 +61,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [],
@@ -79,6 +82,7 @@
         "claude",
         "cursor",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [],
@@ -104,6 +108,7 @@
         "codex",
         "gemini",
         "opencode",
+        "cangming",
         "codebuddy",
         "copilot",
         "windsurf",
@@ -162,6 +167,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -190,6 +196,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -233,6 +240,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -260,6 +268,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -284,6 +293,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -321,6 +331,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -357,6 +368,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -385,6 +397,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -411,6 +424,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -434,6 +448,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -460,6 +475,7 @@
         "cursor",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -484,7 +500,8 @@
       "targets": [
         "claude",
         "codex",
-        "opencode"
+        "opencode",
+        "cangming"
       ],
       "dependencies": [
         "commands-core",
@@ -511,6 +528,7 @@
         "cursor",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -532,6 +550,7 @@
         "cursor",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -559,6 +578,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -598,6 +618,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -621,6 +642,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -650,6 +672,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -673,6 +696,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -695,7 +719,8 @@
         "claude",
         "cursor",
         "codex",
-        "opencode"
+        "opencode",
+        "cangming"
       ],
       "dependencies": [
         "agents-core",
@@ -720,7 +745,8 @@
         "claude",
         "cursor",
         "codex",
-        "opencode"
+        "opencode",
+        "cangming"
       ],
       "dependencies": [
         "team-workflow"
@@ -760,8 +786,16 @@
         "skills/workflow-forensics",
         "templates/context-docs"
       ],
-      "targets": ["claude", "cursor", "codex", "opencode"],
-      "dependencies": ["team-workflow"],
+      "targets": [
+        "claude",
+        "cursor",
+        "codex",
+        "opencode",
+        "cangming"
+      ],
+      "dependencies": [
+        "team-workflow"
+      ],
       "defaultInstall": false,
       "cost": "heavy",
       "stability": "stable"
@@ -781,6 +815,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -808,6 +843,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [
@@ -843,6 +879,7 @@
         "antigravity",
         "codex",
         "opencode",
+        "cangming",
         "codebuddy"
       ],
       "dependencies": [

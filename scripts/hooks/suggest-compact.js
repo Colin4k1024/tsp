@@ -160,6 +160,27 @@ function resolveContextMetrics(data) {
     };
   }
 
+  // Transcript JSONL usage parsing (CCometixLine approach)
+  const transcriptPath = data.transcript_path;
+  const modelId = (data.model && data.model.id) || process.env.CLAUDE_MODEL || null;
+  if (transcriptPath && typeof transcriptPath === 'string') {
+    try {
+      const { resolveTranscriptMetrics } = require('../lib/transcript-usage');
+      const transcriptMetrics = resolveTranscriptMetrics(transcriptPath, modelId);
+      if (transcriptMetrics) {
+        return {
+          usagePct: clampPct(transcriptMetrics.usagePct),
+          remainingPct: null,
+          contextLimit: transcriptMetrics.contextLimit,
+          contextSize: transcriptMetrics.contextTokens,
+          source: 'transcript_usage',
+        };
+      }
+    } catch (_) {
+      // transcript parsing failed — fall through
+    }
+  }
+
   const bridge = readBridgeMetrics(sessionKey(data));
   if (bridge) {
     return {
@@ -167,6 +188,26 @@ function resolveContextMetrics(data) {
       contextLimit,
       contextSize: Math.round((bridge.usagePct / 100) * contextLimit),
     };
+  }
+
+  // Final fallback: estimate from transcript file size
+  if (transcriptPath && typeof transcriptPath === 'string') {
+    try {
+      const stat = fs.statSync(transcriptPath);
+      const estimatedTokens = Math.round(stat.size * 0.25);
+      if (estimatedTokens > 0) {
+        const usagePct = clampPct((estimatedTokens / contextLimit) * 100);
+        return {
+          usagePct,
+          remainingPct: null,
+          contextLimit,
+          contextSize: estimatedTokens,
+          source: 'transcript_size',
+        };
+      }
+    } catch (_) {
+      // transcript not accessible — fall through
+    }
   }
 
   return null;

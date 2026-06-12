@@ -3,7 +3,7 @@
 const { validateInstallModuleIds } = require('../install-manifests');
 const { normalizeInstallTarget } = require('../install-targets/registry');
 
-const LEGACY_INSTALL_TARGETS = ['claude', 'cursor', 'antigravity', 'codex', 'opencode'];
+const LEGACY_INSTALL_TARGETS = ['claude', 'cursor', 'antigravity', 'codex', 'opencode', 'cangming'];
 
 function dedupeStrings(values) {
   return [...new Set((Array.isArray(values) ? values : []).map(value => String(value).trim()).filter(Boolean))];
