@@ -4,13 +4,14 @@ const cangmingHome = require('./cangming-home');
 const claudeHome = require('./claude-home');
 const codebuddyProject = require('./codebuddy-project');
 const codexHome = require('./codex-home');
+const codewhaleHome = require('./codewhale-home');
 const copilotHome = require('./copilot-home');
 const cursorProject = require('./cursor-project');
 const geminiProject = require('./gemini-project');
 const opencodeHome = require('./opencode-home');
 const windsurfProject = require('./windsurf-project');
 
-const PUBLIC_INSTALL_TARGETS = Object.freeze(['claude', 'codex', 'opencode', 'cangming']);
+const PUBLIC_INSTALL_TARGETS = Object.freeze(['claude', 'codex', 'opencode', 'cangming', 'codewhale']);
 const TARGET_ALIASES = Object.freeze({
   'claude-code': 'claude',
   claudecode: 'claude',
@@ -24,6 +25,7 @@ const ADAPTERS = Object.freeze([
   geminiProject,
   opencodeHome,
   cangmingHome,
+  codewhaleHome,
   codebuddyProject,
   copilotHome,
   windsurfProject,

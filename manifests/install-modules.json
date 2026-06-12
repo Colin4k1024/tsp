@@ -18,7 +18,8 @@
         "codebuddy",
         "copilot",
         "windsurf",
-        "augment"
+        "augment",
+        "codewhale"
       ],
       "dependencies": [],
       "defaultInstall": true,
@@ -41,7 +42,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [],
       "defaultInstall": true,
@@ -62,7 +64,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [],
       "defaultInstall": true,
@@ -83,7 +86,8 @@
         "cursor",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [],
       "defaultInstall": true,
@@ -112,7 +116,8 @@
         "codebuddy",
         "copilot",
         "windsurf",
-        "augment"
+        "augment",
+        "codewhale"
       ],
       "dependencies": [],
       "defaultInstall": true,
@@ -168,7 +173,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "rules-core",
@@ -197,7 +203,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "platform-configs"
@@ -241,7 +248,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "platform-configs"
@@ -269,7 +277,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "workflow-quality"
@@ -294,7 +303,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "platform-configs"
@@ -332,7 +342,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "platform-configs"
@@ -369,7 +380,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "platform-configs"
@@ -398,7 +410,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "platform-configs"
@@ -425,7 +438,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "platform-configs"
@@ -449,7 +463,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "business-content"
@@ -476,7 +491,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "platform-configs"
@@ -501,7 +517,8 @@
         "claude",
         "codex",
         "opencode",
-        "cangming"
+        "cangming",
+        "codewhale"
       ],
       "dependencies": [
         "commands-core",
@@ -529,7 +546,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "platform-configs"
@@ -551,7 +569,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "workflow-engine"
@@ -579,7 +598,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "platform-configs"
@@ -619,7 +639,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "platform-configs"
@@ -643,7 +664,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "platform-configs"
@@ -673,7 +695,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "platform-configs"
@@ -697,7 +720,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "platform-configs"
@@ -720,7 +744,8 @@
         "cursor",
         "codex",
         "opencode",
-        "cangming"
+        "cangming",
+        "codewhale"
       ],
       "dependencies": [
         "agents-core",
@@ -746,7 +771,8 @@
         "cursor",
         "codex",
         "opencode",
-        "cangming"
+        "cangming",
+        "codewhale"
       ],
       "dependencies": [
         "team-workflow"
@@ -791,7 +817,8 @@
         "cursor",
         "codex",
         "opencode",
-        "cangming"
+        "cangming",
+        "codewhale"
       ],
       "dependencies": [
         "team-workflow"
@@ -816,7 +843,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "platform-configs",
@@ -844,7 +872,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "hooks-runtime",
@@ -880,7 +909,8 @@
         "codex",
         "opencode",
         "cangming",
-        "codebuddy"
+        "codebuddy",
+        "codewhale"
       ],
       "dependencies": [
         "commands-core",

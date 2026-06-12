@@ -8,7 +8,7 @@ const {
 } = require('./install-targets/registry');
 
 const DEFAULT_REPO_ROOT = path.join(__dirname, '../..');
-const SUPPORTED_INSTALL_TARGETS = ['claude', 'cursor', 'antigravity', 'codex', 'gemini', 'opencode', 'cangming', 'codebuddy', 'copilot', 'windsurf', 'augment'];
+const SUPPORTED_INSTALL_TARGETS = ['claude', 'cursor', 'antigravity', 'codex', 'gemini', 'opencode', 'cangming', 'codewhale', 'codebuddy', 'copilot', 'windsurf', 'augment'];
 const COMPONENT_FAMILY_PREFIXES = {
   baseline: 'baseline:',
   language: 'lang:',
@@ -47,6 +47,14 @@ const LEGACY_COMPAT_BASE_MODULE_IDS_BY_TARGET = Object.freeze({
     'workflow-quality',
   ],
   opencode: [
+    'rules-core',
+    'agents-core',
+    'commands-core',
+    'hooks-runtime',
+    'platform-configs',
+    'workflow-quality',
+  ],
+  codewhale: [
     'rules-core',
     'agents-core',
     'commands-core',
