@@ -37,6 +37,11 @@ const TARGET_METADATA = Object.freeze({
     installPath: '~/.config/opencode/',
     scope: 'home-level',
   },
+  cangming: {
+    label: 'Cangming',
+    installPath: '~/.config/cangming/',
+    scope: 'home-level',
+  },
   codebuddy: {
     label: 'CodeBuddy',
     installPath: './.codebuddy/',
