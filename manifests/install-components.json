@@ -194,6 +194,14 @@
       ]
     },
     {
+      "id": "capability:loop-engineering",
+      "family": "capability",
+      "description": "Loop Engineering runtime: automation, skills, target-neutral state, hard gates, and maker/checker loop primitives.",
+      "modules": [
+        "loop-engineering"
+      ]
+    },
+    {
       "id": "capability:workflow-engine",
       "family": "capability",
       "description": "Workflow definition runtime plus bundled default YAML workflows.",
@@ -394,6 +402,38 @@
       "description": "Verification loop for code quality assurance.",
       "modules": [
         "workflow-quality"
+      ]
+    },
+    {
+      "id": "skill:loop-heartbeat",
+      "family": "skill",
+      "description": "Scheduled discovery automation that routes findings to goals or triage.",
+      "modules": [
+        "loop-engineering"
+      ]
+    },
+    {
+      "id": "skill:goal-convergence",
+      "family": "skill",
+      "description": "Goal convergence patterns for bounded autonomous loops.",
+      "modules": [
+        "loop-engineering"
+      ]
+    },
+    {
+      "id": "skill:rework-loop",
+      "family": "skill",
+      "description": "Rework loop patterns for checker-driven iteration.",
+      "modules": [
+        "loop-engineering"
+      ]
+    },
+    {
+      "id": "skill:autonomous-loops",
+      "family": "skill",
+      "description": "Autonomous loop design and safety guidance.",
+      "modules": [
+        "loop-engineering"
       ]
     },
     {

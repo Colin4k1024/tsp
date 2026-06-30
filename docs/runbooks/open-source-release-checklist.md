@@ -2,10 +2,10 @@
 version: "2.4.1"
 status: active
 created: 2026-04-22
-updated: 2026-05-06
+updated: 2026-06-30
 owner: 工程团队
 doc_tier: entry
-last_verified: 2026-05-06
+last_verified: 2026-06-30
 source_of_truth:
   - ../../README.md
   - ../../package.json

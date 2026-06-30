@@ -2,8 +2,7 @@
 
 const crypto = require('crypto');
 const { execSync } = require('child_process');
-const path = require('path');
-const fs = require('fs');
+const loopStateStore = require('./loop-state-store');
 
 const GOAL_STATES = {
   active: 'active',
@@ -236,38 +235,16 @@ function resumeGoal(goal) {
   }
 }
 
-// Goal persistence
-
-function getGoalsDir() {
-  const home = process.env.HOME || process.env.USERPROFILE;
-  const dir = path.join(home, '.claude', 'goals');
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  return dir;
-}
-
 function saveGoal(goal) {
-  const filePath = path.join(getGoalsDir(), `${goal.goalId}.json`);
-  fs.writeFileSync(filePath, JSON.stringify(goal, null, 2), 'utf-8');
-  return filePath;
+  return loopStateStore.saveGoal(goal);
 }
 
 function loadGoal(goalId) {
-  const filePath = path.join(getGoalsDir(), `${goalId}.json`);
-  if (!fs.existsSync(filePath)) return null;
-  return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  return loopStateStore.loadGoal(goalId);
 }
 
 function listGoals(filter) {
-  const dir = getGoalsDir();
-  if (!fs.existsSync(dir)) return [];
-
-  return fs.readdirSync(dir)
-    .filter(f => f.endsWith('.json'))
-    .map(f => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf-8')))
-    .filter(g => !filter || g.state === filter)
-    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  return loopStateStore.listGoals(filter);
 }
 
 function getActiveGoals() {

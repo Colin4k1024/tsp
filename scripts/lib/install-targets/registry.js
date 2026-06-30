@@ -11,7 +11,7 @@ const geminiProject = require('./gemini-project');
 const opencodeHome = require('./opencode-home');
 const windsurfProject = require('./windsurf-project');
 
-const PUBLIC_INSTALL_TARGETS = Object.freeze(['claude', 'codex', 'opencode', 'cangming', 'codewhale']);
+const PUBLIC_INSTALL_TARGETS = Object.freeze(['claude', 'codex', 'opencode']);
 const TARGET_ALIASES = Object.freeze({
   'claude-code': 'claude',
   claudecode: 'claude',

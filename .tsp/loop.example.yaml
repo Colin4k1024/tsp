@@ -1,0 +1,26 @@
+loop:
+  id: ci-triage
+  description: Keep CI failures triaged and fix machine-checkable failures.
+  cadence: 30m
+  skill: loop-ci-triage
+  stateFile: .tsp/loops/state/ci-triage.md
+  gates:
+    - name: library-validation
+      command: node scripts/validate-library.js
+      description: Validate platform catalog and generated artifacts.
+    - name: tests
+      command: npm test
+      description: Run the repository test suite.
+  maker:
+    role: backend-engineer
+    writeAccess: true
+  checker:
+    role: qa-engineer
+    writeAccess: false
+  budget:
+    maxIterations: 10
+    maxDuration: 2h
+    maxDollars: 5
+  escalation:
+    onBudgetExhausted: triage
+    onSecurityFinding: human

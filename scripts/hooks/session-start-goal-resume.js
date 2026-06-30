@@ -11,34 +11,17 @@
  * session start output so the user knows they can resume with `/goal resume`.
  *
  * Behavior:
- *   1. Scans ~/.claude/goals/ for goal files with state "active" or "paused"
+ *   1. Scans the TSP loop state goals store for active or paused goal files
  *   2. If found, appends a summary to the hook output
  *   3. Non-blocking: failures are silently ignored
  */
 
 const fs = require('fs');
-const path = require('path');
-
-function getGoalsDir() {
-  const home = process.env.HOME || process.env.USERPROFILE || '';
-  return path.join(home, '.claude', 'goals');
-}
+const { listGoals } = require('../lib/loop-state-store');
 
 function scanActiveGoals() {
-  const dir = getGoalsDir();
-  if (!fs.existsSync(dir)) return [];
-
   try {
-    return fs.readdirSync(dir)
-      .filter(f => f.endsWith('.json'))
-      .map(f => {
-        try {
-          return JSON.parse(fs.readFileSync(path.join(dir, f), 'utf-8'));
-        } catch {
-          return null;
-        }
-      })
-      .filter(g => g && (g.state === 'active' || g.state === 'paused'))
+    return [...listGoals('active'), ...listGoals('paused')]
       .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
   } catch {
     return [];

@@ -15,9 +15,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-
-// Autocompact buffer ~16.5% — GSD pattern, normalize to usable context
-const AUTO_COMPACT_BUFFER_PCT = 16.5;
+const { resolveContextMetrics } = require('../scripts/lib/context-window');
 
 let input = '';
 // Guard: if stdin stalls (Windows/pipe issues), exit silently
@@ -31,8 +29,6 @@ process.stdin.on('end', () => {
     const session = data.session_id || '';
     const model = data.model?.display_name || 'Claude';
     const dir = data.cwd || data.workspace?.current_dir || process.cwd();
-    const remaining = data.context_window?.remaining_percentage;
-
     // --- Resolve active role from harness state file ---
     const claudeDir = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude');
     const projectDir = process.env.CLAUDE_PROJECT_DIR || dir;
@@ -49,30 +45,9 @@ process.stdin.on('end', () => {
     // --- Context window metrics ---
     let ctxBar = '';
     let usedPct = null;
-    if (remaining != null) {
-      const usableRemaining = Math.max(0, ((remaining - AUTO_COMPACT_BUFFER_PCT) / (100 - AUTO_COMPACT_BUFFER_PCT)) * 100);
-      usedPct = Math.max(0, Math.min(100, Math.round(100 - usableRemaining)));
-    } else if (data.transcript_path) {
-      // Parse actual token usage from transcript JSONL (CCometixLine approach)
-      try {
-        const { resolveTranscriptMetrics } = require('../scripts/lib/transcript-usage');
-        const modelId = (data.model && data.model.id) || process.env.CLAUDE_MODEL || null;
-        const metrics = resolveTranscriptMetrics(data.transcript_path, modelId);
-        if (metrics) {
-          usedPct = Math.max(0, Math.min(100, Math.round(metrics.usagePct)));
-        }
-      } catch (_) { /* ignore */ }
-
-      // Final fallback: file size estimate
-      if (usedPct == null) {
-        try {
-          const stat = fs.statSync(data.transcript_path);
-          const estimatedTokens = Math.round(stat.size * 0.25);
-          if (estimatedTokens > 0) {
-            usedPct = Math.max(0, Math.min(100, Math.round((estimatedTokens / 200000) * 100)));
-          }
-        } catch (_) { /* ignore */ }
-      }
+    const metrics = resolveContextMetrics(data);
+    if (metrics) {
+      usedPct = metrics.usagePct;
     }
 
     // Write bridge file for downstream hooks (suggest-compact, context-monitor)
@@ -81,8 +56,12 @@ process.stdin.on('end', () => {
         const bridgePath = path.join(os.tmpdir(), `harness-ctx-${session}.json`);
         fs.writeFileSync(bridgePath, JSON.stringify({
           session_id: session,
-          remaining_percentage: remaining != null ? remaining : null,
+          remaining_percentage: metrics?.remainingPct ?? null,
+          remaining_tokens: metrics?.remainingTokens ?? null,
           used_pct: usedPct,
+          context_limit: metrics?.contextLimit ?? null,
+          compact_count: metrics?.compactCount ?? null,
+          context_source: metrics?.source ?? null,
           active_role: activeRole,
           timestamp: Math.floor(Date.now() / 1000),
         }));

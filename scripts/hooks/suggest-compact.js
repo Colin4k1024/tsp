@@ -12,6 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const crypto = require('crypto');
+const contextWindow = require('../lib/context-window');
 
 const AUTO_COMPACT_BUFFER_PCT = 16.5;
 const DEFAULT_CONTEXT_LIMIT = 200000;
@@ -98,119 +99,7 @@ function readBridgeMetrics(sessionId) {
 }
 
 function resolveContextMetrics(data) {
-  const contextLimit = toNumber(process.env.CLAUDE_CONTEXT_LIMIT) || DEFAULT_CONTEXT_LIMIT;
-  let cw = {};
-  if (data.context_window && typeof data.context_window === 'object') {
-    cw = data.context_window;
-  } else if (data.context_window != null) {
-    // Malformed: context_window is present but not an object.
-    // Attempt to extract a numeric value (some Claude Code versions
-    // may pass context_size as a bare number).
-    const numericValue = toNumber(data.context_window);
-    if (numericValue != null && numericValue > 0) {
-      const usagePct = clampPct((numericValue / contextLimit) * 100);
-      return {
-        usagePct,
-        remainingPct: null,
-        contextLimit,
-        contextSize: numericValue,
-        source: 'stdin.context_window_raw',
-      };
-    }
-    if (process.env.STRATEGIC_COMPACT_DEBUG === '1') {
-      process.stderr.write(
-        `[strategic-compact] context_window is ${typeof data.context_window}: ${JSON.stringify(data.context_window).slice(0, 100)}\n`
-      );
-    }
-  }
-
-  const stdinUsed = toNumber(cw.used_percentage);
-  if (stdinUsed != null) {
-    const usagePct = clampPct(stdinUsed);
-    return {
-      usagePct,
-      remainingPct: toNumber(cw.remaining_percentage),
-      contextLimit,
-      contextSize: Math.round((usagePct / 100) * contextLimit),
-      source: 'stdin.used_percentage',
-    };
-  }
-
-  const stdinRemaining = toNumber(cw.remaining_percentage);
-  if (stdinRemaining != null) {
-    const usagePct = normalizeRemainingToUsed(stdinRemaining);
-    return {
-      usagePct,
-      remainingPct: clampPct(stdinRemaining),
-      contextLimit,
-      contextSize: Math.round((usagePct / 100) * contextLimit),
-      source: 'stdin.remaining_percentage',
-    };
-  }
-
-  const envSize = toNumber(process.env.CLAUDE_CONTEXT_SIZE);
-  if (envSize != null && envSize > 0) {
-    const usagePct = clampPct((envSize / contextLimit) * 100);
-    return {
-      usagePct,
-      remainingPct: null,
-      contextLimit,
-      contextSize: envSize,
-      source: 'env',
-    };
-  }
-
-  // Transcript JSONL usage parsing (CCometixLine approach)
-  const transcriptPath = data.transcript_path;
-  const modelId = (data.model && data.model.id) || process.env.CLAUDE_MODEL || null;
-  if (transcriptPath && typeof transcriptPath === 'string') {
-    try {
-      const { resolveTranscriptMetrics } = require('../lib/transcript-usage');
-      const transcriptMetrics = resolveTranscriptMetrics(transcriptPath, modelId);
-      if (transcriptMetrics) {
-        return {
-          usagePct: clampPct(transcriptMetrics.usagePct),
-          remainingPct: null,
-          contextLimit: transcriptMetrics.contextLimit,
-          contextSize: transcriptMetrics.contextTokens,
-          source: 'transcript_usage',
-        };
-      }
-    } catch (_) {
-      // transcript parsing failed — fall through
-    }
-  }
-
-  const bridge = readBridgeMetrics(sessionKey(data));
-  if (bridge) {
-    return {
-      ...bridge,
-      contextLimit,
-      contextSize: Math.round((bridge.usagePct / 100) * contextLimit),
-    };
-  }
-
-  // Final fallback: estimate from transcript file size
-  if (transcriptPath && typeof transcriptPath === 'string') {
-    try {
-      const stat = fs.statSync(transcriptPath);
-      const estimatedTokens = Math.round(stat.size * 0.25);
-      if (estimatedTokens > 0) {
-        const usagePct = clampPct((estimatedTokens / contextLimit) * 100);
-        return {
-          usagePct,
-          remainingPct: null,
-          contextLimit,
-          contextSize: estimatedTokens,
-          source: 'transcript_size',
-        };
-      }
-    } catch (_) {
-      // transcript not accessible — fall through
-    }
-  }
-
-  return null;
+  return contextWindow.resolveContextMetrics(data);
 }
 
 function buildSuggestions(usagePct, contextSize) {
@@ -329,8 +218,9 @@ function shouldEmit(sessionId, urgency, usagePct) {
   }
 }
 
-function buildContextMessage({ usagePct, remainingPct, urgency, savings, suggestions, source }) {
+function buildContextMessage({ usagePct, remainingPct, compactCount, urgency, savings, suggestions, source }) {
   const remainingPart = remainingPct == null ? '' : ` | remaining: ${clampPct(remainingPct)}%`;
+  const compactPart = compactCount == null ? '' : ` | compact count: ${compactCount}`;
   const actionByUrgency = {
     advisory: 'Context usage is approaching the compaction threshold. Be mindful of context budget; avoid starting large new explorations.',
     medium: 'Finish the current small step, then run `/compact` before more broad reading or implementation.',
@@ -340,7 +230,7 @@ function buildContextMessage({ usagePct, remainingPct, urgency, savings, suggest
 
   return [
     '## Strategic Compact Triggered',
-    `- Context usage: ${usagePct}%${remainingPart} | urgency: ${urgency} | source: ${source}`,
+    `- Context usage: ${usagePct}%${remainingPart}${compactPart} | urgency: ${urgency} | source: ${source}`,
     `- Action: ${actionByUrgency[urgency] || actionByUrgency.medium}`,
     `- Estimated savings: ~${savings} tokens`,
     ...suggestions.map(item => `- ${item.action}: ${item.target} - ${item.reason}`),
@@ -394,6 +284,7 @@ function buildHookOutput(rawInput) {
   const additionalContext = buildContextMessage({
     usagePct: metrics.usagePct,
     remainingPct: metrics.remainingPct,
+    compactCount: metrics.compactCount,
     urgency,
     savings,
     suggestions,
@@ -409,6 +300,9 @@ function buildHookOutput(rawInput) {
       should_compact: true,
       urgency,
       context_usage_ratio: metrics.usagePct,
+      context_remaining_percentage: metrics.remainingPct,
+      context_remaining_tokens: metrics.remainingTokens,
+      compact_count: metrics.compactCount,
       context_source: metrics.source,
       estimated_token_savings: savings,
       suggestions,

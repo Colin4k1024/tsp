@@ -14,9 +14,11 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-const yaml = require ? undefined : undefined; // yaml parsing fallback below
+const yaml = require('js-yaml');
 
 const { createGoal, saveGoal } = require('./completion-oracle');
+const loopStateStore = require('./loop-state-store');
+const { parseLoopSpecContent } = require('./loop-spec');
 
 const DEFAULT_CONFIG = {
   interval: '30m',
@@ -75,12 +77,40 @@ function parseSimpleYaml(content) {
 }
 
 function loadConfig(projectRoot) {
-  const configPath = path.join(projectRoot || process.cwd(), '.claude', 'heartbeat.yaml');
-  if (!fs.existsSync(configPath)) return DEFAULT_CONFIG;
+  const root = projectRoot || process.cwd();
+  const loopSpecPath = path.join(root, '.tsp', 'loop.yaml');
+  if (fs.existsSync(loopSpecPath)) {
+    try {
+      const loopSpec = parseLoopSpecContent(fs.readFileSync(loopSpecPath, 'utf-8'), loopSpecPath);
+      return {
+        ...DEFAULT_CONFIG,
+        interval: loopSpec.cadence,
+        scans: loopSpec.gates.map(gate => ({
+          name: gate.name,
+          command: `${gate.command} 2>&1; echo EXIT:$?`,
+          onFailure: SCAN_ACTIONS.autoGoal,
+          description: gate.description || gate.name,
+        })),
+        budget: {
+          ...DEFAULT_CONFIG.budget,
+          maxDollarsPerHour: loopSpec.budget.maxDollars,
+        },
+      };
+    } catch {
+      return DEFAULT_CONFIG;
+    }
+  }
+
+  const configPath = [
+    path.join(root, '.tsp', 'heartbeat.yaml'),
+    path.join(root, '.claude', 'heartbeat.yaml'),
+  ].find(candidate => fs.existsSync(candidate));
+
+  if (!configPath) return DEFAULT_CONFIG;
 
   try {
     const content = fs.readFileSync(configPath, 'utf-8');
-    const parsed = parseSimpleYaml(content);
+    const parsed = yaml.load(content, { schema: yaml.JSON_SCHEMA }) || parseSimpleYaml(content);
     return { ...DEFAULT_CONFIG, ...parsed.heartbeat };
   } catch {
     return DEFAULT_CONFIG;
@@ -147,14 +177,7 @@ function createTriageItem(scan, result) {
 }
 
 function appendToTriageInbox(item) {
-  const home = process.env.HOME || process.env.USERPROFILE || '';
-  const inboxDir = path.join(home, '.claude', 'triage');
-  if (!fs.existsSync(inboxDir)) {
-    fs.mkdirSync(inboxDir, { recursive: true });
-  }
-  const inboxPath = path.join(inboxDir, 'inbox.jsonl');
-  fs.appendFileSync(inboxPath, JSON.stringify(item) + '\n', 'utf-8');
-  return inboxPath;
+  return loopStateStore.appendTriageItem(item);
 }
 
 function createGoalFromScanFailure(scan, result) {
@@ -181,7 +204,7 @@ function runHeartbeat(projectRoot) {
   if (config.scans.length === 0) {
     return {
       status: 'no_scans',
-      message: 'No scans configured in .claude/heartbeat.yaml',
+      message: 'No scans configured in .tsp/loop.yaml, .tsp/heartbeat.yaml, or .claude/heartbeat.yaml',
       results: [],
     };
   }
@@ -216,14 +239,10 @@ function runHeartbeat(projectRoot) {
 function getHeartbeatStatus(projectRoot) {
   const config = loadConfig(projectRoot);
 
-  const home = process.env.HOME || process.env.USERPROFILE || '';
-  const lastRunPath = path.join(home, '.claude', 'heartbeat-last-run.json');
   let lastRun = null;
-  if (fs.existsSync(lastRunPath)) {
-    try {
-      lastRun = JSON.parse(fs.readFileSync(lastRunPath, 'utf-8'));
-    } catch { /* ignore */ }
-  }
+  try {
+    lastRun = loopStateStore.loadHeartbeat('last-run');
+  } catch { /* ignore */ }
 
   return {
     configured: config.scans.length > 0,
@@ -236,11 +255,7 @@ function getHeartbeatStatus(projectRoot) {
 }
 
 function saveLastRun(result) {
-  const home = process.env.HOME || process.env.USERPROFILE || '';
-  const lastRunPath = path.join(home, '.claude', 'heartbeat-last-run.json');
-  const dir = path.dirname(lastRunPath);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(lastRunPath, JSON.stringify(result, null, 2), 'utf-8');
+  return loopStateStore.saveHeartbeat('last-run', result);
 }
 
 function parseInterval(interval) {

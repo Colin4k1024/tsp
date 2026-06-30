@@ -529,6 +529,49 @@
       "stability": "beta"
     },
     {
+      "id": "loop-engineering",
+      "kind": "orchestration",
+      "description": "Loop Engineering command surface, target-neutral state runtime, loop spec schema, heartbeat discovery, and maker/checker loop skills.",
+      "paths": [
+        ".tsp/loop.example.yaml",
+        "commands/goal.md",
+        "commands/heartbeat.md",
+        "commands/triage.md",
+        "commands/loop-start.md",
+        "commands/loop-status.md",
+        "docs/runbooks/loop-engineering-usage.md",
+        "schemas/loop-spec.schema.json",
+        "scripts/lib/loop-state-store.js",
+        "scripts/lib/loop-spec.js",
+        "scripts/lib/loop-oracle.js",
+        "scripts/lib/completion-oracle.js",
+        "scripts/lib/heartbeat-scheduler.js",
+        "scripts/hooks/session-start-goal-resume.js",
+        "skills/loop-heartbeat",
+        "skills/goal-convergence",
+        "skills/rework-loop",
+        "skills/context-engineering",
+        "skills/context-lifecycle",
+        "templates/context-docs"
+      ],
+      "targets": [
+        "claude",
+        "cursor",
+        "codex",
+        "opencode",
+        "cangming",
+        "codebuddy",
+        "codewhale"
+      ],
+      "dependencies": [
+        "commands-core",
+        "platform-configs"
+      ],
+      "defaultInstall": false,
+      "cost": "medium",
+      "stability": "beta"
+    },
+    {
       "id": "workflow-engine",
       "kind": "workflow",
       "description": "Workflow definition schema, loader, discovery helpers, and workflow inspection CLIs.",

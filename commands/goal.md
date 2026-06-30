@@ -114,7 +114,13 @@ When ANY budget limit is hit, the goal escalates rather than continuing blindly.
 
 ## State Persistence
 
-Goals persist to `~/.claude/goals/{goalId}.json` (follows goal.schema.json).
+Goals persist through the shared loop state store:
+
+- `TSP_LOOP_STATE_DIR/goals/{goalId}.json` when `TSP_LOOP_STATE_DIR` is set
+- `.tsp/loops/goals/{goalId}.json` for project-local loop state
+- target defaults such as `~/.claude/loops/goals/{goalId}.json` or `~/.codex/loops/goals/{goalId}.json`
+
+Legacy `~/.claude/goals/{goalId}.json` remains readable during migration.
 
 - Active goals survive session restarts
 - SessionStart hook displays active goal reminder

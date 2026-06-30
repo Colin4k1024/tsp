@@ -52,6 +52,11 @@ source_of_truth:
 | 进阶能力 | `/evolve` | 管理 instinct/gene 演进生命周期 | `docs/memory/`、演进资产 |
 | 进阶能力 | `/learn` | 从会话提炼复用模式并沉淀 | 本地 skills 资产 |
 | 进阶能力 | `/agent-dev` | 交互式 Agent 开发 Workshop | `skills/`、`agents/`、`commands/` |
+| Loop Engineering | `/loop-start` | 对重复、可验证、有预算的任务初始化 target-neutral loop spec 与状态 | `.tsp/loop.yaml`、`.tsp/loops/` |
+| Loop Engineering | `/loop-status` | 汇总 loop state、goal、heartbeat、预算和失败信号 | `.tsp/loops/`、triage inbox |
+| Loop Engineering | `/goal` | 按 objective + hard gates 运行 maker/checker 循环直到通过或升级 | loop goals state、triage inbox |
+| Loop Engineering | `/heartbeat` | 周期性 discovery scan，按分类创建 goal 或 triage | heartbeat state、goal state、triage inbox |
+| Loop Engineering | `/triage` | 人工处理 loop 无法安全自动解决的发现项 | triage inbox |
 | 平台体检 | `/harness-audit` | 审视平台覆盖度、hook 有效性、文档质量和集成深度 | 平台治理、文档补齐、下一轮收敛 |
 
 ## 2. 主链最小闭环
@@ -89,6 +94,7 @@ source_of_truth:
 | `strategic-compact` | 长会话压缩与上下文重组 | 长会话中的 specialist 与主链 |
 | `cost-aware-llm-pipeline` | 模型选择、成本控制、上下文预算 | 长会话、复杂任务规划 |
 | `harness-audit` | 平台能力评分与改进优先级 | `/harness-audit` |
+| `loop-engineering` | 重复任务的 automation + skill + state + hard gate 闭环 | `/loop-start`、`/goal`、`/heartbeat`、`/triage` |
 
 ### 3.3 学习与记忆
 
@@ -104,9 +110,10 @@ source_of_truth:
 | session memory | `scripts/hooks/session-start-bootstrap.js`、`scripts/hooks/session-start.js`、`scripts/hooks/session-end.js` | 会话摘要、待办与上下文连续性 |
 | governance capture | `scripts/hooks/governance-capture.js` | secret / approval / policy 信号采集 |
 | cost awareness | `scripts/hooks/cost-tracker.js` | token 与成本记录 |
-| compact readiness | `scripts/hooks/suggest-compact.js`、`scripts/hooks/pre-compact.js` | 长会话整理与 compact 提示 |
+| compact readiness | `scripts/lib/context-window.js`、`scripts/lib/context-window-state.js`、`scripts/hooks/suggest-compact.js`、`scripts/hooks/pre-compact.js` | CCometixLine-compatible remaining context 计算、compact 次数记忆与长会话整理提示 |
 | MCP health | `scripts/hooks/mcp-health-check.js` | MCP 健康检测与失败信号 |
 | edit quality | `scripts/hooks/quality-gate.js` + Stop hooks | 编辑后最小质量闸口 |
+| loop engineering | `scripts/lib/loop-state-store.js`、`scripts/lib/loop-spec.js`、`scripts/lib/heartbeat-scheduler.js`、`scripts/lib/loop-oracle.js` | target-neutral loop state、spec 校验、heartbeat discovery、maker/checker gate 记录 |
 
 完整说明见 [runtime-capabilities-overview.md](runtime-capabilities-overview.md)。
 

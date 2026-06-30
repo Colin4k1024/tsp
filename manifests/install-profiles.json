@@ -78,6 +78,7 @@
         "workflow-engine",
         "workflow-defaults",
         "orchestration",
+        "loop-engineering",
         "swift-apple",
         "agentic-patterns",
         "devops-infra",
@@ -105,6 +106,7 @@
         "knowledge-graph",
         "workflow-engine",
         "workflow-defaults",
+        "loop-engineering",
         "design-prototyping",
         "enhanced-workflows",
         "rtk-optimization"

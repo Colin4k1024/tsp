@@ -2,7 +2,7 @@
 version: "2.3.0"
 status: draft
 created: 2026-03-29
-updated: 2026-04-18
+updated: 2026-06-30
 owner: 工程团队
 ---
 
@@ -29,17 +29,25 @@ owner: 工程团队
 - `scripts/hooks/session-start-bootstrap.js`：SessionStart bootstrap
 - `scripts/hooks/session-start.js`：加载 `docs/memory/project-context.md`、session summary 等上下文
 - `scripts/hooks/pre-compact.js`：PreCompact 前的高价值状态整理
-- `scripts/hooks/suggest-compact.js`：在真实上下文使用率超过 70/85/95% 时提示人工 compact
+- `scripts/hooks/suggest-compact.js`：在真实上下文使用率超过 65/70/85/95% 时提示人工 compact
 - `scripts/hooks/session-end.js`：Stop 阶段持久化 session 摘要
 - `scripts/hooks/session-end-marker.js`：SessionEnd 生命周期标记
 - `scripts/hooks/cost-tracker.js`：记录 token / cost 指标
 - `scripts/hooks/governance-capture.js`：采集治理与审批相关信号
 - `scripts/hooks/mcp-health-check.js`：MCP 健康检查
 - `scripts/hooks/quality-gate.js`：编辑后质量门禁
+- `scripts/lib/loop-state-store.js`：Loop Engineering 的 target-neutral goal / triage / heartbeat 状态存储
+- `scripts/lib/loop-spec.js`：`.tsp/loop.yaml` 解析和最小安全校验
+- `scripts/lib/heartbeat-scheduler.js`：按 loop spec 或 heartbeat config 执行 discovery scans
+- `scripts/lib/context-window.js`：CCometixLine-compatible context remaining provider，统一为 statusline 与 compact 建议提供 remaining tokens / percentage
+- `scripts/lib/context-window-state.js`：记录每个 session / project 的 compact 次数，让动态上下文压缩可以基于压缩轮次决策
 
 ### 2.3 状态与存储
 
 - `scripts/lib/state-store/`：runtime 状态存储入口
+- `.tsp/context/compact-state.json`：默认项目级 compact 次数状态；可用 `TSP_CONTEXT_STATE_DIR` 改写
+- `scripts/lib/loop-state-store.js`：Loop Engineering 状态入口，优先使用 `TSP_LOOP_STATE_DIR`，其次 `.tsp/loops/` 或 target 默认目录
+- `.tsp/loop.yaml`：Loop Engineering 的 target-neutral spec，schema 位于 `schemas/loop-spec.schema.json`
 - `docs/memory/project-context.md`：主链共享项目上下文
 - `docs/memory/decisions.md`、`docs/memory/lessons-learned.md`：轻量项目记忆
 - `docs/memory/sessions/`：session continuity 落点
@@ -69,8 +77,10 @@ owner: 工程团队
 ### 3.4 Compact readiness
 
 - 触发点：`suggest-compact.js`、`pre-compact.js`
-- 作用：在进入 compact 前整理状态，在高上下文压力下基于 `context_window` 给出压缩提示
-- 用户侧影响：长任务中更容易知道什么时候该手动 compact，而不是在主链中段突然失去上下文
+- 作用：在进入 compact 前整理状态，在高上下文压力下基于 CCometixLine-compatible remaining context 给出压缩提示
+- 计算顺序：优先消费 `TSP_CONTEXT_WINDOW_JSON` / `CCOMETIXLINE_CONTEXT_JSON`、`TSP_CONTEXT_WINDOW_FILE` / `CCOMETIXLINE_CONTEXT_FILE`、hook 输入中的 `ccometixline.context_window` / `ccometixline_context_window`；其次读取 Claude `context_window`；再退回 transcript JSONL usage 与 bridge / size fallback
+- 计数：`pre-compact.js` 每次触发都会递增 `.tsp/context/compact-state.json` 中的 session 和 total compact count，`suggest-compact.js` 会把 `compact_count` 带入输出
+- 用户侧影响：长任务中更容易知道什么时候该手动 compact；compact 后还能知道当前是第几轮压缩，动态上下文压缩策略不会丢失轮次状态
 
 ### 3.5 MCP health
 
@@ -82,6 +92,13 @@ owner: 工程团队
 - 触发点：`quality-gate.js` 以及 Stop 阶段的格式化 / typecheck hook
 - 作用：在 Edit / Write 后补做最小质量闸口，避免把明显坏状态直接带到 `/handoff` 或 `/team-review`
 
+### 3.7 Loop engineering
+
+- 触发点：`/loop-start`、`/goal`、`/heartbeat`、`/triage`、`session-start-goal-resume.js`
+- 作用：把重复、可验证、有预算的任务封装成 automation + skill + state + hard gate 的闭环
+- 状态：`TSP_LOOP_STATE_DIR`、`.tsp/loops/` 或 target 默认目录；旧 `~/.claude/goals` 和 `.claude/heartbeat.yaml` 作为迁移输入继续可读
+- 用户侧影响：循环可以跨会话恢复，失败会进入 triage，不会因为单次对话结束而丢掉目标和验证历史
+
 ## 4. 一条典型 runtime 流水线
 
 1. SessionStart：`session-start-bootstrap.js` 调度 `session-start.js`
@@ -89,7 +106,7 @@ owner: 工程团队
 3. 用户通过 `/team-help` 判断当前该进入哪条主链命令
 4. `/team-intake`、`/team-plan`、`/team-execute` 等命令通过 `artifact:persist` 把正式输出落到 `docs/artifacts/`
 5. PreToolUse / PostToolUse 期间，`governance-capture.js`、`mcp-health-check.js`、质量与观察类 hooks 持续提供后台信号
-6. 长会话中，`suggest-compact.js` 根据真实上下文压力给出 compact 提示，`pre-compact.js` 在真正 compact 前整理关键状态
+6. 长会话中，`suggest-compact.js` 根据 CCometixLine-compatible remaining context 给出 compact 提示，`pre-compact.js` 在真正 compact 前整理关键状态并递增 compact count
 7. Stop：`session-end.js`、`cost-tracker.js` 等 JS hooks 在响应结束后持久化摘要与指标
 8. SessionEnd：`session-end-marker.js` 记录生命周期收尾
 
@@ -98,10 +115,12 @@ owner: 工程团队
 - `/team-help` 是唯一公开入口：负责根据 artifacts、handoff 和当前阶段决定下一步
 - `artifact:persist` 是主链输出的唯一落盘通道：负责把 PRD、delivery-plan、execute-log、handoff、release/closeout artifact 写入仓库
 - runtime hooks 不是第二套 workflow：它们只负责补上下文、记忆、治理和质量信号，不替代 `/team-*`
+- loop engineering 也不是第二套团队治理：只适合已通过四条件准入的重复、可验证任务；团队交付仍回落到 `/team-*` artifact 与 handoff
 
 ## 6. 当前推荐查看路径
 
 - 想先看公开命令与能力映射：看 [command-and-capability-matrix.md](command-and-capability-matrix.md)
+- 想先看 Loop Engineering：看 [loop-engineering-usage.md](loop-engineering-usage.md)
 - 想先看接入与落盘动作：看 [team-skills-usage.md](team-skills-usage.md) 和 [project-onboarding.md](project-onboarding.md)
 - 想先体验 Claude：看 [claude-quick-start.md](claude-quick-start.md)
 - 想先理解 ECC 增强层与主链如何配合：看 [ecc-harness-usage.md](ecc-harness-usage.md)

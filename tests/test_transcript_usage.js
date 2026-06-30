@@ -64,7 +64,7 @@ const usage1 = normalizeUsage({
   cache_creation_input_tokens: 50000,
   cache_read_input_tokens: 60000,
 });
-assertEq('contextTokens sum', usage1.contextTokens, 115300);
+assertEq('contextTokens follows CCometixLine prompt-side sum', usage1.contextTokens, 115000);
 assertEq('inputTokens', usage1.inputTokens, 5000);
 assertEq('outputTokens', usage1.outputTokens, 300);
 assertEq('cacheCreationTokens', usage1.cacheCreationTokens, 50000);
@@ -76,7 +76,7 @@ assertEq('all zeros → null', normalizeUsage({ input_tokens: 0 }), null);
 
 // OpenAI format
 const usage2 = normalizeUsage({ prompt_tokens: 1000, completion_tokens: 200 });
-assertEq('OpenAI format contextTokens', usage2.contextTokens, 1200);
+assertEq('OpenAI prompt-side contextTokens', usage2.contextTokens, 1000);
 
 // --- Test: readTailLines ---
 console.log('\n📖 readTailLines');
@@ -108,7 +108,7 @@ const transcript1 = writeTempJsonl('session1.jsonl', [
   { type: 'assistant', message: { content: [{ type: 'text', text: 'ok' }], usage: { input_tokens: 4000, output_tokens: 500, cache_creation_input_tokens: 55000, cache_read_input_tokens: 65000 } } },
 ]);
 const result1 = parseTranscriptUsage(transcript1);
-assertEq('finds last assistant usage', result1.contextTokens, 4000 + 500 + 55000 + 65000);
+assertEq('finds last assistant usage', result1.contextTokens, 4000 + 55000 + 65000);
 
 const transcript2 = writeTempJsonl('no-assistant.jsonl', [
   { type: 'user', message: { content: 'hello' } },
@@ -128,6 +128,8 @@ const metrics1 = resolveTranscriptMetrics(transcript1, 'claude-opus-4-6');
 assert('returns metrics object', metrics1 != null);
 assertEq('source is transcript_usage', metrics1.source, 'transcript_usage');
 assertEq('contextLimit is 200K', metrics1.contextLimit, 200000);
+assertEq('remainingTokens is derived', metrics1.remainingTokens, 200000 - (4000 + 55000 + 65000));
+assertEq('remainingPct is derived', metrics1.remainingPct, 38);
 assert('usagePct is reasonable', metrics1.usagePct > 0 && metrics1.usagePct <= 100);
 
 const metrics2 = resolveTranscriptMetrics(transcript1, 'claude-opus-4-6[1M]');

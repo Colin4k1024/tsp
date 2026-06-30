@@ -86,7 +86,14 @@ Items enter triage from:
 
 ## Storage
 
-Inbox is stored as newline-delimited JSON at `~/.claude/triage/inbox.jsonl`.
+Inbox is stored as newline-delimited JSON through the shared loop state store:
+
+1. `TSP_LOOP_STATE_DIR/triage/inbox.jsonl` when `TSP_LOOP_STATE_DIR` is set
+2. `.tsp/loops/triage/inbox.jsonl` for project-local state
+3. target defaults such as `~/.claude/loops/triage/inbox.jsonl` or `~/.codex/loops/triage/inbox.jsonl`
+
+Legacy `~/.claude/triage/inbox.jsonl` remains a migration source for older Claude installs.
+
 This format is:
 - Append-only (safe for concurrent writes)
 - Human-readable (one JSON object per line)

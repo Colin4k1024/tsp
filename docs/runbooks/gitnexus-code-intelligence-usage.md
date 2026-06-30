@@ -2,10 +2,10 @@
 version: "0.1.0"
 status: active
 created: 2026-05-05
-updated: 2026-05-05
+updated: 2026-06-30
 owner: 工程团队
 doc_tier: runbook
-last_verified: 2026-05-05
+last_verified: 2026-06-30
 source_of_truth:
   - ../../skills/gitnexus/SKILL.md
   - ../../README.md

@@ -51,7 +51,39 @@ Execute all configured scans immediately (one-shot, no scheduling).
 
 ## Configuration
 
-Heartbeat reads from `.claude/heartbeat.yaml` in the project root:
+Heartbeat reads configuration in this order:
+
+1. `.tsp/loop.yaml` — preferred Loop Engineering spec. Gates become discovery scans.
+2. `.tsp/heartbeat.yaml` — heartbeat-only config.
+3. `.claude/heartbeat.yaml` — legacy compatibility path.
+
+Preferred `.tsp/loop.yaml`:
+
+```yaml
+loop:
+  id: ci-triage
+  description: Keep CI failures triaged and fix machine-checkable failures.
+  cadence: 30m
+  skill: loop-ci-triage
+  stateFile: .tsp/loops/state/ci-triage.md
+  gates:
+    - name: library-validation
+      command: node scripts/validate-library.js
+    - name: tests
+      command: npm test
+  maker:
+    role: backend-engineer
+    writeAccess: true
+  checker:
+    role: qa-engineer
+    writeAccess: false
+  budget:
+    maxIterations: 10
+    maxDuration: 2h
+    maxDollars: 5
+```
+
+Heartbeat-only config remains supported:
 
 ```yaml
 heartbeat:
@@ -119,6 +151,7 @@ Each scan result is classified into an action:
 - **`/triage`**: Heartbeat populates triage inbox from `triage` scan failures
 - **Budget**: Integrates with cost tracking; pauses if hourly budget exceeded
 - **Hooks**: Uses CronCreate/CronDelete for scheduling (7-day auto-expiry applies)
+- **State**: Writes via the shared loop state store under `TSP_LOOP_STATE_DIR`, `.tsp/loops/`, or a target default
 
 ## Arguments
 

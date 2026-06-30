@@ -54,8 +54,13 @@ function normalizeUsage(raw) {
   const outputTokens = Number(raw.output_tokens || raw.completion_tokens || 0) || 0;
   const cacheCreationTokens = Number(raw.cache_creation_input_tokens || raw.cache_creation_prompt_tokens || 0) || 0;
   const cacheReadTokens = Number(raw.cache_read_input_tokens || raw.cache_read_prompt_tokens || raw.cached_tokens || 0) || 0;
+  const totalTokens = Number(raw.total_tokens || 0) || 0;
 
-  const contextTokens = inputTokens + outputTokens + cacheCreationTokens + cacheReadTokens;
+  // CCometixLine's context-window segment treats active context as prompt-side
+  // tokens: input + cache creation + cache read. The current turn's output is
+  // tracked separately because it becomes prompt-side context on the next turn.
+  const promptSideContextTokens = inputTokens + cacheCreationTokens + cacheReadTokens;
+  const contextTokens = promptSideContextTokens || totalTokens || (inputTokens + outputTokens);
   if (contextTokens === 0) return null;
 
   return {
@@ -63,6 +68,7 @@ function normalizeUsage(raw) {
     outputTokens,
     cacheCreationTokens,
     cacheReadTokens,
+    totalTokens,
     contextTokens,
   };
 }
@@ -163,11 +169,15 @@ function resolveTranscriptMetrics(transcriptPath, modelId) {
 
   const contextLimit = resolveContextLimit(modelId);
   const usagePct = Math.max(0, Math.min(100, Math.round((usage.contextTokens / contextLimit) * 100)));
+  const remainingTokens = Math.max(0, contextLimit - usage.contextTokens);
+  const remainingPct = Math.max(0, Math.min(100, Math.round((remainingTokens / contextLimit) * 100)));
 
   return {
     usagePct,
     contextTokens: usage.contextTokens,
     contextLimit,
+    remainingTokens,
+    remainingPct,
     source: 'transcript_usage',
   };
 }

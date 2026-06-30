@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://colin4k1024.github.io/tsp/schemas/loop-spec.schema.json",
+  "title": "TSP Loop Engineering Spec",
+  "type": "object",
+  "required": ["loop"],
+  "additionalProperties": false,
+  "properties": {
+    "loop": {
+      "type": "object",
+      "required": [
+        "id",
+        "description",
+        "cadence",
+        "skill",
+        "stateFile",
+        "gates",
+        "maker",
+        "checker",
+        "budget"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cadence": {
+          "type": "string",
+          "pattern": "^[0-9]+[mhd]$"
+        },
+        "skill": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stateFile": {
+          "type": "string",
+          "minLength": 1
+        },
+        "gates": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name", "command"],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "command": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "maker": {
+          "$ref": "#/$defs/actor"
+        },
+        "checker": {
+          "$ref": "#/$defs/actor"
+        },
+        "budget": {
+          "type": "object",
+          "required": ["maxIterations", "maxDuration", "maxDollars"],
+          "additionalProperties": false,
+          "properties": {
+            "maxIterations": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "maxDuration": {
+              "type": "string",
+              "pattern": "^[0-9]+[mh]$"
+            },
+            "maxDollars": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        "escalation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "onBudgetExhausted": {
+              "type": "string",
+              "enum": ["triage", "human", "stop"]
+            },
+            "onSecurityFinding": {
+              "type": "string",
+              "enum": ["human", "triage", "stop"]
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "actor": {
+      "type": "object",
+      "required": ["role", "writeAccess"],
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "writeAccess": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

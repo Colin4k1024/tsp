@@ -13,12 +13,9 @@
 **触发时机**: 上下文压缩前自动调用
 
 **功能**:
-- 分析所有上下文元素
-- 按重要性分类：
-  - `keep`: 高价值内容（决策、结论、pending items、验证结果）
-  - `summarize`: 中等价值内容（长输出、对话历史）
-  - `discard`: 低价值内容（工具结果、搜索结果、重复信息）
-- 生成摘要指令
+- 保存 compaction 事件
+- 递增 `.tsp/context/compact-state.json` 中的 session compact count 与 total compact count
+- 把 compact 轮次写入 session tmp 文件，供后续恢复和动态上下文策略使用
 
 **优先级规则**:
 - 总是保留的类型：`decision`, `conclusion`, `pending_item`, `task_output`, `verification_result`, `error_fix`
@@ -27,13 +24,14 @@
 
 ### suggest-compact.js
 
-**触发时机**: `hooks/hooks.json` 的 `pre:all:strategic-compact` 在工具调用前运行；当真实上下文使用超过 70% 时注入 `/compact` 建议。
+**触发时机**: `hooks/hooks.json` 的 `pre:all:strategic-compact` 在工具调用前运行；当真实上下文使用超过 65% 时注入 `/compact` 建议。
 
 **功能**:
-- 优先读取 Claude hook 输入里的 `context_window.used_percentage` / `context_window.remaining_percentage`
-- 其次读取 `CLAUDE_CONTEXT_SIZE` / `CLAUDE_CONTEXT_LIMIT`
-- 最后读取 `harness-statusline.js` 写入的 `/tmp/harness-ctx-{session_id}.json`
-- 评估紧迫度：`low` (< 70%) | `medium` (70-85%) | `high` (85-95%) | `critical` (> 95%)
+- 优先读取 CCometixLine-compatible remaining context：`TSP_CONTEXT_WINDOW_JSON` / `CCOMETIXLINE_CONTEXT_JSON`、`TSP_CONTEXT_WINDOW_FILE` / `CCOMETIXLINE_CONTEXT_FILE`、hook 输入的 `ccometixline.context_window` / `ccometixline_context_window`
+- 其次读取 Claude hook 输入里的 `context_window.used_percentage` / `context_window.remaining_percentage`
+- 再退回 transcript JSONL usage、`CLAUDE_CONTEXT_SIZE` / `CLAUDE_CONTEXT_LIMIT`、`harness-statusline.js` 写入的 `/tmp/harness-ctx-{session_id}.json`
+- 评估紧迫度：`low` (< 65%) | `advisory` (65-70%) | `medium` (70-85%) | `high` (85-95%) | `critical` (> 95%)
+- 输出 `compact_count`，让动态上下文策略知道当前已经经历过几轮 compact
 - 估算可节省的 token
 - 提供具体压缩建议：
   - 压缩早期对话历史
@@ -59,7 +57,8 @@
 
 | 使用率 | 紧迫度 | 建议操作 |
 |--------|--------|---------|
-| < 70% | low | 无需操作 |
+| < 65% | low | 无需操作 |
+| 65-70% | advisory | 控制上下文增长 |
 | 70-85% | medium | 建议压缩，可选择性执行 |
 | 85-95% | high | 强烈建议压缩 |
 | > 95% | critical | 必须立即压缩 |

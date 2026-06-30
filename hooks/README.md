@@ -26,7 +26,7 @@ User request → Claude picks a tool → PreToolUse hook runs → Tool executes 
 | **Git push reminder** | `Bash` | Reminds to review changes before `git push` | 0 (warns) |
 | **Pre-commit quality check** | `Bash` | Runs quality checks before `git commit`: lints staged files, validates commit message format when provided via `-m/--message`, detects console.log/debugger/secrets | 2 (blocks critical) / 0 (warns) |
 | **Doc file warning** | `Write` | Warns about non-standard `.md`/`.txt` files (allows README, CLAUDE, CONTRIBUTING, CHANGELOG, LICENSE, SKILL, docs/, skills/); cross-platform path handling | 0 (warns) |
-| **Strategic compact** | `*` | Suggests `/compact` when context usage crosses 70/85/95% thresholds, using Claude context-window metrics when available | 0 (warns) |
+| **Strategic compact** | `*` | Suggests `/compact` when context usage crosses 65/70/85/95% thresholds, using CCometixLine-compatible remaining context first | 0 (warns) |
 | **InsAIts security monitor (opt-in)** | `Bash\|Write\|Edit\|MultiEdit` | Optional security scan for high-signal tool inputs. Disabled unless `ECC_ENABLE_INSAITS=1`. Blocks on critical findings, warns on non-critical, and writes audit log to `.insaits_audit_session.jsonl`. JS wrapper is the canonical hook entry; the Python monitor is an explicit third-party SDK exception. Requires `pip install insa-its`. [Details](../scripts/hooks/insaits-security-monitor.py) | 2 (blocks critical) / 0 (warns) |
 
 ### PostToolUse Hooks
@@ -48,7 +48,7 @@ User request → Claude picks a tool → PreToolUse hook runs → Tool executes 
 |------|-------|-------------|
 | **Session start** | `SessionStart` | Loads previous context and detects package manager |
 | **PUA always-on restore** | `SessionStart` | Restores flavor, level, and failure count when `~/.claude/pua/config.json` enables always-on |
-| **Pre-compact** | `PreCompact` | Saves state before context compaction |
+| **Pre-compact** | `PreCompact` | Saves state and increments project/session compact count before context compaction |
 | **PUA state snapshot** | `PreCompact` | Writes flavor, level, and failure count to the PUA builder journal |
 | **Console.log audit** | `Stop` | Checks all modified files for `console.log` after each response |
 | **Session summary** | `Stop` | Persists session state when transcript path is available |
