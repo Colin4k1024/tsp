@@ -48,7 +48,7 @@ jobs:
 
       - name: Public target install-plan smoke
         run: |
-          for target in cursor antigravity gemini opencode codebuddy copilot windsurf augment; do
+          for target in cursor antigravity gemini cangming opencode codebuddy copilot windsurf augment; do
             node scripts/install-plan.js --profile team --target "$target"
           done
 

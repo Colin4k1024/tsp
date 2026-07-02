@@ -10,6 +10,17 @@ let failed = 0;
 
 const ROOT = path.join(__dirname, '..');
 const TEXT_EXTENSIONS = new Set(['.md', '.json', '.yaml', '.yml']);
+const RECOMMENDED_TARGETS = ['claude', 'codex', 'opencode'];
+const HIDDEN_COMPATIBILITY_TARGETS = [
+  'cursor',
+  'antigravity',
+  'gemini',
+  'cangming',
+  'codebuddy',
+  'copilot',
+  'windsurf',
+  'augment',
+];
 const FORBIDDEN_PATTERNS = [
   /acme-corp-internal/u,
   /\bAcmeCorp\b/u,
@@ -59,6 +70,10 @@ function walk(relativePath) {
   return results;
 }
 
+function markdownTargetList(targets) {
+  return targets.map((target) => `\`${target}\``).join(', ');
+}
+
 console.log('Public release surface tests');
 
 test('community documents exist and README links to them', () => {
@@ -80,10 +95,13 @@ test('community documents exist and README links to them', () => {
     'README should link to the open-source release checklist'
   );
   assert.ok(readme.includes('Support level'), 'README should disclose target support levels');
-  assert.ok(readme.includes('Recommended | `claude`, `codex`, `opencode`'), 'README should identify primary supported code-agent targets');
   assert.ok(
-    readme.includes('Hidden compatibility'),
-    'README should identify hidden compatibility targets'
+    readme.includes(`Recommended | ${markdownTargetList(RECOMMENDED_TARGETS)}`),
+    'README should identify primary supported code-agent targets'
+  );
+  assert.ok(
+    readme.includes(`Hidden compatibility | ${markdownTargetList(HIDDEN_COMPATIBILITY_TARGETS)}`),
+    'README should identify the complete hidden compatibility target set'
   );
   assert.ok(
     readme.includes('公开 quick-start / recipes / examples 聚焦 `claude`、`codex`、`opencode`'),
@@ -123,16 +141,51 @@ test('GitHub community entry points use absolute URLs and current validation com
   const support = fs.readFileSync(path.join(ROOT, 'SUPPORT.md'), 'utf8');
   assert.ok(support.includes('## Target support levels'), 'SUPPORT should document target support levels');
   assert.ok(
-    support.includes('`claude`, `codex`, `opencode`'),
+    support.includes(markdownTargetList(RECOMMENDED_TARGETS)),
     'SUPPORT should call out recommended primary code-agent targets'
   );
   assert.ok(
-    support.includes('Hidden compatibility'),
-    'SUPPORT should call out hidden compatibility targets'
+    support.includes(markdownTargetList(HIDDEN_COMPATIBILITY_TARGETS)),
+    'SUPPORT should call out the complete hidden compatibility target set'
   );
 
   const openSourceChecklist = path.join(ROOT, 'docs', 'runbooks', 'open-source-release-checklist.md');
   assert.ok(fs.existsSync(openSourceChecklist), 'open-source release checklist should exist');
+  const checklist = fs.readFileSync(openSourceChecklist, 'utf8');
+  assert.ok(
+    checklist.includes(markdownTargetList(HIDDEN_COMPATIBILITY_TARGETS).replaceAll(', ', '、')),
+    'open-source release checklist should call out the complete hidden compatibility target set'
+  );
+});
+
+test('CI smoke covers every hidden compatibility install target', () => {
+  const workflow = fs.readFileSync(path.join(ROOT, '.github', 'workflows', 'ci.yml'), 'utf8');
+  for (const target of HIDDEN_COMPATIBILITY_TARGETS) {
+    assert.ok(
+      workflow.includes(` ${target} `) || workflow.includes(` ${target};`) || workflow.includes(` ${target}\n`),
+      `CI public target smoke should include ${target}`
+    );
+  }
+});
+
+test('release script keeps generated version metadata in scope', () => {
+  const releaseScript = fs.readFileSync(path.join(ROOT, 'scripts', 'release.sh'), 'utf8');
+  for (const requiredSnippet of [
+    'scripts/lib/team-skills-data.json',
+    'node scripts/build-platform-artifacts.js',
+    'node scripts/build-platform-artifacts.js --check',
+    'node scripts/validate-library.js',
+    'node scripts/validate-doc-freshness.js',
+    'package-lock.json',
+    '.codex-plugin/plugin.json',
+    '.claude-plugin/plugin.json',
+    '.claude-plugin/marketplace.json',
+    '.cursor-plugin/plugin.json',
+    '.opencode-plugin/config.json',
+    'marketplace.json',
+  ]) {
+    assert.ok(releaseScript.includes(requiredSnippet), `release.sh should include ${requiredSnippet}`);
+  }
 });
 
 test('package metadata keeps the npm surface public-only', () => {

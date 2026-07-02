@@ -65,7 +65,7 @@
     "install:cangming": "node scripts/install-apply.js --profile full --target cangming",
     "prepack": "node scripts/validate-prebuilt.js",
     "prepublishOnly": "node scripts/validate-prebuilt.js",
-    "test": "node tests/run-all.js",
+    "test": "node scripts/validate-library.js && node scripts/validate-doc-freshness.js && node tests/run-all.js",
     "lint": "eslint . && markdownlint '**/*.md' --ignore node_modules",
     "harness:audit": "node scripts/harness-audit.js",
     "pack": "npm pack",

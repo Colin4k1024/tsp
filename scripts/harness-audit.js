@@ -315,8 +315,11 @@ function getRepoChecks(rootDir) {
       scopes: ['repo'],
       path: 'package.json',
       description: 'Test script runs validator chain before tests',
-      pass: typeof packageJson.scripts?.test === 'string' && packageJson.scripts.test.includes('validate-commands.js') && packageJson.scripts.test.includes('tests/run-all.js'),
-      fix: 'Update package.json test script to run validators plus tests/run-all.js.',
+      pass: typeof packageJson.scripts?.test === 'string'
+        && packageJson.scripts.test.includes('scripts/validate-library.js')
+        && packageJson.scripts.test.includes('scripts/validate-doc-freshness.js')
+        && packageJson.scripts.test.includes('tests/run-all.js'),
+      fix: 'Update package.json test script to run validate-library, validate-doc-freshness, and tests/run-all.js.',
     },
     {
       id: 'quality-hook-tests',

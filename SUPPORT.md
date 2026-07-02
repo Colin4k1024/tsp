@@ -16,7 +16,7 @@ Public install targets do not all have the same depth today. Current support is:
 | Level | Targets | Current depth | What to expect |
 |------|---------|---------------|----------------|
 | Recommended | `claude`, `codex`, `opencode` | Public code-agent workflow chain | Full public workflow chain, primary docs, install verification, and strongest regression coverage |
-| Hidden compatibility | `cursor`, `antigravity`, `gemini`, `codebuddy`, `copilot`, `windsurf`, `augment` | Not part of the public promise | Adapters may remain for existing users, but they are not in the public wizard, docs path, or release support matrix |
+| Hidden compatibility | `cursor`, `antigravity`, `gemini`, `cangming`, `codebuddy`, `copilot`, `windsurf`, `augment` | Not part of the public promise | Adapters may remain for existing users, but they are not in the public wizard, docs path, or release support matrix |
 
 Primary public onboarding docs currently focus on `claude` (Claude Code), `codex`, and `opencode`. `claude-code` and `claudecode` are accepted aliases for `claude`.
 

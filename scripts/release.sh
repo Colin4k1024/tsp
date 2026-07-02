@@ -44,13 +44,21 @@ fi
 
 echo "📦  $OLD_VERSION → $NEW_VERSION"
 
-# ── 3. Validate prebuilt binaries ────────────────────────────────────────────
+# ── 3. Sync generated version surfaces ───────────────────────────────────────
+node -e "const fs=require('fs'); const p='scripts/lib/team-skills-data.json'; const data=JSON.parse(fs.readFileSync(p,'utf8')); data.plugin.version=process.argv[1]; fs.writeFileSync(p, JSON.stringify(data, null, 2) + '\n');" "${NEW_VERSION}"
+node scripts/build-platform-artifacts.js
+
+# ── 4. Validate release gates ────────────────────────────────────────────────
+node scripts/build-platform-artifacts.js --check
+node scripts/validate-library.js
+node scripts/validate-doc-freshness.js
+
 echo ""
 echo "🔍  Validating prebuilt binaries ..."
 node scripts/validate-prebuilt.js
 echo "✅  All 5 platform binaries present."
 
-# ── 4. Publish to npm (local mode) ──────────────────────────────────────────
+# ── 5. Publish to npm (local mode) ──────────────────────────────────────────
 if [[ "$PUBLISH" == "true" ]]; then
   echo ""
   echo "📦  Packing tarball for validation ..."
@@ -72,10 +80,19 @@ if [[ "$PUBLISH" == "true" ]]; then
   rm -f "${TARBALL}"
 fi
 
-# ── 5. Commit + tag ─────────────────────────────────────────────────────────
-git add package.json
+# ── 6. Commit + tag ─────────────────────────────────────────────────────────
+git add \
+  package.json \
+  package-lock.json \
+  scripts/lib/team-skills-data.json \
+  .codex-plugin/plugin.json \
+  .claude-plugin/plugin.json \
+  .claude-plugin/marketplace.json \
+  .cursor-plugin/plugin.json \
+  .opencode-plugin/config.json \
+  marketplace.json
 if git diff --cached --quiet; then
-  echo "ℹ️   package.json unchanged (already at v${NEW_VERSION}), skipping version commit."
+  echo "ℹ️   release metadata unchanged (already at v${NEW_VERSION}), skipping version commit."
 else
   git commit -m "chore: prepare npm release v${NEW_VERSION}"
 fi
@@ -92,7 +109,7 @@ else
   git tag "v${NEW_VERSION}"
 fi
 
-# ── 6. Push ─────────────────────────────────────────────────────────────────
+# ── 7. Push ─────────────────────────────────────────────────────────────────
 if [[ "$SKIP_PUSH" == "true" ]]; then
   echo "⏭   Skipping git push (--skip-push)."
   echo "    Run manually: git push origin HEAD && git push origin v${NEW_VERSION}"
