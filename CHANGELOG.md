@@ -1,5 +1,29 @@
 # Changelog
 
+## Release v2.5.4 — Governance Freshness Alignment
+
+### v2.5.4 Highlights
+
+- npm 包版本、插件 manifest、README 近期功能范围和 CHANGELOG 顶部版本统一到 `2.5.4`
+- README 中过期的“97 个用例通过”更新为当前 runner 证据：`tests/run-all.js` 覆盖 297 个测试点（229 个 JS 测试点 + 68 个 Python unittest）
+- `cangming` target 明确归入 Hidden compatibility，和现有 adapter、manifest target、`install:cangming` 脚本保持一致
+- `commands-core` 的 Codex selective-install 缺口补齐可追溯记录：`tests/test_codex_install_plan.js` 已覆盖 full/team profile 不再跳过 `commands-core`
+- `validate-doc-freshness.js` 已在 `.github/workflows/ci.yml` 中作为 CI gate 执行，本轮同步 README 中的治理说明，避免“脚本存在但门禁不明确”的漂移
+
+### v2.5.4 Verification
+
+```bash
+node scripts/build-platform-artifacts.js
+node scripts/validate-library.js
+node scripts/validate-doc-freshness.js
+node tests/run-all.js
+```
+
+### v2.5.4 Notes
+
+- 公开 onboarding 主线仍只承诺 `claude`、`codex`、`opencode`；`cangming` 仅作为隐藏兼容 target 保留。
+- 本轮不改变 package runtime 行为，重点是让治理文档、版本元数据和验证证据重新对齐。
+
 ## Release v2.4.1 — npm Package Surface Alignment
 
 ### v2.4.1 Highlights
