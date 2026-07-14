@@ -1,7 +1,6 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
 
 const DEFAULT_CONTEXT_LIMIT = 200000;
 const EXTENDED_CONTEXT_LIMIT = 1000000;
@@ -91,12 +90,11 @@ function parseTranscriptUsage(transcriptPath) {
       continue;
     }
 
-    // Handle summary entries — they indicate compaction happened
-    if (entry.type === 'summary' && entry.leafUuid) {
-      const projectDir = path.dirname(transcriptPath);
-      const usage = findUsageByLeafUuid(entry.leafUuid, projectDir);
-      if (usage) return usage;
-      continue;
+    // A summary marks a compact boundary. Usage before this entry describes
+    // the pre-compact window and must not be reported as the live context.
+    // Claude Code will write fresh assistant usage after the next API call.
+    if (entry.type === 'summary') {
+      return null;
     }
 
     if (entry.type !== 'assistant') continue;
@@ -119,44 +117,11 @@ function parseTranscriptUsage(transcriptPath) {
         continue;
       }
 
+      if (entry.type === 'summary') return null;
       if (entry.type !== 'assistant') continue;
       if (!entry.message || !entry.message.usage) continue;
 
       return normalizeUsage(entry.message.usage);
-    }
-  }
-
-  return null;
-}
-
-function findUsageByLeafUuid(leafUuid, projectDir) {
-  if (!projectDir || !fs.existsSync(projectDir)) return null;
-
-  let sessionFiles;
-  try {
-    sessionFiles = fs.readdirSync(projectDir)
-      .filter(f => f.endsWith('.jsonl'))
-      .map(f => path.join(projectDir, f));
-  } catch (_) {
-    return null;
-  }
-
-  for (const filePath of sessionFiles) {
-    const lines = readTailLines(filePath, EXPANDED_TAIL_BYTES);
-    for (let i = lines.length - 1; i >= 0; i--) {
-      const line = lines[i].trim();
-      if (!line) continue;
-
-      let entry;
-      try {
-        entry = JSON.parse(line);
-      } catch (_) {
-        continue;
-      }
-
-      if (entry.uuid === leafUuid && entry.type === 'assistant' && entry.message?.usage) {
-        return normalizeUsage(entry.message.usage);
-      }
     }
   }
 

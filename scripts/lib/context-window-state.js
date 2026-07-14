@@ -1,7 +1,6 @@
 'use strict';
 
 const fs = require('fs');
-const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 
@@ -100,6 +99,7 @@ function recordCompactEvent(input = {}, options = {}) {
 
   current.compactCount = (Number(current.compactCount || 0) || 0) + 1;
   current.lastCompactedAt = now;
+  current.lastTrigger = input.trigger || current.lastTrigger || 'unknown';
   current.transcriptPath = input.transcript_path || input.transcriptPath || current.transcriptPath || null;
   current.cwd = input.cwd || input.workspace?.current_dir || options.cwd || process.cwd();
 

@@ -19,6 +19,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { resolveCompactMode } = require('../scripts/hooks/suggest-compact');
 
 const WARNING_THRESHOLD = 35;
 const CRITICAL_THRESHOLD = 25;
@@ -32,6 +33,10 @@ process.stdin.on('data', chunk => { input += chunk; });
 process.stdin.on('end', () => {
   clearTimeout(stdinTimeout);
   try {
+    // Existing installations may still have this deprecated hook registered.
+    // Stay silent while Claude Code native auto-compaction owns the trigger.
+    if (resolveCompactMode() !== 'manual') { process.exit(0); }
+
     const data = JSON.parse(input || '{}');
     const sessionId = data.session_id;
     if (!sessionId) { process.exit(0); }

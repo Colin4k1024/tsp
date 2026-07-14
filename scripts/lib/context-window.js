@@ -7,7 +7,6 @@ const crypto = require('crypto');
 const { resolveTranscriptMetrics, resolveContextLimit } = require('./transcript-usage');
 const { getSessionCompactCount, resolveSessionId } = require('./context-window-state');
 
-const AUTO_COMPACT_BUFFER_PCT = 16.5;
 const STALE_BRIDGE_SECONDS = 120;
 
 function toNumber(value) {
@@ -24,11 +23,11 @@ function clampPct(value) {
 }
 
 function normalizeRemainingToUsed(remainingPct) {
-  const usableRemaining = Math.max(
-    0,
-    ((remainingPct - AUTO_COMPACT_BUFFER_PCT) / (100 - AUTO_COMPACT_BUFFER_PCT)) * 100
-  );
-  return clampPct(100 - usableRemaining);
+  // Claude Code already reports used_percentage / remaining_percentage against
+  // the model's full context window. Applying an additional "auto compact
+  // buffer" inflates usage (for example, 80% becomes ~95%) and makes the hook
+  // race Claude Code's native auto-compaction.
+  return clampPct(100 - remainingPct);
 }
 
 function firstNumber(object, keys) {
@@ -46,10 +45,43 @@ function modelIdFromInput(data = {}) {
 
 function contextLimitFrom(data, candidate) {
   return (
-    firstNumber(candidate, ['context_limit', 'contextLimit', 'limit', 'model_context_window']) ||
+    firstNumber(candidate, [
+      'context_window_size',
+      'contextWindowSize',
+      'context_limit',
+      'contextLimit',
+      'limit',
+      'model_context_window',
+    ]) ||
     firstNumber(data, ['context_limit', 'contextLimit']) ||
     resolveContextLimit(modelIdFromInput(data))
   );
+}
+
+function contextTokensFromCandidate(candidate) {
+  const direct = firstNumber(candidate, [
+    'total_input_tokens',
+    'context_tokens',
+    'contextTokens',
+    'used_tokens',
+    'usedTokens',
+  ]);
+  if (direct != null) return direct;
+
+  const currentUsage = candidate?.current_usage || candidate?.currentUsage;
+  if (!currentUsage || typeof currentUsage !== 'object') return null;
+
+  const inputTokens = firstNumber(currentUsage, ['input_tokens', 'inputTokens']) || 0;
+  const cacheCreationTokens = firstNumber(currentUsage, [
+    'cache_creation_input_tokens',
+    'cacheCreationInputTokens',
+  ]) || 0;
+  const cacheReadTokens = firstNumber(currentUsage, [
+    'cache_read_input_tokens',
+    'cacheReadInputTokens',
+  ]) || 0;
+  const total = inputTokens + cacheCreationTokens + cacheReadTokens;
+  return total > 0 ? total : null;
 }
 
 function metricFromCandidate(data, candidate, source) {
@@ -77,12 +109,7 @@ function metricFromCandidate(data, candidate, source) {
     'available_tokens',
     'availableTokens',
   ]);
-  let contextTokens = firstNumber(candidate, [
-    'context_tokens',
-    'contextTokens',
-    'used_tokens',
-    'usedTokens',
-  ]);
+  let contextTokens = contextTokensFromCandidate(candidate);
 
   if (remainingPct == null && remainingTokens != null && contextLimit > 0) {
     remainingPct = (remainingTokens / contextLimit) * 100;
@@ -226,6 +253,29 @@ function fallbackSessionKey(data = {}) {
   return `${pidKey}-${cwdHash}`;
 }
 
+function clearRuntimeContextState(data = {}) {
+  const sessionId = fallbackSessionKey(data);
+  const runtimeFiles = [
+    `harness-ctx-${sessionId}.json`,
+    `harness-ctx-${sessionId}-warned.json`,
+    `harness-strategic-compact-${sessionId}.json`,
+  ];
+  const removed = [];
+
+  for (const filename of runtimeFiles) {
+    const filePath = path.join(os.tmpdir(), filename);
+    try {
+      if (!fs.existsSync(filePath)) continue;
+      fs.unlinkSync(filePath);
+      removed.push(filePath);
+    } catch (_) {
+      // Runtime cleanup is best-effort and must never block compaction.
+    }
+  }
+
+  return removed;
+}
+
 function attachCompactState(metrics, data = {}) {
   if (!metrics) return null;
   return {
@@ -284,11 +334,11 @@ function resolveContextMetrics(data = {}) {
 }
 
 module.exports = {
-  AUTO_COMPACT_BUFFER_PCT,
   toNumber,
   clampPct,
   normalizeRemainingToUsed,
   metricFromCandidate,
   resolveContextMetrics,
   fallbackSessionKey,
+  clearRuntimeContextState,
 };

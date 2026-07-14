@@ -586,13 +586,6 @@ function registerJsHooks(claudeHome) {
     {
       event: "PreToolUse",
       matcher: ".*",
-      id: "pre:all:harness-context-monitor",
-      command: `node "${path.join(hd, "harness-context-monitor.js")}"`,
-      timeout: 10,
-    },
-    {
-      event: "PreToolUse",
-      matcher: ".*",
       id: "pre:all:harness-prompt-guard",
       command: `node "${path.join(hd, "harness-prompt-guard.js")}"`,
       timeout: 5,

@@ -88,7 +88,7 @@
             "timeout": 10
           }
         ],
-        "description": "Suggest strategic context compaction when context usage crosses 65/70/85/95% thresholds",
+        "description": "Use Claude Code native auto-compaction; suggest manual /compact at 65/70/85/95% only when auto-compaction is disabled",
         "id": "pre:all:strategic-compact"
       },
       {
@@ -189,7 +189,7 @@
     ],
     "PreCompact": [
       {
-        "matcher": "*",
+        "matcher": "auto|manual",
         "hooks": [
           {
             "type": "command",
@@ -200,7 +200,7 @@
         "id": "pre:compact"
       },
       {
-        "matcher": "*",
+        "matcher": "auto|manual",
         "hooks": [
           {
             "type": "command",

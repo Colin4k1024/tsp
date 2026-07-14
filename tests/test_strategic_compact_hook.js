@@ -9,6 +9,7 @@ const { spawnSync } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
 const SCRIPT = path.join(ROOT, 'scripts', 'hooks', 'suggest-compact.js');
+const LEGACY_MONITOR = path.join(ROOT, 'hooks', 'harness-context-monitor.js');
 const HOOKS_JSON = path.join(ROOT, 'hooks', 'hooks.json');
 
 let passed = 0;
@@ -38,6 +39,7 @@ function runSuggestCompact(payload, extraEnv = {}) {
         TMP: tempDir,
         TEMP: tempDir,
         STRATEGIC_COMPACT_DISABLE_DEBOUNCE: '1',
+        STRATEGIC_COMPACT_MODE: 'manual',
         ...extraEnv,
       },
     });
@@ -53,7 +55,7 @@ test('emits compact suggestion from remaining context percentage', () => {
     hook_event_name: 'PreToolUse',
     session_id: 'compact-test-high',
     context_window: {
-      remaining_percentage: 20,
+      remaining_percentage: 10,
     },
   });
 
@@ -64,6 +66,7 @@ test('emits compact suggestion from remaining context percentage', () => {
   assert.strictEqual(output.hookSpecificOutput.hookEventName, 'PreToolUse');
   assert.ok(output.hookSpecificOutput.additionalContext.includes('/compact'));
   assert.strictEqual(output.compactSuggestion.should_compact, true);
+  assert.strictEqual(output.compactSuggestion.mode, 'manual_fallback');
   assert.ok(['high', 'critical'].includes(output.compactSuggestion.urgency));
   assert.strictEqual(output.compactSuggestion.context_source, 'stdin.remaining_percentage');
 });
@@ -88,8 +91,61 @@ test('hooks.json registers strategic compact for all tools', () => {
 
   assert.ok(entry, 'expected pre:all:strategic-compact hook entry');
   assert.strictEqual(entry.matcher, '*');
-  assert.ok(entry.description.includes('65/70/85/95'));
+  assert.ok(entry.description.includes('native auto-compaction'));
   assert.ok(entry.hooks.some(hook => hook.command.includes('scripts/hooks/suggest-compact.js')));
+});
+
+test('hooks.json registers PreCompact for native auto and manual triggers', () => {
+  const payload = JSON.parse(fs.readFileSync(HOOKS_JSON, 'utf8'));
+  const preCompact = payload.hooks.PreCompact || [];
+  const entry = preCompact.find(item => item.id === 'pre:compact');
+
+  assert.ok(entry, 'expected pre:compact hook entry');
+  assert.strictEqual(entry.matcher, 'auto|manual');
+});
+
+test('native auto mode stays silent and lets Claude Code own compaction', () => {
+  const result = runSuggestCompact({
+    hook_event_name: 'PreToolUse',
+    session_id: 'compact-test-native-auto',
+    context_window: {
+      used_percentage: 95,
+      remaining_percentage: 5,
+    },
+  }, { STRATEGIC_COMPACT_MODE: 'auto' });
+
+  assert.strictEqual(result.status, 0);
+  assert.strictEqual(result.stdout, '');
+});
+
+test('deprecated context monitor also stays silent in native auto mode', () => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'legacy-context-monitor-test-'));
+  try {
+    const sessionId = 'legacy-monitor-native-auto';
+    fs.writeFileSync(path.join(tempDir, `harness-ctx-${sessionId}.json`), JSON.stringify({
+      session_id: sessionId,
+      remaining_percentage: 5,
+      used_pct: 95,
+      timestamp: Math.floor(Date.now() / 1000),
+    }));
+
+    const result = spawnSync(process.execPath, [LEGACY_MONITOR], {
+      input: JSON.stringify({ session_id: sessionId, cwd: ROOT }),
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        TMPDIR: tempDir,
+        TMP: tempDir,
+        TEMP: tempDir,
+        STRATEGIC_COMPACT_MODE: 'auto',
+      },
+    });
+
+    assert.strictEqual(result.status, 0);
+    assert.strictEqual(result.stdout, '');
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
 });
 
 test('hooks.json has harness-statusline before strategic-compact', () => {
@@ -129,6 +185,7 @@ test('emits compact suggestion from bridge file when context_window is missing',
         TMP: tempDir,
         TEMP: tempDir,
         STRATEGIC_COMPACT_DISABLE_DEBOUNCE: '1',
+        STRATEGIC_COMPACT_MODE: 'manual',
       },
     });
 
@@ -166,14 +223,11 @@ test('handles malformed context_window (string) without crashing', () => {
 });
 
 test('emits advisory at 65% threshold', () => {
-  // remaining_percentage: 46 -> after buffer normalization ≈ 65% used
-  // Formula: usableRemaining = ((46 - 16.5) / (100 - 16.5)) * 100 ≈ 35.3
-  // usedPct = 100 - 35.3 ≈ 64.7 -> rounds to 65
   const result = runSuggestCompact({
     hook_event_name: 'PreToolUse',
     session_id: 'compact-test-advisory',
     context_window: {
-      remaining_percentage: 46,
+      remaining_percentage: 35,
     },
   });
 

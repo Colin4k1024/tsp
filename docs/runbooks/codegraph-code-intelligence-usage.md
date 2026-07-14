@@ -1,11 +1,11 @@
 ---
-version: "0.1.0"
+version: "0.2.0"
 status: active
 created: 2026-05-20
-updated: 2026-05-22
+updated: 2026-07-14
 owner: 工程团队
 doc_tier: runbook
-last_verified: 2026-05-22
+last_verified: 2026-07-14
 source_of_truth:
   - ../../skills/codegraph/SKILL.md
   - ../../README.md
@@ -72,7 +72,7 @@ codegraph install --target=<claude|codex|cursor|opencode> --location=global --ye
 非 Claude 或自动初始化关闭时，在目标项目根目录初始化索引：
 
 ```bash
-codegraph init -i
+codegraph init
 codegraph status
 ```
 
@@ -80,10 +80,13 @@ codegraph status
 
 ```bash
 codegraph query <symbol>
-codegraph context "<task>"
+codegraph explore "<task>"
+codegraph node <symbol-or-file>
 codegraph affected --stdin
 codegraph files --format tree
 ```
+
+TSP 当前 Claude `SessionStart` hook 仍使用兼容参数 `codegraph init -i <projectRoot>`；CodeGraph 1.1.6 已将 `-i` 标记为 deprecated，但仍接受该参数并默认执行索引。人工操作直接使用 `codegraph init`。
 
 ## 5. 与主链结合方式
 

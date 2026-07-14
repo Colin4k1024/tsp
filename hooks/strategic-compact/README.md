@@ -14,8 +14,10 @@
 
 **功能**:
 - 保存 compaction 事件
+- 同时处理 Claude Code 的 `auto` 与 `manual` trigger
 - 递增 `.tsp/context/compact-state.json` 中的 session compact count 与 total compact count
 - 把 compact 轮次写入 session tmp 文件，供后续恢复和动态上下文策略使用
+- 清除压缩前的 bridge / warning / debounce 临时状态，避免 compact 后继续显示旧的 190K 高水位
 
 **优先级规则**:
 - 总是保留的类型：`decision`, `conclusion`, `pending_item`, `task_output`, `verification_result`, `error_fix`
@@ -24,12 +26,14 @@
 
 ### suggest-compact.js
 
-**触发时机**: `hooks/hooks.json` 的 `pre:all:strategic-compact` 在工具调用前运行；当真实上下文使用超过 65% 时注入 `/compact` 建议。
+**触发时机**: `hooks/hooks.json` 的 `pre:all:strategic-compact` 在工具调用前运行。默认由 Claude Code 原生 auto-compact 接管，不注入人工提示；仅当 `DISABLE_AUTO_COMPACT=1` 或 `STRATEGIC_COMPACT_MODE=manual` 时，在真实使用率超过 65% 后提供 `/compact` 兜底建议。
 
 **功能**:
 - 优先读取 CCometixLine-compatible remaining context：`TSP_CONTEXT_WINDOW_JSON` / `CCOMETIXLINE_CONTEXT_JSON`、`TSP_CONTEXT_WINDOW_FILE` / `CCOMETIXLINE_CONTEXT_FILE`、hook 输入的 `ccometixline.context_window` / `ccometixline_context_window`
 - 其次读取 Claude hook 输入里的 `context_window.used_percentage` / `context_window.remaining_percentage`
+- 直接使用 Claude 官方预计算百分比，不重复扣除 auto-compact buffer；读取 `context_window.context_window_size` 兼容 200K / 1M 模型
 - 再退回 transcript JSONL usage、`CLAUDE_CONTEXT_SIZE` / `CLAUDE_CONTEXT_LIMIT`、`harness-statusline.js` 写入的 `/tmp/harness-ctx-{session_id}.json`
+- compact summary 之后不会回读压缩前的 transcript usage，直到产生新的 assistant usage
 - 评估紧迫度：`low` (< 65%) | `advisory` (65-70%) | `medium` (70-85%) | `high` (85-95%) | `critical` (> 95%)
 - 输出 `compact_count`，让动态上下文策略知道当前已经经历过几轮 compact
 - 估算可节省的 token
@@ -53,7 +57,7 @@
 ### Phase 4: 精简工具输出
 将长工具输出替换为摘要：`[File X read, Y lines]`
 
-## 触发阈值
+## 手动兜底阈值
 
 | 使用率 | 紧迫度 | 建议操作 |
 |--------|--------|---------|

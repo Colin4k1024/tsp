@@ -14,10 +14,7 @@ const os = require('os');
 const crypto = require('crypto');
 const contextWindow = require('../lib/context-window');
 
-const AUTO_COMPACT_BUFFER_PCT = 16.5;
-const DEFAULT_CONTEXT_LIMIT = 200000;
 const DEFAULT_DEBOUNCE_CALLS = 8;
-const STALE_BRIDGE_SECONDS = 120;
 
 const URGENCY = [
   [95, 'critical'],
@@ -41,11 +38,20 @@ function clampPct(value) {
 }
 
 function normalizeRemainingToUsed(remainingPct) {
-  const usableRemaining = Math.max(
-    0,
-    ((remainingPct - AUTO_COMPACT_BUFFER_PCT) / (100 - AUTO_COMPACT_BUFFER_PCT)) * 100
-  );
-  return clampPct(100 - usableRemaining);
+  return contextWindow.normalizeRemainingToUsed(remainingPct);
+}
+
+function resolveCompactMode(env = process.env) {
+  if (env.DISABLE_COMPACT === '1') return 'off';
+
+  const configured = String(env.STRATEGIC_COMPACT_MODE || '').trim().toLowerCase();
+  if (configured === 'off' || configured === 'auto' || configured === 'manual') {
+    return configured;
+  }
+
+  // Claude Code enables native auto-compaction by default. Only fall back to
+  // manual /compact suggestions when the user explicitly disables it.
+  return env.DISABLE_AUTO_COMPACT === '1' ? 'manual' : 'auto';
 }
 
 function getUrgency(usagePct) {
@@ -71,31 +77,6 @@ function sessionKey(data) {
   const cwd = data.cwd || process.cwd();
   const cwdHash = crypto.createHash('sha256').update(String(cwd)).digest('hex').slice(0, 16);
   return `${pidKey}-${cwdHash}`;
-}
-
-function readBridgeMetrics(sessionId) {
-  if (!sessionId) return null;
-
-  const bridgePath = path.join(os.tmpdir(), `harness-ctx-${sessionId}.json`);
-  if (!fs.existsSync(bridgePath)) return null;
-
-  try {
-    const bridge = JSON.parse(fs.readFileSync(bridgePath, 'utf8'));
-    const now = Math.floor(Date.now() / 1000);
-    if (bridge.timestamp && now - bridge.timestamp > STALE_BRIDGE_SECONDS) return null;
-
-    const usagePct = toNumber(bridge.used_pct);
-    const remainingPct = toNumber(bridge.remaining_percentage);
-    if (usagePct == null && remainingPct == null) return null;
-
-    return {
-      usagePct: usagePct != null ? clampPct(usagePct) : normalizeRemainingToUsed(remainingPct),
-      remainingPct,
-      source: 'bridge',
-    };
-  } catch (_) {
-    return null;
-  }
 }
 
 function resolveContextMetrics(data) {
@@ -222,10 +203,10 @@ function buildContextMessage({ usagePct, remainingPct, compactCount, urgency, sa
   const remainingPart = remainingPct == null ? '' : ` | remaining: ${clampPct(remainingPct)}%`;
   const compactPart = compactCount == null ? '' : ` | compact count: ${compactCount}`;
   const actionByUrgency = {
-    advisory: 'Context usage is approaching the compaction threshold. Be mindful of context budget; avoid starting large new explorations.',
-    medium: 'Finish the current small step, then run `/compact` before more broad reading or implementation.',
-    high: 'Stop new exploration, preserve decisions/todos/validation results, and ask the user to run `/compact`.',
-    critical: 'Context is nearly exhausted. Do not start new tool chains; ask the user to run `/compact` now.',
+    advisory: 'Native auto-compaction is disabled. Monitor context growth and avoid starting large new explorations.',
+    medium: 'Native auto-compaction is disabled. Finish the current small step, then run `/compact`.',
+    high: 'Native auto-compaction is disabled. Preserve decisions/todos/validation results, then run `/compact`.',
+    critical: 'Native auto-compaction is disabled and context is nearly exhausted. Run `/compact` now.',
   };
 
   return [
@@ -244,6 +225,14 @@ function buildHookOutput(rawInput) {
   } catch (_) {
     if (process.env.STRATEGIC_COMPACT_DEBUG === '1') {
       process.stderr.write('[strategic-compact] failed to parse stdin JSON\n');
+    }
+    return null;
+  }
+
+  const compactMode = resolveCompactMode();
+  if (compactMode !== 'manual') {
+    if (process.env.STRATEGIC_COMPACT_DEBUG === '1') {
+      process.stderr.write(`[strategic-compact] ${compactMode} mode: native Claude Code compaction owns the trigger\n`);
     }
     return null;
   }
@@ -298,6 +287,7 @@ function buildHookOutput(rawInput) {
     },
     compactSuggestion: {
       should_compact: true,
+      mode: 'manual_fallback',
       urgency,
       context_usage_ratio: metrics.usagePct,
       context_remaining_percentage: metrics.remainingPct,
@@ -342,4 +332,5 @@ module.exports = {
   buildHookOutput,
   resolveContextMetrics,
   normalizeRemainingToUsed,
+  resolveCompactMode,
 };

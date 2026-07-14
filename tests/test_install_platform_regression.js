@@ -59,6 +59,18 @@ test('legacy python hook names are tracked only as cleanup input', () => {
   assert.ok(registerAuditHooks.includes('pruneHookEntries('), 'expected cleanup of legacy hook entries');
 });
 
+test('legacy installer cleans but no longer registers deprecated context monitor', () => {
+  const registerJsHooks = getSection(source, 'function registerJsHooks(', 'function mdDescription(');
+  assert.ok(
+    !registerJsHooks.includes('id: "pre:all:harness-context-monitor"'),
+    'registerJsHooks should defer to native auto-compact and strategic-compact'
+  );
+  assert.ok(
+    source.includes('id: "pre:all:harness-context-monitor"'),
+    'managed hook inventory should retain the legacy id for cleanup'
+  );
+});
+
 test('managed JS hook cleanup preserves custom wrappers around bundled hooks', () => {
   assert.strictEqual(
     isManagedJsHookGroup(

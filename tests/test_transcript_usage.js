@@ -121,6 +121,30 @@ assertEq('null path → null', parseTranscriptUsage(null), null);
 assertEq('non-existent path → null', parseTranscriptUsage('/no/such/file.jsonl'), null);
 assertEq('empty file → null', parseTranscriptUsage(emptyFile), null);
 
+const compactedTranscript = writeTempJsonl('compacted-session.jsonl', [
+  { type: 'assistant', uuid: 'before-compact', message: { usage: { input_tokens: 190000 } } },
+  { type: 'summary', leafUuid: 'before-compact', summary: 'compacted state' },
+]);
+assertEq('summary boundary does not reuse stale pre-compact usage', parseTranscriptUsage(compactedTranscript), null);
+
+const compactedTranscriptWithLargeTail = writeTempJsonl('compacted-large-tail.jsonl', [
+  { type: 'assistant', uuid: 'before-compact-large', message: { usage: { input_tokens: 190000 } } },
+  { type: 'summary', leafUuid: 'before-compact-large', summary: 'compacted state' },
+  { type: 'user', message: { content: 'x'.repeat(70000) } },
+]);
+assertEq(
+  'expanded transcript scan still stops at compact summary',
+  parseTranscriptUsage(compactedTranscriptWithLargeTail),
+  null
+);
+
+const refreshedTranscript = writeTempJsonl('refreshed-session.jsonl', [
+  { type: 'assistant', uuid: 'before-compact', message: { usage: { input_tokens: 190000 } } },
+  { type: 'summary', leafUuid: 'before-compact', summary: 'compacted state' },
+  { type: 'assistant', uuid: 'after-compact', message: { usage: { input_tokens: 32000 } } },
+]);
+assertEq('fresh post-compact usage replaces the old window', parseTranscriptUsage(refreshedTranscript).contextTokens, 32000);
+
 // --- Test: resolveTranscriptMetrics ---
 console.log('\n📈 resolveTranscriptMetrics');
 

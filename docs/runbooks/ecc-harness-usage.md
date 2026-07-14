@@ -47,7 +47,7 @@ owner: 工程团队
 - `scripts/hooks/session-start.js`：在会话开始时加载最近一次会话摘要、待办和提示。
 - `scripts/hooks/session-end.js`：在会话结束时保存任务摘要、决策和下一次会话提示。
 - `scripts/hooks/pre-compact.js`：在压缩上下文前整理高价值信息。
-- `scripts/hooks/suggest-compact.js`：在上下文使用率升高时给出压缩建议。
+- `scripts/hooks/suggest-compact.js`：默认让 Claude Code 原生 auto-compact 接管；仅在原生能力关闭时给出手动压缩建议。
 - `scripts/hooks/governance-capture.js`：观察关键工具调用与治理信号，供后续分析使用。
 - `scripts/hooks/cost-tracker.js`：记录成本事件和任务复杂度信号。
 - 底层状态与会话存储位于 [scripts/lib/state-store/index.js](../../scripts/lib/state-store/index.js)，默认写入运行时状态目录。
@@ -57,7 +57,7 @@ owner: 工程团队
 ### 6.1 用户直接感知到的能力
 
 - memory persistence：重新进入会话时能拿到摘要、待办和提示
-- strategic compact：长会话中出现压缩建议或强制整理
+- strategic compact：Claude Code 长会话自动压缩，PreCompact 保存状态；关闭自动压缩时提供手动兜底
 - parallel execution：可将任务拆分到 worktree 或多实例路径
 - harness audit：可对平台能力面做 7 维评分和优先级建议
 

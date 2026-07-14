@@ -28,8 +28,9 @@ owner: 工程团队
 
 - `scripts/hooks/session-start-bootstrap.js`：SessionStart bootstrap
 - `scripts/hooks/session-start.js`：加载 `docs/memory/project-context.md`、session summary 等上下文
-- `scripts/hooks/pre-compact.js`：PreCompact 前的高价值状态整理
-- `scripts/hooks/suggest-compact.js`：在真实上下文使用率超过 65/70/85/95% 时提示人工 compact
+- `scripts/hooks/pre-compact.js`：在自动或手动 PreCompact 前记录轮次并清除旧窗口指标
+- `scripts/hooks/suggest-compact.js`：默认让 Claude Code 原生 auto-compact 接管；关闭原生能力时才按 65/70/85/95% 提示人工 compact
+- `hooks/harness-context-monitor.js`：仅保留为兼容文件，不再由 legacy 安装器注册；重新安装会清理历史注册，避免与原生 auto-compact 重复告警
 - `scripts/hooks/session-end.js`：Stop 阶段持久化 session 摘要
 - `scripts/hooks/session-end-marker.js`：SessionEnd 生命周期标记
 - `scripts/hooks/cost-tracker.js`：记录 token / cost 指标
@@ -77,10 +78,11 @@ owner: 工程团队
 ### 3.4 Compact readiness
 
 - 触发点：`suggest-compact.js`、`pre-compact.js`
-- 作用：在进入 compact 前整理状态，在高上下文压力下基于 CCometixLine-compatible remaining context 给出压缩提示
+- 作用：由 Claude Code 原生 auto-compact 决定压缩时机；Hook 在进入 compact 前保存状态并清除旧指标，手动模式下才给出压缩提示
 - 计算顺序：优先消费 `TSP_CONTEXT_WINDOW_JSON` / `CCOMETIXLINE_CONTEXT_JSON`、`TSP_CONTEXT_WINDOW_FILE` / `CCOMETIXLINE_CONTEXT_FILE`、hook 输入中的 `ccometixline.context_window` / `ccometixline_context_window`；其次读取 Claude `context_window`；再退回 transcript JSONL usage 与 bridge / size fallback
-- 计数：`pre-compact.js` 每次触发都会递增 `.tsp/context/compact-state.json` 中的 session 和 total compact count，`suggest-compact.js` 会把 `compact_count` 带入输出
-- 用户侧影响：长任务中更容易知道什么时候该手动 compact；compact 后还能知道当前是第几轮压缩，动态上下文压缩策略不会丢失轮次状态
+- 计量：Claude 官方 `used_percentage` / `remaining_percentage` 不再二次扣除 buffer，并通过 `context_window_size` 识别 200K / 1M；compact summary 后不复用 summary 前的 transcript usage
+- 计数：`pre-compact.js` 同时匹配 `auto|manual`，每次触发都会递增 `.tsp/context/compact-state.json` 中的 session 和 total compact count
+- 用户侧影响：接近默认约 95% 阈值时由 Claude Code 自动压缩，不再要求用户先手动确认；显式关闭 auto-compact 后仍有人工 `/compact` 兜底
 
 ### 3.5 MCP health
 

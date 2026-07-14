@@ -19,6 +19,7 @@ const {
   log
 } = require('../lib/utils');
 const { recordCompactEvent } = require('../lib/context-window-state');
+const { clearRuntimeContextState } = require('../lib/context-window');
 
 async function main(rawInput = '{}') {
   let input = {};
@@ -43,6 +44,10 @@ async function main(rawInput = '{}') {
   } catch (_) {
     compactEvent = null;
   }
+  // The status bridge and debounce files describe the pre-compact window.
+  // Remove them before both manual and automatic compaction so the next hook
+  // cannot mistake stale ~95% usage for the new compacted context.
+  clearRuntimeContextState(input);
   const compactCountSuffix = compactEvent
     ? ` (session compact #${compactEvent.sessionCompactCount}, total #${compactEvent.totalCompactCount})`
     : '';

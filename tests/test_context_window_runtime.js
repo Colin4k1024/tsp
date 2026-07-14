@@ -68,7 +68,31 @@ test('prefers CCometixLine-style remaining context from stdin', () => {
     assert.strictEqual(metrics.source, 'stdin.ccometixline.context_window');
     assert.strictEqual(metrics.remainingPct, 20);
     assert.strictEqual(metrics.remainingTokens, 40000);
-    assert.ok(metrics.usagePct >= 95, 'remaining percentage should be normalized against auto-compact buffer');
+    assert.strictEqual(metrics.usagePct, 80, 'remaining percentage should be the inverse of official used percentage');
+  });
+});
+
+test('uses Claude statusline context size and current input usage for 1M windows', () => {
+  withTempState(() => {
+    const metrics = resolveContextMetrics({
+      session_id: 'ctx-official-1m',
+      context_window: {
+        context_window_size: 1000000,
+        used_percentage: 19,
+        remaining_percentage: 81,
+        current_usage: {
+          input_tokens: 10000,
+          cache_creation_input_tokens: 80000,
+          cache_read_input_tokens: 100000,
+          output_tokens: 5000,
+        },
+      },
+    });
+
+    assert.ok(metrics, 'expected metrics');
+    assert.strictEqual(metrics.contextLimit, 1000000);
+    assert.strictEqual(metrics.contextSize, 190000);
+    assert.strictEqual(metrics.usagePct, 19);
   });
 });
 
@@ -78,6 +102,7 @@ test('suggest compact output includes remaining context and compact count', () =
       ...process.env,
       TSP_CONTEXT_STATE_DIR: stateDir,
       STRATEGIC_COMPACT_DISABLE_DEBOUNCE: '1',
+      STRATEGIC_COMPACT_MODE: 'manual',
     };
 
     spawnSync(process.execPath, [PRE_COMPACT], {
@@ -111,10 +136,14 @@ test('suggest compact output includes remaining context and compact count', () =
   });
 });
 
-test('pre-compact increments per-session and total compact counts', () => {
+test('pre-compact increments counts, records auto trigger, and clears stale runtime metrics', () => {
   withTempState((stateDir) => {
-    const env = { ...process.env, TSP_CONTEXT_STATE_DIR: stateDir };
-    const payload = JSON.stringify({ session_id: 'ctx-precompact', cwd: ROOT });
+    const env = { ...process.env, TSP_CONTEXT_STATE_DIR: stateDir, TMPDIR: stateDir };
+    const payload = JSON.stringify({ session_id: 'ctx-precompact', cwd: ROOT, trigger: 'auto' });
+    const bridgePath = path.join(stateDir, 'harness-ctx-ctx-precompact.json');
+    const debouncePath = path.join(stateDir, 'harness-strategic-compact-ctx-precompact.json');
+    fs.writeFileSync(bridgePath, '{}');
+    fs.writeFileSync(debouncePath, '{}');
 
     const first = spawnSync(process.execPath, [PRE_COMPACT], { input: payload, encoding: 'utf8', env });
     const second = spawnSync(process.execPath, [PRE_COMPACT], { input: payload, encoding: 'utf8', env });
@@ -125,6 +154,9 @@ test('pre-compact increments per-session and total compact counts', () => {
     const state = loadCompactState({ stateDir });
     assert.strictEqual(state.totalCompactCount, 2);
     assert.strictEqual(state.sessions['ctx-precompact'].compactCount, 2);
+    assert.strictEqual(state.sessions['ctx-precompact'].lastTrigger, 'auto');
+    assert.strictEqual(fs.existsSync(bridgePath), false);
+    assert.strictEqual(fs.existsSync(debouncePath), false);
   });
 });
 
