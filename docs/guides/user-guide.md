@@ -1,14 +1,15 @@
 ---
-version: "2.3.0"
+version: "2.5.5"
 status: active
 created: 2026-04-17
-updated: 2026-06-10
+updated: 2026-07-17
 owner: 工程团队
 doc_tier: redirect
-last_verified: 2026-06-10
+last_verified: 2026-07-17
 source_of_truth:
   - ../runbooks/team-skills-usage.md
   - ../runbooks/command-and-capability-matrix.md
+  - ../runbooks/loop-engineering-usage.md
   - ../runbooks/project-onboarding.md
   - ../runbooks/troubleshooting.md
 ---
@@ -19,6 +20,7 @@ source_of_truth:
 
 - 主手册：[/runbooks/team-skills-usage](../runbooks/team-skills-usage.md)
 - 命令矩阵：[/runbooks/command-and-capability-matrix](../runbooks/command-and-capability-matrix.md)
+- Loop Engineering：[/runbooks/loop-engineering-usage](../runbooks/loop-engineering-usage.md)
 - 项目接入：[/runbooks/project-onboarding](../runbooks/project-onboarding.md)
 - 故障排查：[/runbooks/troubleshooting](../runbooks/troubleshooting.md)
 
@@ -26,8 +28,9 @@ source_of_truth:
 
 1. `/runbooks/command-and-capability-matrix`
 2. `/runbooks/team-skills-usage`
-3. `/runbooks/project-onboarding`
-4. `/runbooks/troubleshooting`
+3. 需要周期性、可机器验证任务时，再读 `/runbooks/loop-engineering-usage`
+4. `/runbooks/project-onboarding`
+5. `/runbooks/troubleshooting`
 
 ## 主链入口提醒
 
