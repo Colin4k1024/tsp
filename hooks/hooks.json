@@ -69,6 +69,18 @@
         "id": "pre:write:doc-file-warning"
       },
       {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/run-with-flags.js\" \"pre:agent:model-router\" \"scripts/hooks/pre-agent-model-router.js\" \"standard,strict\"",
+            "timeout": 5
+          }
+        ],
+        "description": "Auto-route subagent model based on task classification. Enable with ECC_ENABLE_MODEL_ROUTER=1",
+        "id": "pre:agent:model-router"
+      },
+      {
         "matcher": "*",
         "hooks": [
           {
