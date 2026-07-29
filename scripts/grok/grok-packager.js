@@ -70,8 +70,14 @@ function addProvenance(content, sourcePath) {
     }
   }
 
+  // 正确处理 YAML 值（包含特殊字符时需要引号）
   const frontmatter = Object.entries(newMetadata)
-    .map(([key, value]) => `${key}: ${value}`)
+    .map(([key, value]) => {
+      if (typeof value === 'string' && (value.includes(':') || value.includes('#') || value.includes('"') || value.includes("'"))) {
+        return `${key}: "${value.replace(/"/g, '\\"')}"`;
+      }
+      return `${key}: ${value}`;
+    })
     .join('\n');
 
   // 替换 body 中的 Claude 引用
@@ -189,8 +195,14 @@ function generateGrokAgent(agent) {
     metadata.description = `${agent.type} agent: ${agent.name}`;
   }
 
+  // 正确处理 YAML 值（包含特殊字符时需要引号）
   const frontmatter = Object.entries(metadata)
-    .map(([key, value]) => `${key}: ${value}`)
+    .map(([key, value]) => {
+      if (typeof value === 'string' && (value.includes(':') || value.includes('#') || value.includes('"') || value.includes("'"))) {
+        return `${key}: "${value.replace(/"/g, '\\"')}"`;
+      }
+      return `${key}: ${value}`;
+    })
     .join('\n');
 
   return `---\n${frontmatter}\n---\n${body}`;
