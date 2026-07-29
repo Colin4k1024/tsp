@@ -58,11 +58,31 @@ function addProvenance(content, sourcePath) {
     generated_at: GENERATED_AT,
   };
 
+  // 替换 metadata 中的 Claude 引用
+  for (const key of Object.keys(newMetadata)) {
+    if (typeof newMetadata[key] === 'string') {
+      newMetadata[key] = newMetadata[key]
+        .replace(/~\/\.claude/g, '~/.grok')
+        .replace(/\$\{CLAUDE_HOME\}/g, '${GROK_HOME}')
+        .replace(/\$\{CLAUDE_PLUGIN_ROOT\}/g, '${GROK_PLUGIN_ROOT}')
+        .replace(/CLAUDE_HOME/g, 'GROK_HOME')
+        .replace(/CLAUDE_PROJECT_ROOT/g, 'PROJECT_ROOT');
+    }
+  }
+
   const frontmatter = Object.entries(newMetadata)
     .map(([key, value]) => `${key}: ${value}`)
     .join('\n');
 
-  return `---\n${frontmatter}\n---\n${body}`;
+  // 替换 body 中的 Claude 引用
+  let finalBody = body
+    .replace(/~\/\.claude/g, '~/.grok')
+    .replace(/\$\{CLAUDE_HOME\}/g, '${GROK_HOME}')
+    .replace(/\$\{CLAUDE_PLUGIN_ROOT\}/g, '${GROK_PLUGIN_ROOT}')
+    .replace(/CLAUDE_HOME/g, 'GROK_HOME')
+    .replace(/CLAUDE_PROJECT_ROOT/g, 'PROJECT_ROOT');
+
+  return `---\n${frontmatter}\n---\n${finalBody}`;
 }
 
 // 收集 skills
