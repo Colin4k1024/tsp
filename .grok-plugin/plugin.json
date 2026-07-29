@@ -1,0 +1,24 @@
+{
+  "name": "tsp",
+  "version": "2.5.5",
+  "description": "Team Skills Platform - 角色化多 Agent 协作平台",
+  "author": "Colin4k1024",
+  "license": "MIT",
+  "homepage": "https://github.com/Colin4k1024/tsp",
+  "engines": {
+    "grok": ">=0.1.0"
+  },
+  "capabilities": {
+    "skills": true,
+    "commands": true,
+    "agents": true,
+    "hooks": true
+  },
+  "skills": [],
+  "commands": [],
+  "agents": [],
+  "hooks": [],
+  "dependencies": {
+    "node": ">=18"
+  }
+}

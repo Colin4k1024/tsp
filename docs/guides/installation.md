@@ -2,10 +2,10 @@
 version: "2.3.0"
 status: active
 created: 2026-04-17
-updated: 2026-06-10
+updated: 2026-07-29
 owner: 工程团队
 doc_tier: redirect
-last_verified: 2026-06-10
+last_verified: 2026-07-29
 source_of_truth:
   - ../runbooks/claude-quick-start.md
   - ../runbooks/codex-quick-start.md
