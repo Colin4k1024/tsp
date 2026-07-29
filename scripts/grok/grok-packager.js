@@ -214,7 +214,10 @@ function generateManifest(skills, commands, agents) {
     name: 'tsp',
     version: TSP_VERSION,
     description: 'Team Skills Platform - 角色化多 Agent 协作平台',
-    author: 'Colin4k1024',
+    author: {
+      name: 'Colin4k1024',
+      email: 'colin4k1024@users.noreply.github.com',
+    },
     license: 'MIT',
     homepage: 'https://github.com/Colin4k1024/tsp',
     engines: {
