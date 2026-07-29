@@ -33,3 +33,4 @@ dist/
 docs/.vitepress/dist/
 .cursor/
 .codegraph/
+.grok-build
