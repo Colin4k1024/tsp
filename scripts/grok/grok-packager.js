@@ -270,6 +270,7 @@ function main() {
   ensureDir(outputDir);
   ensureDir(path.join(outputDir, 'skills'));
   ensureDir(path.join(outputDir, 'agents'));
+  ensureDir(path.join(outputDir, 'scripts/grok/hooks'));
 
   // 写入 skills
   for (const skill of skills) {
@@ -293,6 +294,25 @@ function main() {
     fs.writeFileSync(path.join(outputDir, 'agents', `${agent.name}.md`), content);
   }
 
+  // 复制 Grok hooks 脚本
+  const hooksDir = path.join(TSP_ROOT, 'scripts/grok/hooks');
+  if (fs.existsSync(hooksDir)) {
+    const hookFiles = fs.readdirSync(hooksDir).filter(f => f.endsWith('.js'));
+    for (const hookFile of hookFiles) {
+      const source = path.join(hooksDir, hookFile);
+      const dest = path.join(outputDir, 'scripts/grok/hooks', hookFile);
+      fs.copyFileSync(source, dest);
+    }
+    console.log(`  Hooks scripts: ${hookFiles.length} files copied`);
+  }
+
+  // 复制 path-resolver.js
+  const pathResolverSource = path.join(TSP_ROOT, 'scripts/grok/path-resolver.js');
+  const pathResolverDest = path.join(outputDir, 'scripts/grok/path-resolver.js');
+  if (fs.existsSync(pathResolverSource)) {
+    fs.copyFileSync(pathResolverSource, pathResolverDest);
+  }
+
   // 写入 manifest
   const manifest = generateManifest(skills, commands, agents);
   const manifestDir = path.join(outputDir, '.grok-plugin');
@@ -308,6 +328,18 @@ function main() {
   if (fs.existsSync(hooksSource)) {
     fs.copyFileSync(hooksSource, hooksDest);
     console.log('  Hooks: hooks.json copied');
+  } else {
+    // 如果源文件不存在，使用默认的 hooks.json
+    const defaultHooks = {
+      hooks: {
+        context: [],
+        observation: [],
+        summarize: [],
+        'file-context': []
+      }
+    };
+    fs.writeFileSync(hooksDest, JSON.stringify(defaultHooks, null, 2));
+    console.log('  Hooks: default hooks.json created');
   }
 
   // 写入 provenance 记录
