@@ -224,11 +224,12 @@ function generateManifest(skills, commands, agents) {
       skills: true,
       commands: true,
       agents: true,
-      hooks: false, // Phase 3
+      hooks: true,
     },
     skills: skills.map((s) => `skills/${s.name}/SKILL.md`),
     commands: commands.map((c) => `skills/command-${c.name}/SKILL.md`),
     agents: agents.map((a) => `agents/${a.name}.md`),
+    hooks: 'hooks.json',
     dependencies: {
       node: '>=18',
     },
@@ -300,6 +301,14 @@ function main() {
     path.join(manifestDir, 'plugin.json'),
     JSON.stringify(manifest, null, 2)
   );
+
+  // 复制 hooks.json（如果存在）
+  const hooksSource = path.join(TSP_ROOT, '.grok-build/hooks.json');
+  const hooksDest = path.join(outputDir, 'hooks.json');
+  if (fs.existsSync(hooksSource)) {
+    fs.copyFileSync(hooksSource, hooksDest);
+    console.log('  Hooks: hooks.json copied');
+  }
 
   // 写入 provenance 记录
   const provenance = {
