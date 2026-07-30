@@ -1,10 +1,10 @@
 ---
-description: Fix Rust build errors, borrow checker issues, and dependency problems incrementally. Invokes the rust-build-resolver agent for minimal, surgical fixes.
+description: Fix Rust build errors, borrow checker issues, and dependency problems incrementally. Invokes the build-error-resolver agent with language focus for minimal, surgical fixes.
 ---
 
 # Rust Build and Fix
 
-This command invokes the **rust-build-resolver** agent to incrementally fix Rust build errors with minimal changes.
+This command invokes the **build-error-resolver** agent to incrementally fix Rust build errors with minimal changes.
 
 ## What This Command Does
 
@@ -183,5 +183,5 @@ The agent will stop and report if:
 
 ## Related
 
-- Agent: `agents/rust-build-resolver.md`
+- Agent: `agents/specialists/build-error-resolver.md`
 - Skill: `skills/rust-patterns/`

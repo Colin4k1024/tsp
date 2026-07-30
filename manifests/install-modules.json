@@ -125,63 +125,163 @@
       "stability": "stable"
     },
     {
-      "id": "framework-language",
+      "id": "framework-core",
       "kind": "skills",
-      "description": "Core framework, language, and application-engineering skills.",
+      "description": "Language-agnostic framework and application-engineering skills.",
       "paths": [
-        "skills/android-clean-architecture",
         "skills/api-design",
         "skills/backend-patterns",
         "skills/coding-standards",
-        "skills/compose-multiplatform-patterns",
-        "skills/cpp-coding-standards",
-        "skills/cpp-testing",
-        "skills/django-patterns",
-        "skills/django-tdd",
-        "skills/django-verification",
         "skills/frontend-patterns",
         "skills/frontend-slides",
         "skills/ui-ux-promax",
+        "skills/hexagonal-architecture",
+        "skills/mcp-server-patterns"
+      ],
+      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "dependencies": ["rules-core", "agents-core", "commands-core", "platform-configs"],
+      "defaultInstall": false,
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "lang-python",
+      "kind": "skills",
+      "description": "Python, Django, and PyTorch engineering skills.",
+      "paths": [
+        "skills/python-patterns",
+        "skills/python-testing",
+        "skills/pytorch-patterns",
+        "skills/django-patterns",
+        "skills/django-tdd",
+        "skills/django-verification"
+      ],
+      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "dependencies": ["framework-core"],
+      "defaultInstall": false,
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "lang-golang",
+      "kind": "skills",
+      "description": "Go and GoFrame engineering skills.",
+      "paths": [
         "skills/golang-patterns",
         "skills/golang-testing",
-        "skills/goframe-v2",
+        "skills/goframe-v2"
+      ],
+      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "dependencies": ["framework-core"],
+      "defaultInstall": false,
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "lang-java",
+      "kind": "skills",
+      "description": "Java and Spring Boot engineering skills.",
+      "paths": [
         "skills/java-coding-standards",
+        "skills/springboot-patterns",
+        "skills/springboot-tdd",
+        "skills/springboot-verification"
+      ],
+      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "dependencies": ["framework-core"],
+      "defaultInstall": false,
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "lang-kotlin",
+      "kind": "skills",
+      "description": "Kotlin, Ktor, Exposed, Coroutines, Compose Multiplatform, and Android skills.",
+      "paths": [
         "skills/kotlin-coroutines-flows",
         "skills/kotlin-exposed-patterns",
         "skills/kotlin-ktor-patterns",
         "skills/kotlin-patterns",
         "skills/kotlin-testing",
-        "skills/laravel-plugin-discovery",
+        "skills/compose-multiplatform-patterns",
+        "skills/android-clean-architecture"
+      ],
+      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "dependencies": ["framework-core"],
+      "defaultInstall": false,
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "lang-rust",
+      "kind": "skills",
+      "description": "Rust patterns and testing skills.",
+      "paths": ["skills/rust-patterns", "skills/rust-testing"],
+      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "dependencies": ["framework-core"],
+      "defaultInstall": false,
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "lang-cpp",
+      "kind": "skills",
+      "description": "C++ coding standards and testing skills.",
+      "paths": ["skills/cpp-coding-standards", "skills/cpp-testing"],
+      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "dependencies": ["framework-core"],
+      "defaultInstall": false,
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "lang-perl",
+      "kind": "skills",
+      "description": "Modern Perl patterns and testing skills.",
+      "paths": ["skills/perl-patterns", "skills/perl-testing"],
+      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "dependencies": ["framework-core"],
+      "defaultInstall": false,
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "lang-laravel",
+      "kind": "skills",
+      "description": "Laravel patterns, TDD, verification, and plugin discovery skills.",
+      "paths": [
         "skills/laravel-patterns",
         "skills/laravel-tdd",
         "skills/laravel-verification",
-        "skills/mcp-server-patterns",
-        "skills/perl-patterns",
-        "skills/perl-testing",
-        "skills/python-patterns",
-        "skills/python-testing",
-        "skills/rust-patterns",
-        "skills/rust-testing",
-        "skills/springboot-patterns",
-        "skills/springboot-tdd",
-        "skills/springboot-verification"
+        "skills/laravel-plugin-discovery"
       ],
-      "targets": [
-        "claude",
-        "cursor",
-        "antigravity",
-        "codex",
-        "opencode",
-        "cangming",
-        "codebuddy",
-        "codewhale"
-      ],
+      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "dependencies": ["framework-core", "lang-python"],
+      "defaultInstall": false,
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "framework-language",
+      "kind": "skills",
+      "description": "Meta-module: all language and framework skills. Installs framework-core + all lang-* modules.",
+      "paths": [],
+      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
       "dependencies": [
-        "rules-core",
-        "agents-core",
-        "commands-core",
-        "platform-configs"
+        "framework-core",
+        "lang-python",
+        "lang-golang",
+        "lang-java",
+        "lang-kotlin",
+        "lang-rust",
+        "lang-cpp",
+        "lang-perl",
+        "lang-laravel"
       ],
+      "defaultInstall": false,
+      "cost": "medium",
+      "stability": "stable"
+    },
       "defaultInstall": false,
       "cost": "medium",
       "stability": "stable"
@@ -220,7 +320,6 @@
       "paths": [
         "skills/ai-regression-testing",
         "skills/configure-ecc",
-        "skills/continuous-learning",
         "skills/continuous-learning-v2",
         "skills/e2e-testing",
         "skills/eval-harness",
@@ -229,13 +328,6 @@
         "skills/plankton-code-quality",
         "skills/project-guidelines-example",
         "skills/pua",
-        "skills/pua-loop",
-        "skills/pua-mama",
-        "skills/pua-p10",
-        "skills/pua-p7",
-        "skills/pua-p9",
-        "skills/pua-pro",
-        "skills/pua-yes",
         "skills/skill-stocktake",
         "skills/strategic-compact",
         "skills/tdd-workflow",
@@ -659,7 +751,7 @@
         "skills/agent-harness-construction",
         "skills/agentic-engineering",
         "skills/ai-first-engineering",
-        "skills/autonomous-loops",
+        "skills/benchmark",
         "skills/blueprint",
         "skills/claude-devfleet",
         "skills/content-hash-cache-pattern",
@@ -806,6 +898,7 @@
         "skills/frontend-engineering",
         "skills/frontend-ui-ux-system",
         "skills/api-contract",
+        "skills/architecture-decision-records",
         "skills/doc-architecture",
         "skills/agent-dev-workshop"
       ],
@@ -832,9 +925,10 @@
         "skills/adk-framework-adapters",
         "skills/agent-patterns-catalog",
         "skills/browser-smoke-testing",
+        "skills/browser-qa",
         "skills/context-lifecycle",
         "skills/context-recall",
-        "skills/continuous-learning",
+        "skills/continuous-learning-v2",
         "skills/cost-aware-llm-pipeline",
         "skills/error-experience-library",
         "skills/eval-harness",
@@ -852,6 +946,7 @@
         "skills/testcontainers-integration-testing",
         "skills/context-engineering",
         "skills/git-worktree-isolation",
+        "skills/git-workflow",
         "skills/workflow-forensics",
         "templates/context-docs"
       ],
@@ -962,6 +1057,21 @@
       ],
       "defaultInstall": false,
       "cost": "medium",
+      "stability": "beta"
+    },
+    {
+      "id": "graph-engineering",
+      "kind": "orchestration",
+      "description": "Graph Engineering role, commands, and CodeGraph-backed analysis capabilities for impact analysis, architecture visualization, and refactoring safety assessment.",
+      "paths": [
+        "roles/graph-engineer",
+        "commands/graph-impact.md",
+        "commands/graph-visualize.md"
+      ],
+      "targets": ["claude", "cursor", "codex", "opencode", "cangming", "codewhale"],
+      "dependencies": ["commands-core", "knowledge-graph", "team-workflow"],
+      "defaultInstall": false,
+      "cost": "light",
       "stability": "beta"
     },
     {

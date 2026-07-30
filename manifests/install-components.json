@@ -52,65 +52,65 @@
     {
       "id": "lang:typescript",
       "family": "language",
-      "description": "TypeScript and frontend/backend application-engineering guidance. Currently resolves through the shared framework-language module.",
+      "description": "TypeScript and frontend/backend application-engineering guidance.",
       "modules": [
-        "framework-language"
+        "framework-core"
       ]
     },
     {
       "id": "lang:python",
       "family": "language",
-      "description": "Python and Django-oriented engineering guidance. Currently resolves through the shared framework-language module.",
+      "description": "Python and Django-oriented engineering guidance.",
       "modules": [
-        "framework-language"
+        "lang-python"
       ]
     },
     {
       "id": "lang:go",
       "family": "language",
-      "description": "Go-focused coding and testing guidance. Currently resolves through the shared framework-language module.",
+      "description": "Go-focused coding and testing guidance.",
       "modules": [
-        "framework-language"
+        "lang-golang"
       ]
     },
     {
       "id": "lang:java",
       "family": "language",
-      "description": "Java and Spring application guidance. Currently resolves through the shared framework-language module.",
+      "description": "Java and Spring application guidance.",
       "modules": [
-        "framework-language"
+        "lang-java"
       ]
     },
     {
       "id": "framework:react",
       "family": "framework",
-      "description": "React-focused engineering guidance. Currently resolves through the shared framework-language module.",
+      "description": "React-focused engineering guidance.",
       "modules": [
-        "framework-language"
+        "framework-core"
       ]
     },
     {
       "id": "framework:nextjs",
       "family": "framework",
-      "description": "Next.js-focused engineering guidance. Currently resolves through the shared framework-language module.",
+      "description": "Next.js-focused engineering guidance.",
       "modules": [
-        "framework-language"
+        "framework-core"
       ]
     },
     {
       "id": "framework:django",
       "family": "framework",
-      "description": "Django-focused engineering guidance. Currently resolves through the shared framework-language module.",
+      "description": "Django-focused engineering guidance.",
       "modules": [
-        "framework-language"
+        "lang-python"
       ]
     },
     {
       "id": "framework:springboot",
       "family": "framework",
-      "description": "Spring Boot-focused engineering guidance. Currently resolves through the shared framework-language module.",
+      "description": "Spring Boot-focused engineering guidance.",
       "modules": [
-        "framework-language"
+        "lang-java"
       ]
     },
     {
@@ -221,50 +221,50 @@
     {
       "id": "lang:cpp",
       "family": "language",
-      "description": "C++ coding standards and testing guidance. Currently resolves through the shared framework-language module.",
+      "description": "C++ coding standards and testing guidance.",
       "modules": [
-        "framework-language"
+        "lang-cpp"
       ]
     },
     {
       "id": "lang:kotlin",
       "family": "language",
-      "description": "Kotlin, Ktor, Exposed, Coroutines, and Compose Multiplatform guidance. Currently resolves through the shared framework-language module.",
+      "description": "Kotlin, Ktor, Exposed, Coroutines, and Compose Multiplatform guidance.",
       "modules": [
-        "framework-language"
+        "lang-kotlin"
       ]
     },
     {
       "id": "lang:perl",
       "family": "language",
-      "description": "Modern Perl patterns, testing, and security guidance. Currently resolves through framework-language and security modules.",
+      "description": "Modern Perl patterns, testing, and security guidance.",
       "modules": [
-        "framework-language",
+        "lang-perl",
         "security"
       ]
     },
     {
       "id": "lang:rust",
       "family": "language",
-      "description": "Rust patterns and testing guidance. Currently resolves through the shared framework-language module.",
+      "description": "Rust patterns and testing guidance.",
       "modules": [
-        "framework-language"
+        "lang-rust"
       ]
     },
     {
       "id": "lang:csharp",
       "family": "language",
-      "description": "C# coding standards and patterns guidance. Currently resolves through the shared framework-language module.",
+      "description": "C# coding standards and patterns guidance.",
       "modules": [
-        "framework-language"
+        "framework-core"
       ]
     },
     {
       "id": "framework:laravel",
       "family": "framework",
-      "description": "Laravel patterns, TDD, verification, and security guidance. Resolves through framework-language and security modules.",
+      "description": "Laravel patterns, TDD, verification, and security guidance.",
       "modules": [
-        "framework-language",
+        "lang-laravel",
         "security"
       ]
     },
@@ -381,7 +381,7 @@
       ]
     },
     {
-      "id": "skill:continuous-learning",
+      "id": "skill:continuous-learning-v2",
       "family": "skill",
       "description": "Session pattern extraction and continuous learning skill.",
       "modules": [
@@ -429,14 +429,6 @@
       ]
     },
     {
-      "id": "skill:autonomous-loops",
-      "family": "skill",
-      "description": "Autonomous loop design and safety guidance.",
-      "modules": [
-        "loop-engineering"
-      ]
-    },
-    {
       "id": "skill:strategic-compact",
       "family": "skill",
       "description": "Strategic context compaction for long sessions.",
@@ -449,7 +441,7 @@
       "family": "skill",
       "description": "Language-agnostic coding standards and best practices.",
       "modules": [
-        "framework-language"
+        "framework-core"
       ]
     },
     {
@@ -457,7 +449,7 @@
       "family": "skill",
       "description": "React and frontend engineering patterns.",
       "modules": [
-        "framework-language"
+        "framework-core"
       ]
     },
     {
@@ -465,7 +457,7 @@
       "family": "skill",
       "description": "API design, database, and backend engineering patterns.",
       "modules": [
-        "framework-language"
+        "framework-core"
       ]
     },
     {

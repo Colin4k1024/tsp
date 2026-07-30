@@ -1,10 +1,10 @@
 ---
-description: Comprehensive Rust code review for ownership, lifetimes, error handling, unsafe usage, and idiomatic patterns. Invokes the rust-reviewer agent.
+description: Comprehensive Rust code review for ownership, lifetimes, error handling, unsafe usage, and idiomatic patterns. Invokes the code-reviewer agent with language focus.
 ---
 
 # Rust Code Review
 
-This command invokes the **rust-reviewer** agent for comprehensive Rust-specific code review.
+This command invokes the **code-reviewer** agent for comprehensive Rust-specific code review.
 
 ## What This Command Does
 
@@ -138,5 +138,5 @@ Recommendation: Block merge until CRITICAL issue is fixed
 
 ## Related
 
-- Agent: `agents/rust-reviewer.md`
+- Agent: `agents/specialists/code-reviewer.md`
 - Skills: `skills/rust-patterns/`, `skills/rust-testing/`

@@ -1,10 +1,10 @@
 ---
-description: Comprehensive Go code review for idiomatic patterns, concurrency safety, error handling, and security. Invokes the go-reviewer agent.
+description: Comprehensive Go code review for idiomatic patterns, concurrency safety, error handling, and security. Invokes the code-reviewer agent with language focus.
 ---
 
 # Go Code Review
 
-This command invokes the **go-reviewer** agent for comprehensive Go-specific code review.
+This command invokes the **code-reviewer** agent for comprehensive Go-specific code review.
 
 ## What This Command Does
 
@@ -144,5 +144,5 @@ Recommendation: FAIL: Block merge until CRITICAL issue is fixed
 
 ## Related
 
-- Agent: `agents/go-reviewer.md`
+- Agent: `agents/specialists/code-reviewer.md`
 - Skills: `skills/golang-patterns/`, `skills/golang-testing/`

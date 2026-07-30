@@ -56,7 +56,7 @@ source_of_truth:
 | `/plan` | `planner` | 回落到 `/team-plan` 或 `/handoff` |
 | `/tdd` | `tdd-guide` | 回落到 `/team-execute` 或 `/team-review` |
 | `/code-review` | `code-reviewer` | 回落到 `/team-review` 或 `/handoff` |
-| `/build-fix` | `build-error-resolver`（通用），或 `java-build-resolver`、`go-build-resolver`、`rust-build-resolver`、`python-reviewer`、`typescript-reviewer`、`kotlin-build-resolver`、`pytorch-build-resolver`（语言专项） | 回落到 `/team-execute` |
+| `/build-fix` | `build-error-resolver`（通用），或 `build-error-resolver (Java focus)`、`build-error-resolver (Go focus)`、`build-error-resolver (Rust focus)`、`code-reviewer (Python focus)`、`code-reviewer (TypeScript focus)`、`build-error-resolver (Kotlin focus)`、`build-error-resolver (PyTorch focus)`（语言专项） | 回落到 `/team-execute` |
 | `/verify` | `loop-operator`、`tdd-guide` | 回落到 `/team-review` 或 `/team-execute` |
 | `/multi-frontend` | `planner` 编排，`frontend-engineer` 执行 | 回落到 `/team-execute` |
 | `/multi-backend` | `planner` 编排，`backend-engineer` 执行 | 回落到 `/team-execute` |

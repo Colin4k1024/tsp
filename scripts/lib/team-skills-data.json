@@ -575,6 +575,92 @@
         "评估 Integration Depth（集成深度）。",
         "输出改进建议和优先级。"
       ]
+    },
+    {
+      "name": "graph-impact",
+      "summary": "分析代码变更的影响面，追踪调用链和依赖关系，输出结构化的影响评估报告。",
+      "primary_role": "graph-engineer",
+      "inputs": [
+        "代码变更范围",
+        "分析深度要求"
+      ],
+      "outputs": [
+        "影响面分析报告",
+        "调用链证据",
+        "验证建议"
+      ],
+      "steps": [
+        "通过 CodeGraph 分析变更文件的直接和间接依赖。",
+        "追踪调用链，标注每一步的 file:line 证据。",
+        "按影响程度分级输出报告。"
+      ]
+    },
+    {
+      "name": "graph-visualize",
+      "summary": "生成代码架构的可视化图表，展示模块依赖、调用关系和系统结构。",
+      "primary_role": "graph-engineer",
+      "inputs": [
+        "可视化范围",
+        "图表类型偏好"
+      ],
+      "outputs": [
+        "Mermaid 图表",
+        "架构说明",
+        "关键节点标注"
+      ],
+      "steps": [
+        "通过 CodeGraph 获取项目结构和符号关系。",
+        "生成 Mermaid 格式的依赖/调用图表。",
+        "标注关键节点和模块边界。"
+      ]
+    },
+    {
+      "name": "loop-start",
+      "summary": "启动循环任务，设置目标、收敛条件和预算。",
+      "primary_role": "loop-engineer",
+      "inputs": [],
+      "outputs": [],
+      "steps": [
+        "读取 .tsp/loop.yaml 或交互式收集循环任务规格。",
+        "验证收敛条件和预算设置。",
+        "启动循环任务并注册 heartbeat。"
+      ]
+    },
+    {
+      "name": "loop-status",
+      "summary": "查看循环任务的当前状态、迭代进度和预算消耗。",
+      "primary_role": "loop-engineer",
+      "inputs": [],
+      "outputs": [],
+      "steps": [
+        "读取循环任务状态文件。",
+        "报告迭代次数、收敛趋势和预算消耗。",
+        "给出继续/暂停/升级建议。"
+      ]
+    },
+    {
+      "name": "goal",
+      "summary": "管理循环任务的目标状态和收敛条件。",
+      "primary_role": "loop-engineer",
+      "inputs": [],
+      "outputs": [],
+      "steps": [
+        "管理循环任务的目标状态。",
+        "更新收敛条件和优先级。",
+        "检查目标是否已达成。"
+      ]
+    },
+    {
+      "name": "heartbeat",
+      "summary": "查看和管理 heartbeat 发现扫描的结果。",
+      "primary_role": "loop-engineer",
+      "inputs": [],
+      "outputs": [],
+      "steps": [
+        "查看最近的 heartbeat 发现扫描结果。",
+        "按类型分类结果（auto-goal/triage/notify/ignore）。",
+        "管理 heartbeat 调度配置。"
+      ]
     }
   ],
   "specialistAgentDefinitions": [
@@ -883,115 +969,6 @@
       "focus_skills": []
     },
     {
-      "name": "cpp-reviewer",
-      "display_name": "C++ Reviewer",
-      "mission": "负责 C++ 代码质量和设计评审。",
-      "triggers": [
-        "需要 C++ review",
-        "怀疑 C++ 改动有资源或边界问题"
-      ],
-      "outputs": [
-        "C++ 评审结论",
-        "潜在问题",
-        "建议修复项"
-      ],
-      "default_commands": [
-        "/code-review"
-      ],
-      "focus_rules": [
-        "rules/common/coding-style.md"
-      ],
-      "focus_skills": []
-    },
-    {
-      "name": "cpp-build-resolver",
-      "display_name": "C++ Build Resolver",
-      "mission": "负责 C++ 构建、链接和测试失败归因。",
-      "triggers": [
-        "C++ 编译失败",
-        "链接失败",
-        "CTest 或构建日志不明确"
-      ],
-      "outputs": [
-        "失败归因",
-        "修复建议",
-        "验证命令"
-      ],
-      "default_commands": [
-        "/build-fix"
-      ],
-      "focus_rules": [
-        "rules/common/testing.md"
-      ],
-      "focus_skills": []
-    },
-    {
-      "name": "go-reviewer",
-      "display_name": "Go Reviewer",
-      "mission": "负责 Go 代码质量、接口和并发行为评审。",
-      "triggers": [
-        "需要 Go review",
-        "怀疑 goroutine、context 或接口边界问题"
-      ],
-      "outputs": [
-        "Go 评审结论",
-        "风险项",
-        "建议修复"
-      ],
-      "default_commands": [
-        "/code-review"
-      ],
-      "focus_rules": [
-        "rules/golang/coding-style.md",
-        "rules/golang/testing.md"
-      ],
-      "focus_skills": []
-    },
-    {
-      "name": "go-build-resolver",
-      "display_name": "Go Build Resolver",
-      "mission": "负责 Go 构建、依赖和测试失败归因。",
-      "triggers": [
-        "Go build/test 失败",
-        "模块或依赖错误",
-        "构建日志需要快速定位"
-      ],
-      "outputs": [
-        "失败归因",
-        "修复建议",
-        "验证命令"
-      ],
-      "default_commands": [
-        "/build-fix"
-      ],
-      "focus_rules": [
-        "rules/golang/testing.md"
-      ],
-      "focus_skills": []
-    },
-    {
-      "name": "python-reviewer",
-      "display_name": "Python Reviewer",
-      "mission": "负责 Python 代码质量、边界和安全性评审。",
-      "triggers": [
-        "需要 Python review",
-        "怀疑 Python 改动有边界或测试问题"
-      ],
-      "outputs": [
-        "Python 评审结论",
-        "风险项",
-        "建议修复"
-      ],
-      "default_commands": [
-        "/code-review"
-      ],
-      "focus_rules": [
-        "rules/python/coding-style.md",
-        "rules/python/security.md"
-      ],
-      "focus_skills": []
-    },
-    {
       "name": "database-reviewer",
       "display_name": "Database Reviewer",
       "mission": "负责数据库 schema、查询、事务和迁移风险评审。",
@@ -1012,183 +989,6 @@
       "focus_rules": [
         "rules/common/security.md",
         "rules/java/jpa.md"
-      ],
-      "focus_skills": []
-    },
-    {
-      "name": "typescript-reviewer",
-      "display_name": "TypeScript Reviewer",
-      "mission": "负责 TypeScript/JavaScript 代码质量、类型边界和前端实现评审。",
-      "triggers": [
-        "需要 TypeScript review",
-        "怀疑类型边界或前端实现有问题"
-      ],
-      "outputs": [
-        "TypeScript 评审结论",
-        "风险项",
-        "建议修复"
-      ],
-      "default_commands": [
-        "/code-review",
-        "/multi-frontend"
-      ],
-      "focus_rules": [
-        "rules/typescript/coding-style.md",
-        "rules/typescript/frontend.md"
-      ],
-      "focus_skills": []
-    },
-    {
-      "name": "java-reviewer",
-      "display_name": "Java Reviewer",
-      "mission": "负责 Java / Spring Boot 代码质量、分层和事务边界评审。",
-      "triggers": [
-        "需要 Java review",
-        "怀疑 Spring Boot/JPA 设计或边界问题"
-      ],
-      "outputs": [
-        "Java 评审结论",
-        "风险项",
-        "建议修复"
-      ],
-      "default_commands": [
-        "/code-review",
-        "/multi-backend"
-      ],
-      "focus_rules": [
-        "rules/java/coding-style.md",
-        "rules/java/springboot.md",
-        "rules/java/jpa.md"
-      ],
-      "focus_skills": []
-    },
-    {
-      "name": "java-build-resolver",
-      "display_name": "Java Build Resolver",
-      "mission": "负责 Java / Maven / Gradle 构建和测试失败归因。",
-      "triggers": [
-        "Java build/test 失败",
-        "Maven/Gradle 日志难定位",
-        "依赖或编译错误"
-      ],
-      "outputs": [
-        "失败归因",
-        "修复建议",
-        "验证命令"
-      ],
-      "default_commands": [
-        "/build-fix"
-      ],
-      "focus_rules": [
-        "rules/java/testing.md"
-      ],
-      "focus_skills": []
-    },
-    {
-      "name": "kotlin-reviewer",
-      "display_name": "Kotlin Reviewer",
-      "mission": "负责 Kotlin 代码质量、架构和协程使用评审。",
-      "triggers": [
-        "需要 Kotlin review",
-        "怀疑 Kotlin/Android/KMP 设计问题"
-      ],
-      "outputs": [
-        "Kotlin 评审结论",
-        "风险项",
-        "建议修复"
-      ],
-      "default_commands": [
-        "/code-review"
-      ],
-      "focus_rules": [
-        "rules/common/coding-style.md"
-      ],
-      "focus_skills": []
-    },
-    {
-      "name": "kotlin-build-resolver",
-      "display_name": "Kotlin Build Resolver",
-      "mission": "负责 Kotlin / Gradle 构建失败归因。",
-      "triggers": [
-        "Kotlin build 失败",
-        "Gradle 失败",
-        "需要快速定位构建问题"
-      ],
-      "outputs": [
-        "失败归因",
-        "修复建议",
-        "验证命令"
-      ],
-      "default_commands": [
-        "/build-fix"
-      ],
-      "focus_rules": [
-        "rules/common/testing.md"
-      ],
-      "focus_skills": []
-    },
-    {
-      "name": "rust-reviewer",
-      "display_name": "Rust Reviewer",
-      "mission": "负责 Rust 代码质量、所有权边界和错误处理评审。",
-      "triggers": [
-        "需要 Rust review",
-        "怀疑 Rust 设计或错误处理问题"
-      ],
-      "outputs": [
-        "Rust 评审结论",
-        "风险项",
-        "建议修复"
-      ],
-      "default_commands": [
-        "/code-review"
-      ],
-      "focus_rules": [
-        "rules/common/coding-style.md"
-      ],
-      "focus_skills": []
-    },
-    {
-      "name": "rust-build-resolver",
-      "display_name": "Rust Build Resolver",
-      "mission": "负责 Rust 构建、borrow checker 和测试失败归因。",
-      "triggers": [
-        "Rust 编译失败",
-        "borrow checker 报错",
-        "Cargo test 失败"
-      ],
-      "outputs": [
-        "失败归因",
-        "修复建议",
-        "验证命令"
-      ],
-      "default_commands": [
-        "/build-fix"
-      ],
-      "focus_rules": [
-        "rules/common/testing.md"
-      ],
-      "focus_skills": []
-    },
-    {
-      "name": "pytorch-build-resolver",
-      "display_name": "PyTorch Build Resolver",
-      "mission": "负责 PyTorch / CUDA 训练、依赖和运行时错误归因。",
-      "triggers": [
-        "PyTorch/CUDA 报错",
-        "训练环境异常",
-        "需要快速定位框架或算子问题"
-      ],
-      "outputs": [
-        "失败归因",
-        "修复建议",
-        "环境检查项"
-      ],
-      "default_commands": [
-        "/build-fix"
-      ],
-      "focus_rules": [
-        "rules/python/testing.md"
       ],
       "focus_skills": []
     }

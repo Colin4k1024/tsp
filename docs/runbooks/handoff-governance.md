@@ -187,7 +187,7 @@ flowchart TD
 | `tech-lead` | `harness-optimizer` | 平台审计 | 当前配置 | 回落到 docs/memory/ |
 | `backend-engineer` | `code-reviewer` | 代码完成 | 代码变更 diff | 回落到 Execute Log |
 | `backend-engineer` | `build-error-resolver` | 构建失败 | 错误日志 | 回落到 /team-execute |
-| `backend-engineer` | `java-build-resolver` | Java 构建失败 | 错误日志 | 回落到 /team-execute |
+| `backend-engineer` | `build-error-resolver (Java focus)` | Java 构建失败 | 错误日志 | 回落到 /team-execute |
 | `frontend-engineer` | `code-reviewer` | 代码完成 | 代码变更 diff | 回落到 Execute Log |
 | `frontend-engineer` | `build-error-resolver` | 构建失败 | 错误日志 | 回落到 /team-execute |
 | `qa-engineer` | `tdd-guide` | 测试策略制定 | PRD、代码结构 | 回落到 Test Plan |

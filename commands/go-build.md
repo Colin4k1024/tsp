@@ -1,10 +1,10 @@
 ---
-description: Fix Go build errors, go vet warnings, and linter issues incrementally. Invokes the go-build-resolver agent for minimal, surgical fixes.
+description: Fix Go build errors, go vet warnings, and linter issues incrementally. Invokes the build-error-resolver agent with language focus for minimal, surgical fixes.
 ---
 
 # Go Build and Fix
 
-This command invokes the **go-build-resolver** agent to incrementally fix Go build errors with minimal changes.
+This command invokes the **build-error-resolver** agent to incrementally fix Go build errors with minimal changes.
 
 ## What This Command Does
 
@@ -179,5 +179,5 @@ The agent will stop and report if:
 
 ## Related
 
-- Agent: `agents/go-build-resolver.md`
+- Agent: `agents/specialists/build-error-resolver.md`
 - Skill: `skills/golang-patterns/`

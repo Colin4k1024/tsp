@@ -1,10 +1,10 @@
 ---
-description: Comprehensive C++ code review for memory safety, modern C++ idioms, concurrency, and security. Invokes the cpp-reviewer agent.
+description: Comprehensive C++ code review for memory safety, modern C++ idioms, concurrency, and security. Invokes the code-reviewer agent with language focus.
 ---
 
 # C++ Code Review
 
-This command invokes the **cpp-reviewer** agent for comprehensive C++-specific code review.
+This command invokes the **code-reviewer** agent for comprehensive C++-specific code review.
 
 ## What This Command Does
 
@@ -128,5 +128,5 @@ Recommendation: FAIL: Block merge until CRITICAL issue is fixed
 
 ## Related
 
-- Agent: `agents/cpp-reviewer.md`
+- Agent: `agents/specialists/code-reviewer.md`
 - Skills: `skills/cpp-coding-standards/`, `skills/cpp-testing/`

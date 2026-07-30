@@ -1,10 +1,10 @@
 ---
-description: Comprehensive Kotlin code review for idiomatic patterns, null safety, coroutine safety, and security. Invokes the kotlin-reviewer agent.
+description: Comprehensive Kotlin code review for idiomatic patterns, null safety, coroutine safety, and security. Invokes the code-reviewer agent with language focus.
 ---
 
 # Kotlin Code Review
 
-This command invokes the **kotlin-reviewer** agent for comprehensive Kotlin-specific code review.
+This command invokes the **code-reviewer** agent for comprehensive Kotlin-specific code review.
 
 ## What This Command Does
 
@@ -136,5 +136,5 @@ Recommendation: FAIL: Block merge until CRITICAL issue is fixed
 
 ## Related
 
-- Agent: `agents/kotlin-reviewer.md`
+- Agent: `agents/specialists/code-reviewer.md`
 - Skills: `skills/kotlin-patterns/`, `skills/kotlin-testing/`

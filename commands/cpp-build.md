@@ -1,10 +1,10 @@
 ---
-description: Fix C++ build errors, CMake issues, and linker problems incrementally. Invokes the cpp-build-resolver agent for minimal, surgical fixes.
+description: Fix C++ build errors, CMake issues, and linker problems incrementally. Invokes the build-error-resolver agent with language focus for minimal, surgical fixes.
 ---
 
 # C++ Build and Fix
 
-This command invokes the **cpp-build-resolver** agent to incrementally fix C++ build errors with minimal changes.
+This command invokes the **build-error-resolver** agent to incrementally fix C++ build errors with minimal changes.
 
 ## What This Command Does
 
@@ -169,5 +169,5 @@ The agent will stop and report if:
 
 ## Related
 
-- Agent: `agents/cpp-build-resolver.md`
+- Agent: `agents/specialists/build-error-resolver.md`
 - Skill: `skills/cpp-coding-standards/`
