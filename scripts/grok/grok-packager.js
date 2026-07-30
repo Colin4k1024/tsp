@@ -332,13 +332,23 @@ function main() {
     fs.copyFileSync(hooksSource, hooksDest);
     console.log('  Hooks: hooks.json copied');
   } else {
-    // 如果源文件不存在，使用默认的 hooks.json
+    // 如果源文件不存在，使用默认的 hooks.json（使用官方事件名）
     const defaultHooks = {
       hooks: {
-        context: [],
-        observation: [],
-        summarize: [],
-        'file-context': []
+        SessionStart: [],
+        SessionEnd: [],
+        PreToolUse: [],
+        PostToolUse: [],
+        PostToolUseFailure: [],
+        Stop: [],
+        UserPromptSubmit: [],
+        PreCompact: [],
+        PostCompact: [],
+        PermissionDenied: [],
+        Notification: [],
+        SubagentStart: [],
+        SubagentStop: [],
+        StopFailure: [],
       }
     };
     fs.writeFileSync(hooksDest, JSON.stringify(defaultHooks, null, 2));

@@ -28,10 +28,10 @@ function main() {
     let command = '';
     try {
       const input = raw.trim() ? JSON.parse(raw) : {};
-      // 支持 Grok 和 Claude 两种输入格式
+      // Grok 官方规范: camelCase (toolInput)，兼容 snake_case (tool_input)
       command = String(
-        input.tool_input?.command ||
         input.toolInput?.command ||
+        input.tool_input?.command ||
         ''
       );
     } catch {
@@ -45,17 +45,19 @@ function main() {
     const hasNoVerify = /\s--no-verify(?:\s|$)/.test(normalized);
 
     if (isGitCommit && hasNoVerify) {
-      // Grok 使用 exit 2 表示阻断错误
+      // Grok 官方规范: exit 2 + stdout 输出 {"decision":"deny","reason":"..."}
       process.stderr.write(
         '[pre:bash:block-no-verify] BLOCKED: `git commit --no-verify` is not allowed. Git hooks must not be bypassed.\n'
       );
-      console.log(raw);
+      console.log(JSON.stringify({
+        decision: 'deny',
+        reason: '`git commit --no-verify` is not allowed. Git hooks must not be bypassed.',
+      }));
       process.exit(2);
       return;
     }
 
-    // 通过 - 输出原始输入
-    console.log(raw);
+    // 通过 - exit 0 允许执行
     process.exit(0);
   });
 }

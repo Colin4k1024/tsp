@@ -53,9 +53,11 @@ last_verified: 2026-07-29
 
 | 特性 | Claude | Grok | 差异处理 |
 |------|--------|------|----------|
-| 事件格式 | snake_case | camelCase | grok-event-bridge.js |
-| 工具名 | Bash/Read/Write | bash/read/write | 自动转换 |
-| 环境变量 | CLAUDE_HOME | GROK_HOME | path-resolver.js |
+| 事件格式 | PascalCase | PascalCase | 一致，无需转换 |
+| 工具名 | Bash/Read/Write | 自动映射 | Grok 内部处理 |
+| 环境变量 | CLAUDE_PLUGIN_ROOT | GROK_PLUGIN_ROOT | path-resolver.js |
+| 会话 ID | CLAUDE_SESSION_ID | GROK_SESSION_ID | 直接使用 |
+| 工作区根目录 | - | GROK_WORKSPACE_ROOT | 直接使用 |
 | 插件目录 | ~/.claude/plugins | ~/.grok/installed-plugins | 自动映射 |
 | Hook 协议 | hooks.json | hooks.json | 格式兼容 |
 

@@ -16,8 +16,8 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 
-// 平台检测
-const PLATFORM = process.env.GROK_HOME ? 'grok' : 'claude';
+// 平台检测（优先使用 Grok 官方环境变量 GROK_HOOK_EVENT / GROK_WORKSPACE_ROOT）
+const PLATFORM = (process.env.GROK_HOOK_EVENT || process.env.GROK_WORKSPACE_ROOT || process.env.GROK_HOME) ? 'grok' : 'claude';
 
 // 路径缓存
 const pathCache = {};
@@ -38,13 +38,30 @@ function getHomeDir() {
 }
 
 /**
- * 获取项目根目录
+ * 获取工作区根目录（优先使用 Grok 官方环境变量）
+ * @returns {string} 工作区根目录
+ */
+function getWorkspaceRoot() {
+  if (pathCache.workspaceRoot) return pathCache.workspaceRoot;
+
+  const workspaceRoot = process.env.GROK_WORKSPACE_ROOT
+    || process.env.PROJECT_ROOT
+    || process.cwd();
+
+  pathCache.workspaceRoot = workspaceRoot;
+  return workspaceRoot;
+}
+
+/**
+ * 获取项目根目录（优先使用 Grok 官方环境变量 GROK_WORKSPACE_ROOT）
  * @returns {string} 项目根目录
  */
 function getProjectRoot() {
   if (pathCache.projectRoot) return pathCache.projectRoot;
 
-  const projectRoot = process.env.PROJECT_ROOT || process.cwd();
+  const projectRoot = process.env.GROK_WORKSPACE_ROOT
+    || process.env.PROJECT_ROOT
+    || process.cwd();
   pathCache.projectRoot = projectRoot;
   return projectRoot;
 }
@@ -182,6 +199,7 @@ function getCompatiblePath(relativePath) {
 module.exports = {
   getHomeDir,
   getProjectRoot,
+  getWorkspaceRoot,
   getTspHome,
   getSessionDir,
   getPluginDir,

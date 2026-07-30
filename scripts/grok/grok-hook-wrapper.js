@@ -19,35 +19,28 @@ const os = require('os');
 
 const TSP_HOME = path.resolve(__dirname, '../..');
 const GROK_HOME = process.env.GROK_HOME || path.join(os.homedir(), '.grok');
-const PROJECT_ROOT = process.env.PROJECT_ROOT || process.cwd();
+const WORKSPACE_ROOT = process.env.GROK_WORKSPACE_ROOT || process.env.PROJECT_ROOT || process.cwd();
 
 // 环境变量映射
 const ENV_MAP = {
   CLAUDE_HOME: GROK_HOME,
-  CLAUDE_PROJECT_ROOT: PROJECT_ROOT,
+  CLAUDE_PROJECT_ROOT: WORKSPACE_ROOT,
   TSP_HOME: TSP_HOME,
   GROK_HOME: GROK_HOME,
-  PROJECT_ROOT: PROJECT_ROOT,
+  GROK_WORKSPACE_ROOT: WORKSPACE_ROOT,
+  PROJECT_ROOT: WORKSPACE_ROOT,
 };
 
-// 工具名映射（Claude → Grok）
-const TOOL_NAME_MAP = {
-  Bash: 'bash',
-  Read: 'read',
-  Write: 'write',
-  Edit: 'edit',
-  Grep: 'grep',
-  Glob: 'glob',
-  Agent: 'agent',
-};
+// Grok 自动映射 Claude 工具名，无需手动转换
+// 参见官方文档: "Claude tool names such as Bash, Read, and Edit are mapped to Grok's automatically"
 
-// 转换输入格式
+// 转换输入格式（snake_case → camelCase）
 function translateInput(claudeInput) {
   const grokInput = { ...claudeInput };
 
-  // 转换工具名
+  // 转换工具名字段（snake_case → camelCase，值保持原样由 Grok 自动映射）
   if (grokInput.tool_name) {
-    grokInput.toolName = TOOL_NAME_MAP[grokInput.tool_name] || grokInput.tool_name.toLowerCase();
+    grokInput.toolName = grokInput.tool_name;
     delete grokInput.tool_name;
   }
 

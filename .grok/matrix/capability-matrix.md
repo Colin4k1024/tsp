@@ -55,10 +55,12 @@ last_verified: 2026-07-29
 
 ## Hook 兼容性详情
 
-### Grok 事件协议（camelCase）
-- `preToolUse` → TSP `pre_tool_use`
-- `postToolUse` → TSP `post_tool_use`
-- `stop` → TSP `stop`
+### Grok 事件协议（PascalCase，与 Claude Code 一致）
+- `PreToolUse` → TSP `PreToolUse`（无需映射）
+- `PostToolUse` → TSP `PostToolUse`（无需映射）
+- `SessionStart` → TSP `SessionStart`（无需映射）
+- `Stop` → TSP `Stop`（无需映射）
+- 详见 Grok Build 官方文档
 
 ### 需要适配的 Hook 脚本（只读 snake_case）
 

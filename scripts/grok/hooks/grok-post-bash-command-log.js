@@ -10,7 +10,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { getHomeDir } = require('./path-resolver');
+const { getHomeDir } = require('../path-resolver');
 
 const MAX_STDIN = 1024 * 1024;
 let raw = '';
@@ -60,10 +60,10 @@ function main() {
     try {
       if (config) {
         const input = raw.trim() ? JSON.parse(raw) : {};
-        // 支持 Grok 和 Claude 两种输入格式
+        // Grok 官方规范: camelCase (toolInput)，兼容 snake_case (tool_input)
         const command = sanitizeCommand(
-          input.tool_input?.command ||
           input.toolInput?.command ||
+          input.tool_input?.command ||
           '?'
         );
         const homeDir = getHomeDir();
@@ -73,8 +73,8 @@ function main() {
       // Logging must never block the calling hook.
     }
 
-    // 输出原始输入（Grok 需要 JSON 输出到 stdout）
-    console.log(raw);
+    // PostToolUse 为被动事件，stdout 被忽略；exit 0 表示成功
+    process.exit(0);
   });
 }
 

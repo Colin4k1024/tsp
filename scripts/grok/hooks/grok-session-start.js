@@ -9,7 +9,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { getHomeDir, getProjectRoot, isGrok } = require('./path-resolver');
+const { getHomeDir, getProjectRoot, isGrok } = require('../path-resolver');
 
 // 读取 stdin 输入
 const raw = fs.readFileSync(0, 'utf8');
@@ -26,7 +26,7 @@ function main() {
       homeDir,
       projectRoot,
       timestamp: new Date().toISOString(),
-      sessionId: input.session_id || input.sessionId || 'unknown',
+      sessionId: input.sessionId || input.session_id || 'unknown',
     };
 
     // 读取项目上下文（如果存在）
@@ -56,23 +56,10 @@ function main() {
       }
     }
 
-    // 输出 Grok 兼容的格式
-    const output = {
-      hookSpecificOutput: {
-        hookEventName: 'SessionStart',
-        additionalContext: formatContext(context),
-      },
-    };
-
-    console.log(JSON.stringify(output));
+    // SessionStart 为被动事件，stdout 被忽略；exit 0 表示成功
+    // 上下文注入通过 hook 脚本内部处理（如需要）
   } catch (error) {
     // 静默失败，不阻塞会话
-    console.log(JSON.stringify({
-      hookSpecificOutput: {
-        hookEventName: 'SessionStart',
-        additionalContext: '',
-      },
-    }));
   }
 }
 

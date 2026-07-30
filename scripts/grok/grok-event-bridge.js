@@ -16,49 +16,72 @@
 const fs = require('fs');
 const path = require('path');
 
-// 事件映射：Claude → Grok
+// 事件映射：Claude → Grok (Grok 使用与 Claude Code 完全一致的事件名)
 const EVENT_MAP = {
-  pre_tool_use: 'preToolUse',
-  post_tool_use: 'postToolUse',
-  stop: 'stop',
-  pre_bash: 'preToolUse',
-  post_bash: 'postToolUse',
+  PreToolUse: 'PreToolUse',
+  PostToolUse: 'PostToolUse',
+  PostToolUseFailure: 'PostToolUseFailure',
+  SessionStart: 'SessionStart',
+  SessionEnd: 'SessionEnd',
+  Stop: 'Stop',
+  StopFailure: 'StopFailure',
+  UserPromptSubmit: 'UserPromptSubmit',
+  PreCompact: 'PreCompact',
+  PostCompact: 'PostCompact',
+  PermissionDenied: 'PermissionDenied',
+  Notification: 'Notification',
+  SubagentStart: 'SubagentStart',
+  SubagentStop: 'SubagentStop',
+  // Legacy snake_case aliases (backward compat)
+  pre_tool_use: 'PreToolUse',
+  post_tool_use: 'PostToolUse',
+  post_tool_use_failure: 'PostToolUseFailure',
+  session_start: 'SessionStart',
+  session_end: 'SessionEnd',
+  stop: 'Stop',
+  user_prompt_submit: 'UserPromptSubmit',
+  pre_compact: 'PreCompact',
+  post_compact: 'PostCompact',
 };
 
 // 环境变量映射
 const ENV_MAP = {
   CLAUDE_HOME: 'GROK_HOME',
-  CLAUDE_PROJECT_ROOT: 'PROJECT_ROOT',
+  CLAUDE_PROJECT_ROOT: 'GROK_WORKSPACE_ROOT',
   TSP_HOME: 'GROK_HOME',
 };
 
-// Grok camelCase 工具名映射
-const TOOL_NAME_MAP = {
-  Bash: 'bash',
-  Read: 'read',
-  Write: 'write',
-  Edit: 'edit',
-  Grep: 'grep',
-  Glob: 'glob',
-  Agent: 'agent',
-};
+// Grok 自动映射 Claude 工具名，无需手动转换
+// 参见官方文档: "Claude tool names such as Bash, Read, and Edit are mapped to Grok's automatically"
 
 class GrokEventBridge {
   constructor(options = {}) {
     this.tspHome = options.tspHome || process.env.TSP_HOME || path.resolve(__dirname, '../..');
     this.grokHome = options.grokHome || process.env.GROK_HOME || path.join(require('os').homedir(), '.grok');
-    this.projectRoot = options.projectRoot || process.env.PROJECT_ROOT || process.cwd();
+    this.projectRoot = options.projectRoot || process.env.GROK_WORKSPACE_ROOT || process.env.PROJECT_ROOT || process.cwd();
     this.debug = options.debug || false;
   }
 
-  // 转换事件名
+  // 转换事件名（Grok 使用与 Claude Code 一致的 PascalCase 事件名）
   mapEventName(claudeEvent) {
     return EVENT_MAP[claudeEvent] || claudeEvent;
   }
 
-  // 转换工具名
+  // 检查事件名是否为 Grok 官方支持的事件
+  isOfficialGrokEvent(eventName) {
+    const official = [
+      'SessionStart', 'SessionEnd', 'UserPromptSubmit',
+      'PreToolUse', 'PostToolUse', 'PostToolUseFailure',
+      'PermissionDenied', 'Stop', 'StopFailure',
+      'Notification', 'SubagentStart', 'SubagentStop',
+      'PreCompact', 'PostCompact',
+    ];
+    return official.includes(eventName);
+  }
+
+  // 工具名由 Grok 自动映射，透传原始值
   mapToolName(claudeTool) {
-    return TOOL_NAME_MAP[claudeTool] || claudeTool.toLowerCase();
+    return claudeTool;
   }
 
   // 转换环境变量
@@ -74,7 +97,7 @@ class GrokEventBridge {
 
     // 设置 Grok 专用变量
     translated.GROK_HOME = this.grokHome;
-    translated.PROJECT_ROOT = this.projectRoot;
+    translated.GROK_WORKSPACE_ROOT = this.projectRoot;
     translated.TSP_HOME = this.tspHome;
 
     return translated;
@@ -89,9 +112,9 @@ class GrokEventBridge {
       grokInput.event = this.mapEventName(grokInput.event);
     }
 
-    // 转换工具名
+    // 转换工具名字段（snake_case → camelCase，值保持原样由 Grok 自动映射）
     if (grokInput.tool_name) {
-      grokInput.toolName = this.mapToolName(grokInput.tool_name);
+      grokInput.toolName = grokInput.tool_name;
       delete grokInput.tool_name;
     }
 

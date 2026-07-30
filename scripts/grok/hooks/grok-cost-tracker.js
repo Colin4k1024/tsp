@@ -9,7 +9,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { getHomeDir } = require('./path-resolver');
+const { getHomeDir } = require('../path-resolver');
 
 const MAX_STDIN = 1024 * 1024;
 let raw = '';
@@ -51,16 +51,19 @@ process.stdin.on('end', () => {
     const inputTokens = toNumber(usage.input_tokens || usage.prompt_tokens || 0);
     const outputTokens = toNumber(usage.output_tokens || usage.completion_tokens || 0);
 
+    // Grok 官方环境变量: GROK_SESSION_ID, GROK_HOOK_EVENT
+    // 模型信息从 stdin JSON 中读取（如可用）
     const model = String(
       input.model ||
       input._cursor?.model ||
       process.env.CLAUDE_MODEL ||
-      process.env.GROK_MODEL ||
       'unknown'
     );
     const sessionId = String(
-      process.env.CLAUDE_SESSION_ID ||
+      input.sessionId ||
+      input.session_id ||
       process.env.GROK_SESSION_ID ||
+      process.env.CLAUDE_SESSION_ID ||
       'default'
     );
 
@@ -86,6 +89,6 @@ process.stdin.on('end', () => {
     // Keep hook non-blocking.
   }
 
-  // 输出原始输入（Grok 需要 JSON 输出到 stdout）
-  console.log(raw);
+  // PostToolUse 为被动事件，stdout 被忽略；exit 0 表示成功
+  process.exit(0);
 });

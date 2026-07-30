@@ -9,29 +9,38 @@ last_verified: 2026-07-29
 
 ## Grok 支持的 Hook 事件
 
-根据 Grok 源码分析（`src/cli/handlers/index.ts`），Grok 支持以下事件：
+根据 Grok Build 官方文档，Grok 使用与 Claude Code 完全一致的事件名：
 
 | Grok 事件 | 触发时机 | 用途 |
 |-----------|----------|------|
-| `context` | SessionStart | 注入上下文（静默） |
-| `session-init` | UserPromptSubmit | 初始化会话 |
-| `observation` | PostToolUse | 工具使用观察 |
-| `summarize` | Stop | 会话总结 |
-| `user-message` | UserPromptSubmit | 用户消息处理 |
-| `file-edit` | 文件编辑 | 文件编辑处理 |
-| `file-context` | PreToolUse | 文件上下文注入 |
+| `SessionStart` | 会话开始 | 注入上下文 |
+| `SessionEnd` | 会话结束 | 保存状态 |
+| `UserPromptSubmit` | 用户提交 prompt | 初始化会话 |
+| `PreToolUse` | 工具即将运行（唯一阻断事件） | 安全检查、命令拦截 |
+| `PostToolUse` | 工具完成 | 日志、观察 |
+| `PostToolUseFailure` | 工具失败 | 错误处理 |
+| `PermissionDenied` | 权限系统拒绝工具调用 | 拒绝处理 |
+| `Stop` | 一个 turn 结束 | 会话总结、持久化 |
+| `StopFailure` | turn 以 API 错误结束 | 错误处理 |
+| `Notification` | Agent 发送通知 | 通知处理 |
+| `SubagentStart` | 子 agent 启动 | 子 agent 管理 |
+| `SubagentStop` | 子 agent 完成 | 子 agent 管理 |
+| `PreCompact` | 对话压缩前 | 状态保存 |
+| `PostCompact` | 对话压缩后 | 状态恢复 |
 
 ## TSP Hook 事件
 
-| TSP 事件 | 数量 | Grok 映射 |
+Grok 使用与 Claude Code 完全一致的事件名，无需映射：
+
+| TSP 事件 | 数量 | Grok 事件 |
 |----------|------|-----------|
-| `PreToolUse` | 17 | `file-context` |
-| `PostToolUse` | 12 | `observation` |
-| `PostToolUseFailure` | 3 | `observation` (错误路径) |
-| `SessionStart` | 4 | `context` |
-| `SessionEnd` | 2 | 无直接映射 |
-| `Stop` | 3 | `summarize` |
-| `PreCompact` | 2 | 无直接映射 |
+| `PreToolUse` | 17 | `PreToolUse` |
+| `PostToolUse` | 12 | `PostToolUse` |
+| `PostToolUseFailure` | 3 | `PostToolUseFailure` |
+| `SessionStart` | 4 | `SessionStart` |
+| `SessionEnd` | 2 | `SessionEnd` |
+| `Stop` | 3 | `Stop` |
+| `PreCompact` | 2 | `PreCompact` |
 
 ## 兼容性矩阵
 
@@ -39,37 +48,37 @@ last_verified: 2026-07-29
 
 | TSP Hook | Grok 事件 | 说明 |
 |----------|-----------|------|
-| `session-start-bootstrap.js` | `context` | 会话启动时注入上下文 |
-| `session-guard.js` | `context` | 会话保护检查 |
-| `observe.sh` | `observation` | 工具使用观察 |
-| `cost-tracker.js` | `observation` | 成本跟踪 |
-| `memory-persistence/*.js` | `summarize` | 记忆持久化 |
-| `strategic-compact/*.js` | `summarize` | 策略性压缩 |
+| `session-start-bootstrap.js` | `SessionStart` | 会话启动时注入上下文 |
+| `session-guard.js` | `SessionStart` | 会话保护检查 |
+| `observe.sh` | `PostToolUse` | 工具使用观察 |
+| `cost-tracker.js` | `PostToolUse` | 成本跟踪 |
+| `memory-persistence/*.js` | `Stop` | 记忆持久化 |
+| `strategic-compact/*.js` | `Stop` | 策略性压缩 |
 
 ### ⚠️ 部分兼容（需要适配）
 
 | TSP Hook | Grok 事件 | 适配内容 |
 |----------|-----------|----------|
-| `pre-bash-block-no-verify.js` | `file-context` | 输入格式转换 |
-| `git-operation-gate.sh` | `file-context` | 环境变量映射 |
-| `naming-check.sh` | `file-context` | 工具名转换 |
-| `no-any.sh` | `file-context` | TypeScript 特定 |
-| `review-reminder.sh` | `file-context` | 提示类 hook |
-| `rtk-rewrite.sh` | `observation` | 命令重写 |
-| `session-start-bootstrap.js` | `context` | 上下文注入 |
+| `pre-bash-block-no-verify.js` | `PreToolUse` | 输入格式转换 |
+| `git-operation-gate.sh` | `PreToolUse` | 环境变量映射 |
+| `naming-check.sh` | `PreToolUse` | 工具名转换 |
+| `no-any.sh` | `PreToolUse` | TypeScript 特定 |
+| `review-reminder.sh` | `PreToolUse` | 提示类 hook |
+| `rtk-rewrite.sh` | `PostToolUse` | 命令重写 |
+| `session-start-bootstrap.js` | `SessionStart` | 上下文注入 |
 
 ### ❌ 不兼容（需要重写）
 
 | TSP Hook | 原因 | 替代方案 |
 |----------|------|----------|
-| `harness-context-monitor.js` | 依赖 Claude 特定 API | 使用 Grok `file-context` |
-| `harness-prompt-guard.js` | 依赖 Claude 特定 API | 使用 Grok `user-message` |
+| `harness-context-monitor.js` | 依赖 Claude 特定 API | 使用 Grok `PreToolUse` |
+| `harness-prompt-guard.js` | 依赖 Claude 特定 API | 使用 Grok `UserPromptSubmit` |
 | `harness-statusline.js` | 依赖 Claude UI | 不适用 |
-| `pre-compact.js` | Grok 无 PreCompact 事件 | 使用 `summarize` |
+| `pre-compact.js` | 需适配 Grok 格式 | 使用 `PreCompact` |
 
 ## 详细兼容性分析
 
-### 1. PreToolUse → file-context
+### 1. PreToolUse
 
 **TSP PreToolUse Hooks (17个):**
 
@@ -95,23 +104,24 @@ last_verified: 2026-07-29
 }
 ```
 
-**Grok file-context 输入格式:**
+**Grok PreToolUse 输入格式（官方规范）:**
 ```json
 {
-  "session_id": "...",
+  "hookEventName": "PreToolUse",
+  "sessionId": "...",
   "cwd": "...",
-  "tool_name": "Bash",
-  "tool_input": { "command": "..." },
-  "transcript_path": "..."
+  "workspaceRoot": "...",
+  "toolName": "Bash",
+  "toolInput": { "command": "..." }
 }
 ```
 
 **适配要求:**
-- 输入格式基本兼容
-- 需要映射 `tool_name` (Bash → bash)
-- 需要处理环境变量差异
+- 事件名一致，无需映射
+- 工具名由 Grok 自动映射（无需手动转换）
+- 使用 camelCase 字段名（`sessionId`, `toolName`, `toolInput`）
 
-### 2. PostToolUse → observation
+### 2. PostToolUse
 
 **TSP PostToolUse Hooks (12个):**
 
@@ -132,23 +142,23 @@ last_verified: 2026-07-29
 }
 ```
 
-**Grok observation 输入格式:**
+**Grok PostToolUse 输入格式（官方规范）:**
 ```json
 {
-  "session_id": "...",
+  "hookEventName": "PostToolUse",
+  "sessionId": "...",
   "cwd": "...",
-  "tool_name": "Bash",
-  "tool_input": { "command": "..." },
-  "tool_response": "..."
+  "workspaceRoot": "...",
+  "toolName": "Bash",
+  "toolInput": { "command": "..." }
 }
 ```
 
 **适配要求:**
-- 输入格式兼容
-- 需要映射 `tool_name`
-- 需要处理 `tool_response` 字段
+- 事件名一致，无需映射
+- 使用 camelCase 字段名
 
-### 3. SessionStart → context
+### 3. SessionStart
 
 **TSP SessionStart Hooks (4个):**
 
@@ -161,21 +171,20 @@ last_verified: 2026-07-29
 }
 ```
 
-**Grok context 输出格式:**
+**Grok SessionStart 输入格式（官方规范）:**
 ```json
 {
-  "hookSpecificOutput": {
-    "hookEventName": "SessionStart",
-    "additionalContext": "..."
-  }
+  "hookEventName": "SessionStart",
+  "sessionId": "...",
+  "cwd": "...",
+  "workspaceRoot": "..."
 }
 ```
 
 **适配要求:**
-- 输出格式需要转换
-- 需要生成 `hookSpecificOutput` 结构
+- 使用 camelCase 字段名
 
-### 4. Stop → summarize
+### 4. Stop
 
 **TSP Stop Hooks (3个):**
 
@@ -187,19 +196,19 @@ last_verified: 2026-07-29
 }
 ```
 
-**Grok summarize 输出格式:**
+**Grok Stop 输入格式（官方规范）:**
 ```json
 {
-  "hookSpecificOutput": {
-    "hookEventName": "Stop",
-    "summary": "..."
-  }
+  "hookEventName": "Stop",
+  "sessionId": "...",
+  "cwd": "...",
+  "workspaceRoot": "..."
 }
 ```
 
 **适配要求:**
-- 输出格式需要转换
-- 需要生成 `hookSpecificOutput` 结构
+- 使用 camelCase 字段名
+- 注意：`Stop`（turn 结束）与 `SessionEnd`（会话结束）是独立事件
 
 ## 推荐迁移策略
 
@@ -209,10 +218,10 @@ last_verified: 2026-07-29
 
 | Hook | Grok 事件 | 风险 | 优先级 |
 |------|-----------|------|--------|
-| `observe.sh` | `observation` | 低 | P0 |
-| `cost-tracker.js` | `observation` | 低 | P0 |
-| `memory-persistence/*.js` | `summarize` | 低 | P0 |
-| `session-start-bootstrap.js` | `context` | 低 | P0 |
+| `observe.sh` | `PostToolUse` | 低 | P0 |
+| `cost-tracker.js` | `PostToolUse` | 低 | P0 |
+| `memory-persistence/*.js` | `Stop` | 低 | P0 |
+| `session-start-bootstrap.js` | `SessionStart` | 低 | P0 |
 
 ### Phase 2: 提示类 Hook（中风险）
 
@@ -220,10 +229,10 @@ last_verified: 2026-07-29
 
 | Hook | Grok 事件 | 风险 | 优先级 |
 |------|-----------|------|--------|
-| `review-reminder.sh` | `file-context` | 中 | P1 |
-| `tmux-reminder` | `file-context` | 中 | P1 |
-| `git-push-reminder` | `file-context` | 中 | P1 |
-| `git-commit-reminder` | `file-context` | 中 | P1 |
+| `review-reminder.sh` | `PreToolUse` | 中 | P1 |
+| `tmux-reminder` | `PreToolUse` | 中 | P1 |
+| `git-push-reminder` | `PreToolUse` | 中 | P1 |
+| `git-commit-reminder` | `PreToolUse` | 中 | P1 |
 
 ### Phase 3: 阻断类 Hook（高风险）
 
@@ -231,10 +240,10 @@ last_verified: 2026-07-29
 
 | Hook | Grok 事件 | 风险 | 优先级 |
 |------|-----------|------|--------|
-| `pre-bash-block-no-verify.js` | `file-context` | 高 | P2 |
-| `git-operation-gate.sh` | `file-context` | 高 | P2 |
-| `unauthorized-tools.sh` | `file-context` | 高 | P2 |
-| `session-guard.js` | `context` | 高 | P2 |
+| `pre-bash-block-no-verify.js` | `PreToolUse` | 高 | P2 |
+| `git-operation-gate.sh` | `PreToolUse` | 高 | P2 |
+| `unauthorized-tools.sh` | `PreToolUse` | 高 | P2 |
+| `session-guard.js` | `SessionStart` | 高 | P2 |
 
 ## 实现建议
 
@@ -243,35 +252,23 @@ last_verified: 2026-07-29
 ```javascript
 // scripts/grok/grok-hook-adapter.js
 
-const GROK_EVENT_MAP = {
-  'PreToolUse': 'file-context',
-  'PostToolUse': 'observation',
-  'PostToolUseFailure': 'observation',
-  'SessionStart': 'context',
-  'Stop': 'summarize',
-  'SessionEnd': null, // 无直接映射
-  'PreCompact': null, // 无直接映射
-};
-
+// Grok 使用与 Claude Code 完全一致的事件名，无需映射
 function adaptHookForGrok(tspHook, grokEvent) {
   return {
     matcher: tspHook.matcher,
     hooks: tspHook.hooks.map(h => ({
       type: 'command',
-      command: adaptCommand(h.command, grokEvent),
+      command: adaptCommand(h.command),
       timeout: h.timeout || 30,
     })),
   };
 }
 
-function adaptCommand(command, grokEvent) {
+function adaptCommand(command) {
   // 替换环境变量
-  let adapted = command
+  return command
     .replace(/\$\{CLAUDE_PLUGIN_ROOT\}/g, '${GROK_PLUGIN_ROOT}')
     .replace(/\$\{CLAUDE_HOME\}/g, '${GROK_HOME}');
-
-  // 包装为 Grok 兼容格式
-  return `node scripts/grok/grok-hook-wrapper.js "${adapted}" --event ${grokEvent}`;
 }
 ```
 
@@ -280,9 +277,9 @@ function adaptCommand(command, grokEvent) {
 ```json
 {
   "hooks": {
-    "context": [
+    "SessionStart": [
       {
-        "matcher": "startup|resume",
+        "matcher": "*",
         "hooks": [{
           "type": "command",
           "command": "node ${GROK_PLUGIN_ROOT}/hooks/session-start-bootstrap.js",
@@ -290,7 +287,7 @@ function adaptCommand(command, grokEvent) {
         }]
       }
     ],
-    "observation": [
+    "PostToolUse": [
       {
         "matcher": ".*",
         "hooks": [{
@@ -300,8 +297,9 @@ function adaptCommand(command, grokEvent) {
         }]
       }
     ],
-    "summarize": [
+    "Stop": [
       {
+        "matcher": "*",
         "hooks": [{
           "type": "command",
           "command": "node ${GROK_PLUGIN_ROOT}/hooks/memory-persistence/stop.sh",
@@ -309,9 +307,9 @@ function adaptCommand(command, grokEvent) {
         }]
       }
     ],
-    "file-context": [
+    "PreToolUse": [
       {
-        "matcher": "^Bash$",
+        "matcher": "Bash",
         "hooks": [{
           "type": "command",
           "command": "node ${GROK_PLUGIN_ROOT}/hooks/pre-bash-block-no-verify.js",
