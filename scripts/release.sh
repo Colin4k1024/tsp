@@ -88,7 +88,7 @@ git add \
   .codex-plugin/plugin.json \
   .claude-plugin/plugin.json \
   .claude-plugin/marketplace.json \
-  .cursor-plugin/plugin.json \
+  .grok-plugin/plugin.json \
   .opencode-plugin/config.json \
   marketplace.json
 if git diff --cached --quiet; then

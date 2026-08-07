@@ -16,7 +16,7 @@ const AUTHORITATIVE_DOCS = [
   path.join('docs', 'guides', 'user-guide.md'),
   path.join('docs', 'runbooks', 'claude-quick-start.md'),
   path.join('docs', 'runbooks', 'codex-quick-start.md'),
-  path.join('docs', 'runbooks', 'cursor-quick-start.md'),
+  path.join('docs', 'runbooks', 'grok-build-quick-start.md'),
   path.join('docs', 'runbooks', 'opencode-quick-start.md'),
   path.join('docs', 'runbooks', 'project-onboarding.md'),
   path.join('docs', 'runbooks', 'team-skills-usage.md'),

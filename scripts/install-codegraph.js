@@ -12,7 +12,7 @@ const INSTALL_PS1_URL = 'https://raw.githubusercontent.com/colbymchenry/codegrap
 const SUPPORTED_TARGETS = Object.freeze({
   claude: 'claude',
   codex: 'codex',
-  cursor: 'cursor',
+  grok: 'claude', // Grok Build is compatible with Claude Code, map to claude for CodeGraph
   opencode: 'opencode',
 })
 
@@ -293,7 +293,7 @@ function buildTargetInstallInvocation(target) {
 }
 
 function printHelp() {
-  console.log(`Usage: node scripts/install-codegraph.js [--target <claude|codex|cursor|opencode>] [--dry-run]
+  console.log(`Usage: node scripts/install-codegraph.js [--target <claude|codex|grok|opencode>] [--dry-run]
 
 Installs the standalone CodeGraph CLI with the official upstream curl/PowerShell installer when needed,
 then configures CodeGraph for the current TSP install target only.

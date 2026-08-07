@@ -6,20 +6,19 @@ const codebuddyProject = require('./codebuddy-project');
 const codexHome = require('./codex-home');
 const codewhaleHome = require('./codewhale-home');
 const copilotHome = require('./copilot-home');
-const cursorProject = require('./cursor-project');
 const geminiProject = require('./gemini-project');
 const opencodeHome = require('./opencode-home');
 const windsurfProject = require('./windsurf-project');
 
-const PUBLIC_INSTALL_TARGETS = Object.freeze(['claude', 'codex', 'opencode']);
+const PUBLIC_INSTALL_TARGETS = Object.freeze(['claude', 'codex', 'opencode', 'grok']);
 const TARGET_ALIASES = Object.freeze({
   'claude-code': 'claude',
   claudecode: 'claude',
+  grok: 'claude', // Grok Build is fully compatible with Claude Code
 });
 
 const ADAPTERS = Object.freeze([
   claudeHome,
-  cursorProject,
   antigravityProject,
   codexHome,
   geminiProject,

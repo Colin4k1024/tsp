@@ -18,9 +18,9 @@ const PLUGIN_NAME = pluginData.plugin.name;
 
 function usage() {
   console.log(
-    "Usage: node scripts/install-platform.js <codex|claude|cursor|opencode> " +
+    "Usage: node scripts/install-platform.js <codex|claude|grok|opencode> " +
       "[--codex-home PATH] [--claude-home PATH] [--agents-home PATH] " +
-      "[--cursor-home PATH] [--opencode-home PATH]",
+      "[--grok-home PATH] [--opencode-home PATH]",
   );
 }
 
@@ -772,11 +772,11 @@ function installClaude(root, claudeHome) {
   console.log(`Updated Claude marketplace at ${path.join(claudeHome, "marketplace.json")}`);
 }
 
-function installCursor(root, cursorHome) {
-  const pluginDir = path.join(cursorHome, "plugins", PLUGIN_NAME);
+function installGrok(root, grokHome) {
+  const pluginDir = path.join(grokHome, "plugins", PLUGIN_NAME);
   fs.mkdirSync(path.dirname(pluginDir), { recursive: true });
   for (const name of [
-    ".cursor-plugin",
+    ".grok-plugin",
     "skills",
     "commands",
     "rules",
@@ -792,11 +792,7 @@ function installCursor(root, cursorHome) {
       copyTree(src, path.join(pluginDir, name));
     }
   }
-  const mdcTarget = path.join(cursorHome, "rules");
-  fs.mkdirSync(mdcTarget, { recursive: true });
-  convertRulesToMdc(path.join(root, "rules"), mdcTarget);
-  console.log(`Installed Cursor plugin to ${pluginDir}`);
-  console.log(`Converted rules to MDC in ${mdcTarget}`);
+  console.log(`Installed Grok Build plugin to ${pluginDir}`);
 }
 
 function generateOpenCodeConfig(root, opencodeHome) {
@@ -929,7 +925,7 @@ function parseArgs(argv) {
     codexHome: null,
     claudeHome: null,
     agentsHome: null,
-    cursorHome: null,
+    grokHome: null,
     opencodeHome: null,
   };
 
@@ -937,7 +933,7 @@ function parseArgs(argv) {
     "--codex-home": "codexHome",
     "--claude-home": "claudeHome",
     "--agents-home": "agentsHome",
-    "--cursor-home": "cursorHome",
+    "--grok-home": "grokHome",
     "--opencode-home": "opencodeHome",
   };
 
@@ -954,7 +950,7 @@ function parseArgs(argv) {
     index += 1;
   }
 
-  if (!["codex", "claude", "cursor", "opencode"].includes(platform)) {
+  if (!["codex", "claude", "grok", "opencode"].includes(platform)) {
     throw new Error(`Unknown platform: ${platform}`);
   }
   return options;
@@ -988,9 +984,9 @@ function main(argv = process.argv.slice(2)) {
       });
       return;
     }
-    if (options.platform === "cursor") {
-      const cursorHome = options.cursorHome || path.join(os.homedir(), ".cursor");
-      installCursor(root, cursorHome);
+    if (options.platform === "grok") {
+      const grokHome = options.grokHome || path.join(os.homedir(), ".grok");
+      installGrok(root, grokHome);
       emitPost({
         component: "script",
         action: "install_platform",
@@ -998,7 +994,7 @@ function main(argv = process.argv.slice(2)) {
         source: "install_platform",
         projectPath: root,
         callId,
-        payload: { platform: "cursor", cursor_home: cursorHome },
+        payload: { platform: "grok", grok_home: grokHome },
       });
       return;
     }

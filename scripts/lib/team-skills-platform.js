@@ -394,20 +394,21 @@ function codexMarketplaceManifest() {
   }, null, 2)}\n`;
 }
 
-function cursorPluginManifest() {
+function grokPluginManifest() {
   return `${JSON.stringify({
     name: plugin.name,
     version: plugin.version,
-    description: "开源角色化 Team Skills 平台，含 ECC harness skeleton、前端工程与 UI/UX 治理能力（Cursor 版）",
-    platform: "cursor",
+    description: "开源角色化 Team Skills 平台，含 ECC harness skeleton、前端工程与 UI/UX 治理能力（Grok Build 版）",
+    platform: "grok",
     rules_dir: "./rules/",
     skills_dir: "./skills/",
     agents_dir: "./agents/",
     commands_dir: "./commands/",
+    hooks_dir: "./hooks/",
     interface: {
       displayName: "Team Skills Platform",
       shortDescription: "角色化团队平台 + ECC harness 增强层",
-      longDescription: "通过 Tech Lead 编排与专业角色分工统一需求、方案、研发、测试和发布协作，并提供 ECC 风格的 specialist agents、commands、rules（MDC 格式）与前端治理能力。",
+      longDescription: "通过 Tech Lead 编排与专业角色分工统一需求、方案、研发、测试和发布协作，并提供 ECC 风格的 specialist agents、commands、rules 与前端治理能力。",
       developerName: plugin.authorName,
       category: plugin.category,
       capabilities: ["Read", "Write", "Interactive"],
@@ -487,7 +488,7 @@ function expectedGeneratedFiles(root = repoRoot()) {
   expected.set(path.join(root, ".claude-plugin", "marketplace.json"), claudeMarketplaceManifest("./"));
   expected.set(path.join(root, "marketplace.json"), claudeMarketplaceManifest("./"));
   expected.set(path.join(root, ".agents", "plugins", "marketplace.json"), codexMarketplaceManifest());
-  expected.set(path.join(root, ".cursor-plugin", "plugin.json"), cursorPluginManifest());
+  expected.set(path.join(root, ".grok-plugin", "plugin.json"), grokPluginManifest());
   expected.set(path.join(root, ".opencode-plugin", "config.json"), opencodeConfigManifest());
   expected.set(path.join(root, "scripts", "lib", "workflow-help-catalog.json"), workflowHelpCatalog());
   return expected;

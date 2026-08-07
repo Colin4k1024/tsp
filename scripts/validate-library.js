@@ -316,7 +316,7 @@ function validateActiveSurfaceDocs(root) {
     path.join("docs", "runbooks", "command-and-capability-matrix.md"),
     path.join("docs", "runbooks", "claude-quick-start.md"),
     path.join("docs", "runbooks", "codex-quick-start.md"),
-    path.join("docs", "runbooks", "cursor-quick-start.md"),
+    path.join("docs", "runbooks", "grok-build-quick-start.md"),
     path.join("docs", "runbooks", "opencode-quick-start.md"),
   ];
 
@@ -351,7 +351,7 @@ function validateActiveSurfaceDocs(root) {
     path.join("docs", "runbooks", "command-and-capability-matrix.md"),
     path.join("docs", "runbooks", "claude-quick-start.md"),
     path.join("docs", "runbooks", "codex-quick-start.md"),
-    path.join("docs", "runbooks", "cursor-quick-start.md"),
+    path.join("docs", "runbooks", "grok-build-quick-start.md"),
     path.join("docs", "runbooks", "opencode-quick-start.md"),
   ];
   for (const relativePath of teamHelpRequired) {
@@ -368,7 +368,7 @@ function validateActiveSurfaceDocs(root) {
     path.join("docs", "runbooks", "command-and-capability-matrix.md"),
     path.join("docs", "runbooks", "claude-quick-start.md"),
     path.join("docs", "runbooks", "codex-quick-start.md"),
-    path.join("docs", "runbooks", "cursor-quick-start.md"),
+    path.join("docs", "runbooks", "grok-build-quick-start.md"),
     path.join("docs", "runbooks", "opencode-quick-start.md"),
   ];
   for (const relativePath of artifactPersistRequired) {

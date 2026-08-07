@@ -1,37 +1,34 @@
 ---
-version: "2.3.0"
+version: "2.5.6"
 status: draft
-created: 2026-03-28
-updated: 2026-04-18
+created: 2026-08-07
+updated: 2026-08-07
 owner: 工程团队
 doc_tier: entry
-last_verified: 2026-04-18
+last_verified: 2026-08-07
 source_of_truth:
   - ../../README.md
   - ../../AGENTS.md
   - ./team-skills-usage.md
 ---
 
-# Cursor Quick Start — Team Skills Platform
+# Grok Build Quick Start — Team Skills Platform
 
-> 参考对象：需要在 Cursor 编辑器中使用 Team Skills Platform 的工程师。
+> 参考对象：需要在 Grok Build CLI 中使用 Team Skills Platform 的工程师。
 
 ## 1. 安装
 
 ```bash
 node scripts/build-platform-artifacts.js
-./scripts/install-cursor.sh
-
-# 指定自定义路径
-CURSOR_HOME_DIR=/path/to/cursor ./scripts/install-cursor.sh
+node scripts/install-apply.js --profile full --target grok
 ```
 
 ## 2. 安装后目录结构
 
 ```text
-~/.cursor/
+~/.grok/
 ├── plugins/team-skills-platform/
-│   ├── .cursor-plugin/
+│   ├── .grok-plugin/
 │   ├── skills/                     # 当前正式技能目录（统一平铺）
 │   ├── commands/                   # 团队主链 + specialist 命令
 │   ├── rules/
@@ -43,10 +40,8 @@ CURSOR_HOME_DIR=/path/to/cursor ./scripts/install-cursor.sh
 │   ├── contexts/
 │   ├── examples/
 │   └── mcp-configs/
-└── rules/                          # Cursor MDC 规则输出
+└── rules/                          # Grok 规则输出
 ```
-
-Cursor 安装输出只保留当前 JS runtime 入口，不再把旧 Python hook 文件名当成现行能力。
 
 ### 2.1 代码图谱能力检查：CodeGraph / Graphify / GitNexus
 
@@ -60,19 +55,19 @@ npm run gitnexus:doctor
 
 CodeGraph 是默认内置的 MCP-backed 符号、调用链和影响面能力；Graphify 适合轻量结构证据，GitNexus 适合更深 MCP 查询、impact 和 detect_changes。CodeGraph 的 TSP 安装 wrapper 使用官方 standalone installer 且不会使用 `--target=auto`；目标项目需要索引时运行 `codegraph init -i`。
 
-## 3. 在 Cursor 中怎么进入主链
+## 3. 在 Grok Build 中怎么进入主链
 
 - 公开入口统一从 `/team-help` 开始
 - 正式任务产出要通过 `npm run artifact:persist -- ...` 回写到项目仓库
 - specialist 结论仍需回落到 `/handoff` 或 `/team-*`
 
-## 4. 在 Cursor 中使用
+## 4. 在 Grok Build 中使用
 
 ### 4.1 引用角色 Agent
 
 ```text
 请以 Tech Lead 角色帮我拆解这个需求。
-参考：~/.cursor/plugins/team-skills-platform/agents/roles/tech-lead.md
+参考：~/.grok/plugins/team-skills-platform/agents/roles/tech-lead.md
 ```
 
 ### 4.2 使用团队命令
@@ -83,13 +78,13 @@ CodeGraph 是默认内置的 MCP-backed 符号、调用链和影响面能力；G
 
 ```text
 执行 /team-plan 流程，定义见：
-~/.cursor/plugins/team-skills-platform/commands/team-plan.md
+~/.grok/plugins/team-skills-platform/commands/team-plan.md
 ```
 
 ### 4.3 引用 Skill
 
 ```text
-读取 ~/.cursor/plugins/team-skills-platform/skills/systematic-debugging/SKILL.md 并帮我定位这个 bug。
+读取 ~/.grok/plugins/team-skills-platform/skills/systematic-debugging/SKILL.md 并帮我定位这个 bug。
 ```
 
 ## 5. 常用命令速查
@@ -113,7 +108,7 @@ CodeGraph 是默认内置的 MCP-backed 符号、调用链和影响面能力；G
 
 ```bash
 node scripts/build-platform-artifacts.js
-./scripts/install-cursor.sh
+node scripts/install-apply.js --profile full --target grok
 ```
 
 ## 7. 相关文档

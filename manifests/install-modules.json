@@ -10,7 +10,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -37,7 +37,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -59,7 +59,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -83,7 +83,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "opencode",
         "cangming",
         "codebuddy",
@@ -101,13 +101,13 @@
       "paths": [
         ".claude-plugin",
         ".codex-plugin",
-        ".cursor",
+        ".grok-plugin",
         ".opencode-plugin",
         "mcp-configs"
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "gemini",
@@ -138,7 +138,7 @@
         "skills/hexagonal-architecture",
         "skills/mcp-server-patterns"
       ],
-      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "targets": ["claude", "grok", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
       "dependencies": ["rules-core", "agents-core", "commands-core", "platform-configs"],
       "defaultInstall": false,
       "cost": "light",
@@ -156,7 +156,7 @@
         "skills/django-tdd",
         "skills/django-verification"
       ],
-      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "targets": ["claude", "grok", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
       "dependencies": ["framework-core"],
       "defaultInstall": false,
       "cost": "light",
@@ -171,7 +171,7 @@
         "skills/golang-testing",
         "skills/goframe-v2"
       ],
-      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "targets": ["claude", "grok", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
       "dependencies": ["framework-core"],
       "defaultInstall": false,
       "cost": "light",
@@ -187,7 +187,7 @@
         "skills/springboot-tdd",
         "skills/springboot-verification"
       ],
-      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "targets": ["claude", "grok", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
       "dependencies": ["framework-core"],
       "defaultInstall": false,
       "cost": "light",
@@ -206,7 +206,7 @@
         "skills/compose-multiplatform-patterns",
         "skills/android-clean-architecture"
       ],
-      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "targets": ["claude", "grok", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
       "dependencies": ["framework-core"],
       "defaultInstall": false,
       "cost": "light",
@@ -217,7 +217,7 @@
       "kind": "skills",
       "description": "Rust patterns and testing skills.",
       "paths": ["skills/rust-patterns", "skills/rust-testing"],
-      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "targets": ["claude", "grok", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
       "dependencies": ["framework-core"],
       "defaultInstall": false,
       "cost": "light",
@@ -228,7 +228,7 @@
       "kind": "skills",
       "description": "C++ coding standards and testing skills.",
       "paths": ["skills/cpp-coding-standards", "skills/cpp-testing"],
-      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "targets": ["claude", "grok", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
       "dependencies": ["framework-core"],
       "defaultInstall": false,
       "cost": "light",
@@ -239,7 +239,7 @@
       "kind": "skills",
       "description": "Modern Perl patterns and testing skills.",
       "paths": ["skills/perl-patterns", "skills/perl-testing"],
-      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "targets": ["claude", "grok", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
       "dependencies": ["framework-core"],
       "defaultInstall": false,
       "cost": "light",
@@ -255,7 +255,7 @@
         "skills/laravel-verification",
         "skills/laravel-plugin-discovery"
       ],
-      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "targets": ["claude", "grok", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
       "dependencies": ["framework-core", "lang-python"],
       "defaultInstall": false,
       "cost": "light",
@@ -266,7 +266,7 @@
       "kind": "skills",
       "description": "Meta-module: all language and framework skills. Installs framework-core + all lang-* modules.",
       "paths": [],
-      "targets": ["claude", "cursor", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
+      "targets": ["claude", "grok", "antigravity", "codex", "opencode", "cangming", "codebuddy", "codewhale"],
       "dependencies": [
         "framework-core",
         "lang-python",
@@ -278,10 +278,6 @@
         "lang-perl",
         "lang-laravel"
       ],
-      "defaultInstall": false,
-      "cost": "medium",
-      "stability": "stable"
-    },
       "defaultInstall": false,
       "cost": "medium",
       "stability": "stable"
@@ -298,7 +294,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -335,7 +331,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -364,7 +360,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -390,7 +386,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -429,7 +425,7 @@
       },
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -467,7 +463,7 @@
       },
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -497,7 +493,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -525,7 +521,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -550,7 +546,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -579,7 +575,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "codex",
         "opencode",
         "cangming",
@@ -648,7 +644,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "codex",
         "opencode",
         "cangming",
@@ -677,7 +673,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "codex",
         "opencode",
         "cangming",
@@ -700,7 +696,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "codex",
         "opencode",
         "cangming",
@@ -728,7 +724,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -769,7 +765,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -794,7 +790,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -825,7 +821,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -850,7 +846,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -876,7 +872,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "codex",
         "opencode",
         "cangming",
@@ -904,7 +900,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "codex",
         "opencode",
         "cangming",
@@ -952,7 +948,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "codex",
         "opencode",
         "cangming",
@@ -976,7 +972,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -1005,7 +1001,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -1042,7 +1038,7 @@
       ],
       "targets": [
         "claude",
-        "cursor",
+        "grok",
         "antigravity",
         "codex",
         "opencode",
@@ -1068,7 +1064,7 @@
         "commands/graph-impact.md",
         "commands/graph-visualize.md"
       ],
-      "targets": ["claude", "cursor", "codex", "opencode", "cangming", "codewhale"],
+      "targets": ["claude", "grok", "codex", "opencode", "cangming", "codewhale"],
       "dependencies": ["commands-core", "knowledge-graph", "team-workflow"],
       "defaultInstall": false,
       "cost": "light",
@@ -1085,7 +1081,7 @@
       ],
       "targets": [
         "claude",
-        "cursor"
+        "grok"
       ],
       "dependencies": [
         "hooks-runtime"

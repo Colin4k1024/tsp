@@ -340,93 +340,6 @@ function planClaudeLegacyInstall(context) {
   };
 }
 
-function planCursorLegacyInstall(context) {
-  const adapter = getInstallTargetAdapter('cursor');
-  const targetRoot = adapter.resolveRoot({ repoRoot: context.projectRoot });
-  const installStatePath = adapter.getInstallStatePath({ repoRoot: context.projectRoot });
-  const operations = [];
-  const warnings = [];
-
-  addMatchingRuleOperations(operations, {
-    moduleId: 'legacy-cursor-install',
-    sourceRoot: context.sourceRoot,
-    sourceRelativeDir: path.join('.cursor', 'rules'),
-    destinationDir: path.join(targetRoot, 'rules'),
-    matcher: fileName => /^common-.*\.md$/.test(fileName),
-  });
-
-  for (const language of context.languages) {
-    if (!LANGUAGE_NAME_PATTERN.test(language)) {
-      warnings.push(
-        `Invalid language name '${language}'. Only alphanumeric, dash, and underscore are allowed`
-      );
-      continue;
-    }
-
-    const matches = addMatchingRuleOperations(operations, {
-      moduleId: 'legacy-cursor-install',
-      sourceRoot: context.sourceRoot,
-      sourceRelativeDir: path.join('.cursor', 'rules'),
-      destinationDir: path.join(targetRoot, 'rules'),
-      matcher: fileName => fileName.startsWith(`${language}-`) && fileName.endsWith('.md'),
-    });
-
-    if (matches === 0) {
-      warnings.push(`No Cursor rules for '${language}' found, skipping`);
-    }
-  }
-
-  addRecursiveCopyOperations(operations, {
-    moduleId: 'legacy-cursor-install',
-    sourceRoot: context.sourceRoot,
-    sourceRelativeDir: path.join('.cursor', 'agents'),
-    destinationDir: path.join(targetRoot, 'agents'),
-  });
-  addRecursiveCopyOperations(operations, {
-    moduleId: 'legacy-cursor-install',
-    sourceRoot: context.sourceRoot,
-    sourceRelativeDir: path.join('.cursor', 'skills'),
-    destinationDir: path.join(targetRoot, 'skills'),
-  });
-  addRecursiveCopyOperations(operations, {
-    moduleId: 'legacy-cursor-install',
-    sourceRoot: context.sourceRoot,
-    sourceRelativeDir: path.join('.cursor', 'commands'),
-    destinationDir: path.join(targetRoot, 'commands'),
-  });
-  addRecursiveCopyOperations(operations, {
-    moduleId: 'legacy-cursor-install',
-    sourceRoot: context.sourceRoot,
-    sourceRelativeDir: path.join('.cursor', 'hooks'),
-    destinationDir: path.join(targetRoot, 'hooks'),
-  });
-
-  addFileCopyOperation(operations, {
-    moduleId: 'legacy-cursor-install',
-    sourceRoot: context.sourceRoot,
-    sourceRelativePath: path.join('.cursor', 'hooks.json'),
-    destinationPath: path.join(targetRoot, 'hooks.json'),
-  });
-  addFileCopyOperation(operations, {
-    moduleId: 'legacy-cursor-install',
-    sourceRoot: context.sourceRoot,
-    sourceRelativePath: path.join('.cursor', 'mcp.json'),
-    destinationPath: path.join(targetRoot, 'mcp.json'),
-  });
-
-  return {
-    mode: 'legacy',
-    adapter,
-    target: 'cursor',
-    targetRoot,
-    installRoot: targetRoot,
-    installStatePath,
-    operations,
-    warnings,
-    selectedModules: ['legacy-cursor-install'],
-  };
-}
-
 function planAntigravityLegacyInstall(context) {
   const adapter = getInstallTargetAdapter('antigravity');
   const targetRoot = adapter.resolveRoot({ repoRoot: context.projectRoot });
@@ -532,8 +445,6 @@ function createLegacyInstallPlan(options = {}) {
   let plan;
   if (target === 'claude') {
     plan = planClaudeLegacyInstall(context);
-  } else if (target === 'cursor') {
-    plan = planCursorLegacyInstall(context);
   } else {
     plan = planAntigravityLegacyInstall(context);
   }

@@ -693,8 +693,8 @@ OPENCODE_CONFIG_DIR=/tmp/opencode ./scripts/install-opencode.sh
 
 | Support level | Targets | `team` profile depth | Notes |
 |------|---------|----------------------|-------|
-| Recommended | `claude`, `codex`, `opencode` | 完整主链；仅跳过 target-intentional runtime gaps | 完整公开 workflow 链路、quick-start、安装验证与回归覆盖 |
-| Hidden compatibility | `cursor`, `antigravity`, `gemini`, `cangming`, `codebuddy`, `copilot`, `windsurf`, `augment` | 不作为公开承诺 | 适配器可继续存在以兼容旧用户，但不进入公开 wizard / release matrix |
+| Recommended | `claude`, `codex`, `opencode`, `grok` | 完整主链；仅跳过 target-intentional runtime gaps | 完整公开 workflow 链路、quick-start、安装验证与回归覆盖 |
+| Hidden compatibility | `antigravity`, `gemini`, `cangming`, `codebuddy`, `copilot`, `windsurf`, `augment` | 不作为公开承诺 | 适配器可继续存在以兼容旧用户，但不进入公开 wizard / release matrix |
 
 当前公开 quick-start / recipes / examples 聚焦 `claude`、`codex`、`opencode`。其他 targets 属于隐藏兼容，不应按 full parity 预期使用。
 
