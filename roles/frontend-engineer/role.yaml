@@ -46,9 +46,9 @@
   ],
   "recommended_ecc_skills": [
     "karpathy-guidelines",
-    "browser-smoke-testing",
+    "browser-qa",
     "systematic-debugging",
-    "browser-smoke-testing"
+    "browser-qa"
   ],
   "governance_rules": [
     "rules/frontend-engineering-standards.md",

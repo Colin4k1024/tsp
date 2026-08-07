@@ -231,7 +231,7 @@ add_two_columns(s9, '项目已有强项',
     [
         'maven-qa (4阶段质量门禁)',
         'pairwise-test-design',
-        'browser-smoke-testing',
+        'browser-qa',
         'testcontainers-integration',
         'tdd-guide + e2e-runner',
         '45+ 质量门禁检查项'

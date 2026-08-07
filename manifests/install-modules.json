@@ -916,11 +916,11 @@
     {
       "id": "ecc-skills",
       "kind": "skills",
-      "description": "ECC curated skills installed at skills/ — includes java-unit-test, maven-qa, browser-smoke-testing, systematic-debugging, and other specialized engineering skills referenced by role agents.",
+      "description": "ECC curated skills installed at skills/ — includes java-unit-test, maven-qa, browser-qa, systematic-debugging, and other specialized engineering skills referenced by role agents.",
       "paths": [
         "skills/adk-framework-adapters",
         "skills/agent-patterns-catalog",
-        "skills/browser-smoke-testing",
+        "skills/browser-qa",
         "skills/browser-qa",
         "skills/context-lifecycle",
         "skills/context-recall",

@@ -48,7 +48,7 @@
 9. 若实现中遇到连续修错、跨模块链路或表象报错，切到 `systematic-debugging` 先定位根因，再继续修改。
 10. 以最小改动完成实现并记录影响面。
 11. 即便使用 private enterprise overlay，也要把最终实现说明、自测结果和风险统一归并到 `/handoff` 输出中。
-12. 若前端变更需要真实浏览器验证，补用 `browser-smoke-testing` 形成关键页面 / 核心路径 smoke 证据。
+12. 若前端变更需要真实浏览器验证，补用 `browser-qa` 形成关键页面 / 核心路径 smoke 证据。
 13. 前端交付前使用 `templates/ui-review-checklist.md` 补齐自测证据，再通过 `/handoff` 交给 QA 或 DevOps。
 14. 完成自测后通过 `/handoff` 交给 QA 或 DevOps。
 15. 【落盘 — 必须执行，不可跳过】

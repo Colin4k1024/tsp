@@ -74,9 +74,9 @@
 ## 推荐 ECC 技能
 
 - `karpathy-guidelines`
-- `browser-smoke-testing`
+- `browser-qa`
 - `systematic-debugging`
-- `browser-smoke-testing`
+- `browser-qa`
 
 
 > **注意**：上述领域技能仅在任务明确依赖 `private enterprise overlay` 时启用；默认继续使用公开共享技能，例如 `frontend-engineering` 和 `frontend-ui-ux-system`。

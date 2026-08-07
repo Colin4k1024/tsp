@@ -93,7 +93,7 @@
 - fal-ai-media, videodb, video-editing, manim-video, html-to-video-pipeline
 - ui-demo, ui-ux-promax, open-design, frontend-slides
 - plankton-code-quality, langfuse-coding-trace
-- benchmark, browser-qa, browser-smoke-testing
+- benchmark, browser-qa, browser-qa
 - clickhouse-io, mysql-query, maven-qa
 
 ### 保留但降级为可选 (约 15 个)

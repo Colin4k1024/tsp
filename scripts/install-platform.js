@@ -907,6 +907,15 @@ function installOpenCode(root, opencodeHome) {
   // 转换 hooks 为 OpenCode 插件格式
   convertHooksPlugin(root, opencodeHome);
 
+  // 替换 hooks.json 中的 ${CLAUDE_PLUGIN_ROOT} 占位符
+  const hooksJsonPath = path.join(pluginDir, "hooks", "hooks.json");
+  if (fs.existsSync(hooksJsonPath)) {
+    let hooksContent = fs.readFileSync(hooksJsonPath, "utf8");
+    hooksContent = hooksContent.split("${CLAUDE_PLUGIN_ROOT}").join(pluginDir);
+    fs.writeFileSync(hooksJsonPath, hooksContent, "utf8");
+    console.log(`Replaced \${CLAUDE_PLUGIN_ROOT} in ${hooksJsonPath}`);
+  }
+
   console.log(`Installed OpenCode plugin to ${pluginDir}`);
   console.log(`Updated AGENTS.md at ${path.join(opencodeHome, "AGENTS.md")}`);
   console.log(`Copied commands to ${commandTarget}`);

@@ -78,7 +78,7 @@ source_of_truth:
 | `graphify` | 可选知识图谱能力，用于 brownfield 结构扫描、依赖路径分析与架构问答证据 | `/team-help`、`/team-plan`、`/team-execute` |
 | `gitnexus` | 受控可选代码智能能力，用于 MCP 查询、impact、detect_changes、多仓图谱证据 | `/team-help`、`/team-plan`、`/team-execute`、`/team-review` |
 | `karpathy-guidelines` | 主流程默认行为护栏：先暴露假设、优先简单方案、限定改动边界、先锁成功标准 | `/team-help`、`/team-intake`、`/team-plan`、`/team-execute`、`/team-review`、`/team-release` |
-| `browser-smoke-testing` | 浏览器主路径与 smoke 证据 | `/team-execute`、`/verify`、`/team-release` |
+| `browser-qa` | 浏览器主路径与 smoke 证据 | `/team-execute`、`/verify`、`/team-release` |
 | `pairwise-test-design` | 组合爆炸压缩 | `/team-plan`、`/team-review` |
 | `testcontainers-integration-testing` | 容器化集成验证 | `/team-execute`、`/verify` |
 | `systematic-debugging` | 根因定位而不是表面修错 | `/build-fix`、`/team-execute` |

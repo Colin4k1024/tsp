@@ -64,7 +64,7 @@
   ],
   "recommended_ecc_skills": [
     "karpathy-guidelines",
-    "browser-smoke-testing",
+    "browser-qa",
     "pairwise-test-design",
     "systematic-debugging"
   ],

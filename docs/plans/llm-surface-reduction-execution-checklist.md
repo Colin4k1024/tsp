@@ -157,7 +157,7 @@
 
 ### 6.2 高价值 ecc skills
 
-- [ ] 保留 `browser-smoke-testing`
+- [ ] 保留 `browser-qa`
 - [ ] 保留 `java-unit-test`
 - [ ] 保留 `maven-qa`
 - [ ] 保留 `mysql-query`

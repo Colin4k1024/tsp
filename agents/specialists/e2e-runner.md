@@ -30,7 +30,7 @@
 
 ## 重点技能
 
-- `browser-smoke-testing`
+- `browser-qa`
 
 ## 协作约束
 

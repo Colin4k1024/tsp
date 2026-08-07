@@ -25,7 +25,7 @@
 一个对象不适合删，通常是因为满足以下任意一条：
 
 1. 承载企业专属能力，例如 私有流程、权限集成、组织内部领域扩展。
-2. 承载具体工具链或验证方法，例如 `maven-qa`、`mysql-query`、`browser-smoke-testing`。
+2. 承载具体工具链或验证方法，例如 `maven-qa`、`mysql-query`、`browser-qa`。
 3. 是平台主链、前端治理或发布门禁中的显式锚点，被大范围引用。
 
 ## 3. 当前保留项
@@ -40,7 +40,7 @@
 
 ### 3.2 ECC skills
 
-- `browser-smoke-testing`
+- `browser-qa`
 - `java-unit-test`
 - `maven-qa`
 - `mysql-query`

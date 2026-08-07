@@ -38,7 +38,7 @@
 1. 汇总发布范围、质量状态和环境前置条件。
 2. 默认沿用 `karpathy-guidelines` 复核发布输入：确认 release notes、rollout 范围、观察项与回滚前提仍然对应已约定的最小变更和成功标准，没有在发布阶段悄悄扩 scope。
 3. 记录发布责任链、执行步骤、暂停点 / Go-No-Go 判断点，以及观察窗口。
-4. 若包含前端变更，补充关键页面 smoke、静态资源发布风险、性能基线和回滚触发条件，必要时使用 `browser-smoke-testing` 留下真实浏览器验证证据。
+4. 若包含前端变更，补充关键页面 smoke、静态资源发布风险、性能基线和回滚触发条件，必要时使用 `browser-qa` 留下真实浏览器验证证据。
 5. 若发布范围包含 GitHub Actions workflow、reusable workflow 或 release automation 变更，参考 `docs/runbooks/actionlint-workflow-gates.md` 与 `docs/runbooks/zizmor-workflow-audits.md` 汇总 workflow lint、安全审计与 triage 结论。
 6. 若发布范围包含 GitHub Actions workflow 的 `permissions`、默认 workflow 权限或 `GITHUB_TOKEN` scope 收敛，参考 `docs/runbooks/github-token-permissions-baseline.md` 汇总最小权限建议、例外和回退边界。
 7. 若发布范围包含 Terraform、CloudFormation、Bicep、ARM、OpenTofu、Helm、Kubernetes 或其他 IaC / 模板基线检查，参考 `docs/runbooks/checkov-iac-gates.md` 汇总 IaC 安全与合规预检结论。

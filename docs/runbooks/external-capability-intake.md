@@ -43,7 +43,7 @@ status:
 
 | source_name | source_url | license | trust_tier | maintenance_signal | portability | overlap_with_existing | import_mode | target_layer | target_name | why_now | status |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| `anthropics/skills:webapp-testing` | [anthropics/skills](https://github.com/anthropics/skills) | `Apache-2.0 / verify target folder before adaptation` | `A-official` | `65.8k` stars；2025-11 仍有 `webapp-testing` 相关 PR 活跃 | `codex+claude` | 已有 `frontend-engineering`、前端门禁，但没有独立浏览器 smoke / webapp 测试 skill | `adapt-into-local-skill` | `ecc` | `browser-smoke-testing` | 补齐前端与发布链之间的浏览器验证空位 | `approved` |
+| `anthropics/skills:webapp-testing` | [anthropics/skills](https://github.com/anthropics/skills) | `Apache-2.0 / verify target folder before adaptation` | `A-official` | `65.8k` stars；2025-11 仍有 `webapp-testing` 相关 PR 活跃 | `codex+claude` | 已有 `frontend-engineering`、前端门禁，但没有独立浏览器 smoke / webapp 测试 skill | `adapt-into-local-skill` | `ecc` | `browser-qa` | 补齐前端与发布链之间的浏览器验证空位 | `approved` |
 | `nexu-io/open-design` | [nexu-io/open-design](https://github.com/nexu-io/open-design) | `Apache-2.0` | `B-proven-community` | `30k+` stars；2026-05 仍活跃更新；包含本地 daemon、web UI、31 个 design skills、设计系统库、preview/export 与多 CLI agent adapters | `codex+claude` | 已有 `frontend-ui-ux-system`、`frontend-slides`、`design-system` 与 `ui-demo`，但缺少“Claude Design 类”本地优先设计工作台的受控接入路径 | `reference-only-runbook + full-profile-sidecar-install` | `runbook + skills` | `open-design-integration` | 为 TSP 补齐原型、deck、dashboard、mobile flow、`DESIGN.md` 和导出 artifact 的外部设计工作台协同能力；`full` profile 尝试准备 `~/.tsp/open-design`，但 GitHub 网络失败只警告不阻塞核心安装，也不把上游 daemon 和 Node 24/pnpm 生命周期并入 TSP 默认 npm 依赖 | `approved` |
 | `alchaincyf/huashu-design` | [alchaincyf/huashu-design](https://github.com/alchaincyf/huashu-design) | `Custom / personal use free；企业商用与工具链集成需上游授权` | `B-proven-community` | `4.4k+` stars；2026-04 仍活跃更新；包含独立 `SKILL.md`、演示与导出工具链 | `practice-only` | 已有 `frontend-ui-ux-system`、`ui-ux-promax` 与前端门禁，但没有专门面向高保真 HTML 原型、HTML-first deck、时间轴动画与设计评审的外部设计 skill 接入说明 | `reference-only-runbook` | `runbook` | `huashu-design-integration` | 在不复制上游内容的前提下，为 TSP 补齐外部设计 skill 接入路径、README 说明与致谢归档；待获得授权后再决定是否升级为本地化适配候选 | `approved` |
 | `Colin4k1024/andrej-karpathy-skills` | [Colin4k1024/andrej-karpathy-skills](https://github.com/Colin4k1024/andrej-karpathy-skills/tree/main) | `MIT` | `B-proven-community` | 轻量仓库，当前核心内容稳定；包含 `CLAUDE.md` 与 `karpathy-guidelines` skill 形态 | `codex+claude` | 已有 `coding-standards`、`tdd-workflow`、`verification-loop`，但缺少一层专门约束“先暴露假设、避免过度设计、限定改动边界、先定义成功标准”的行为护栏 | `adapt-into-local-skill` | `ecc` | `karpathy-guidelines` | 补齐实现前的行为约束层，让现有质量与验证技能前面多一道“别猜、别做重、别多改、先定义成功”的轻量护栏 | `approved` |
@@ -99,13 +99,13 @@ status:
 | target_name | target_layer | upstream | 为什么现在做 |
 |---|---|---|---|
 | `systematic-debugging` | `ecc` | `obra/superpowers` | 当前平台能验证，但缺少系统化根因定位流程 |
-| `browser-smoke-testing` | `ecc` | `anthropics/skills:webapp-testing` | 当前平台有前端治理，没有独立浏览器 smoke skill |
+| `browser-qa` | `ecc` | `anthropics/skills:webapp-testing` | 当前平台有前端治理，没有独立浏览器 smoke skill |
 | `pairwise-test-design` | `ecc` | `omkamal/pypict-claude-skill` | 当前平台有测试策略，没有组合测试设计入口 |
 
 当前进展：
 
 - `systematic-debugging` 已本地化落在 [skills/systematic-debugging/SKILL.md](../../skills/systematic-debugging/SKILL.md)。
-- `browser-smoke-testing` 已本地化落在 [skills/browser-smoke-testing/SKILL.md](../../skills/browser-smoke-testing/SKILL.md)。
+- `browser-qa` 已本地化落在 [skills/browser-qa/SKILL.md](../../skills/browser-qa/SKILL.md)。
 - `pairwise-test-design` 已本地化落在 [skills/pairwise-test-design/SKILL.md](../../skills/pairwise-test-design/SKILL.md)。
 - `karpathy-guidelines` 已本地化落在 [skills/karpathy-guidelines/SKILL.md](../../skills/karpathy-guidelines/SKILL.md)，并作为 `workflow-quality` 的一部分进入安装基线；配套使用说明见 [karpathy-guidelines-usage.md](karpathy-guidelines-usage.md)。
 - `git-pr-workflow` 已本地化落在 [docs/runbooks/git-pr-workflow.md](git-pr-workflow.md)。

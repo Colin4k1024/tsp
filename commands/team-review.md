@@ -45,7 +45,7 @@
 13. 若交付物涉及 Helm、Kubernetes、Terraform、YAML、JSON 或其他结构化配置策略，参考 `docs/runbooks/conftest-policy-gates.md` 核对 policy-as-code 预检、例外和阻塞条件。
 14. 若交付物涉及 Kubernetes admission、background scan、policy reports 或 image verification，参考 `docs/runbooks/kyverno-policy-gates.md` 核对 `Audit/Enforce` 状态、policy 命中和例外处理。
 15. 若变更涉及前端，必须验证视觉一致性、交互完整性、边界态、无障碍和前端性能。
-16. 若前端主路径或发布前验证需要真实浏览器证据，补用 `browser-smoke-testing`。
+16. 若前端主路径或发布前验证需要真实浏览器证据，补用 `browser-qa`。
 17. 区分阻塞问题和非阻塞风险。
 18. 必要时把冲突升级给 `tech-lead`。
 19. 【落盘 — 必须执行，不可跳过】

@@ -54,7 +54,8 @@ function hasRunnerRoot(candidate) {
  *   2. ~/.claude (direct install)
  *   3. Several well-known plugin sub-paths under ~/.claude/plugins/
  *   4. Versioned cache directories under ~/.claude/plugins/cache/everything-claude-code/
- *   5. Falls back to ~/.claude if nothing else matches
+ *   5. OpenCode plugin directory (~/.config/opencode/plugins/team-skills-platform)
+ *   6. Falls back to ~/.claude if nothing else matches
  *
  * @returns {string}
  */
@@ -75,6 +76,8 @@ function resolvePluginRoot() {
     path.join(claudeDir, 'plugins', 'everything-claude-code'),
     path.join(claudeDir, 'plugins', 'everything-claude-code@everything-claude-code'),
     path.join(claudeDir, 'plugins', 'marketplace', 'everything-claude-code'),
+    // OpenCode plugin path
+    path.join(home, '.config', 'opencode', 'plugins', 'team-skills-platform'),
   ];
 
   for (const candidate of knownPaths) {

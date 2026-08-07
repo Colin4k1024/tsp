@@ -132,7 +132,7 @@ source_of_truth:
 | 类别 | 技能 | 适用场景 |
 |------|------|----------|
 | 调试与验证（结构认知） | `graphify`、`gitnexus` | brownfield 结构扫描、依赖路径分析、架构问答、MCP 查询、impact / detect_changes 证据补齐 |
-| 调试与验证 | `browser-smoke-testing`、`pairwise-test-design`、`testcontainers-integration-testing`、`systematic-debugging`、`java-unit-test`、`maven-qa`、`mysql-query`、`eval-harness` | 浏览器回归、组合压缩、集成验证、系统化排障、语言/数据库专项、EDD |
+| 调试与验证 | `browser-qa`、`pairwise-test-design`、`testcontainers-integration-testing`、`systematic-debugging`、`java-unit-test`、`maven-qa`、`mysql-query`、`eval-harness` | 浏览器回归、组合压缩、集成验证、系统化排障、语言/数据库专项、EDD |
 | 编排与效率 | `parallel-execution`、`strategic-compact`、`cost-aware-llm-pipeline`、`harness-audit` | 并行执行、长会话整理、成本控制、平台能力自检 |
 | 学习与记忆 | `error-experience-library`、`continuous-learning` | 错误模式沉淀、instinct 学习与演进 |
 

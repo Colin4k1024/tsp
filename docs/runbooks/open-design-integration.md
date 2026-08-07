@@ -150,7 +150,7 @@ pnpm tools-dev
 |---|---|
 | 先收敛视觉系统 | `frontend-ui-ux-system -> open-design design-system -> /team-plan` |
 | 做高保真网页原型 | `/team-intake -> open-design web-prototype -> /team-execute` |
-| 做 dashboard / admin UI | `frontend-engineering -> open-design dashboard -> browser-smoke-testing` |
+| 做 dashboard / admin UI | `frontend-engineering -> open-design dashboard -> browser-qa` |
 | 做汇报材料 | `frontend-slides -> open-design deck mode -> /team-review` |
 | 做产品文档或 PM spec | `product-manager -> open-design pm-spec -> doc-architecture` |
 

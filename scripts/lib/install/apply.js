@@ -372,12 +372,38 @@ function mergeOpenCodeAgentsIndex(plan) {
   );
 }
 
+function replacePluginRootInJsonFiles(dir, pluginRoot) {
+  if (!fs.existsSync(dir)) {
+    return;
+  }
+
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      replacePluginRootInJsonFiles(fullPath, pluginRoot);
+    } else if (entry.name.endsWith('.json')) {
+      try {
+        const content = fs.readFileSync(fullPath, 'utf8');
+        if (content.includes('${CLAUDE_PLUGIN_ROOT}')) {
+          const replaced = content.split('${CLAUDE_PLUGIN_ROOT}').join(pluginRoot);
+          fs.writeFileSync(fullPath, replaced, 'utf8');
+        }
+      } catch {
+        // Skip files that can't be read/written
+      }
+    }
+  }
+}
+
 function applyTargetPostInstall(plan) {
   if (plan.adapter && plan.adapter.target === 'codex') {
     registerCodexPlugin(plan);
   }
   if (plan.adapter && plan.adapter.target === 'opencode') {
     mergeOpenCodeAgentsIndex(plan);
+    // Replace ${CLAUDE_PLUGIN_ROOT} in all JSON files for OpenCode
+    replacePluginRootInJsonFiles(plan.targetRoot, plan.targetRoot);
   }
 }
 
@@ -464,9 +490,16 @@ function applyInstallPlan(plan) {
 
   if (mergedSettingsPlan) {
     fs.mkdirSync(path.dirname(mergedSettingsPlan.hooksDestinationPath), { recursive: true });
+
+    // Replace ${CLAUDE_PLUGIN_ROOT} with actual plugin root path
+    let hooksJson = JSON.stringify(mergedSettingsPlan.resolvedHooksConfig, null, 2) + '\n';
+    if (plan.targetRoot) {
+      hooksJson = hooksJson.split('${CLAUDE_PLUGIN_ROOT}').join(plan.targetRoot);
+    }
+
     fs.writeFileSync(
       mergedSettingsPlan.hooksDestinationPath,
-      JSON.stringify(mergedSettingsPlan.resolvedHooksConfig, null, 2) + '\n',
+      hooksJson,
       'utf8'
     );
     fs.mkdirSync(path.dirname(mergedSettingsPlan.settingsPath), { recursive: true });

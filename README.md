@@ -238,7 +238,7 @@ npx skills add alchaincyf/huashu-design
 
 - `agents/specialists/` 提供规划、review、build-fix、验证、文档和语言专项能力。
 - `skills/` 当前承载 195+ 技能，覆盖六大类：
-	- 调试与验证：browser-smoke-testing、pairwise-test-design、testcontainers-integration-testing、systematic-debugging、eval-harness 等
+	- 调试与验证：browser-qa、pairwise-test-design、testcontainers-integration-testing、systematic-debugging、eval-harness 等
   - 高能动性与压力协议：pua、pua-p7、pua-p9、pua-pro、pua-loop、pua-yes、pua-mama
 	- 编排与效率：parallel-execution、wave-execution、strategic-compact、cost-aware-llm-pipeline、subagent-driven-development
 	- 学习与记忆：continuous-learning-v2、error-experience-library、evolution-core

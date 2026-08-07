@@ -28,7 +28,7 @@ owner: 工程团队
 2. 需要新界面或较大 UI 变化时，先补 [design-system-brief.md](../../templates/design-system-brief.md)。
 3. `frontend-engineer` 编写 [ui-implementation-plan.md](../../templates/ui-implementation-plan.md)，明确组件结构、状态流和交付风险。
 4. 进入 QA 前，`frontend-engineer` 必须填写 [ui-review-checklist.md](../../templates/ui-review-checklist.md)。
-5. 需要用真实浏览器做关键页面 / 发布前回归时，补用 [browser-smoke-testing](../../skills/browser-smoke-testing/SKILL.md) 明确 smoke 范围与证据。
+5. 需要用真实浏览器做关键页面 / 发布前回归时，补用 [browser-qa](../../skills/browser-qa/SKILL.md) 明确 smoke 范围与证据。
 6. `qa-engineer` 在 `/team-review` 依据 [frontend-quality-gates.md](../../rules/frontend-quality-gates.md) 给出结论。
 
 ## 4. 知识库结构
@@ -37,7 +37,7 @@ owner: 工程团队
 - 门禁入口：[frontend-quality-gates.md](../../rules/frontend-quality-gates.md)
 - 知识索引：[frontend-design-knowledge-base.md](../../rules/frontend-design-knowledge-base.md)
 - 工程参考：[frontend-engineering](../../skills/frontend-engineering/SKILL.md)
-- 浏览器验证：[browser-smoke-testing](../../skills/browser-smoke-testing/SKILL.md)
+- 浏览器验证：[browser-qa](../../skills/browser-qa/SKILL.md)
 - 设计参考：[frontend-ui-ux-system](../../skills/frontend-ui-ux-system/SKILL.md)
 
 ## 5. 默认交付要求
