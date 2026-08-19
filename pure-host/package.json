@@ -24,7 +24,8 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@iarna/toml": "^2.2.5"
+    "@iarna/toml": "^2.2.5",
+    "js-yaml": "^4.1.1"
   },
   "peerDependencies": {
     "claude-code": ">=1.0.0"

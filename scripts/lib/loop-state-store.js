@@ -199,6 +199,134 @@ function getLegacyHeartbeatLastRunPath() {
   return path.join(readHome(), ...LEGACY_CLAUDE_DIRS.heartbeatLastRun);
 }
 
+// ============ 新增 Metrics API ============
+
+/**
+ * 获取 loop 级别的指标汇总
+ * @param {string} loopId - loop 标识
+ * @param {Object} [options] - 状态目录选项
+ * @returns {{ loopId: number, totalIterations: number, acceptedChanges: number, gatePasses: number, gateFailures: number, costPerAcceptedChange: number|null }}
+ */
+function getLoopMetrics(loopId, options = {}) {
+  const heartbeat = loadHeartbeat(loopId, options) || {};
+  const gateHistory = heartbeat.gateHistory || [];
+  const totalIterations = heartbeat.totalRuns || 0;
+  const gatePasses = gateHistory.filter(g => g.passed).length;
+  const gateFailures = gateHistory.filter(g => !g.passed).length;
+  const acceptedChanges = heartbeat.acceptedChanges || 0;
+  const totalCost = heartbeat.totalCost || 0;
+
+  return {
+    loopId,
+    totalIterations,
+    acceptedChanges,
+    gatePasses,
+    gateFailures,
+    costPerAcceptedChange: acceptedChanges > 0
+      ? Math.round((totalCost / acceptedChanges) * 100) / 100
+      : null,
+  };
+}
+
+/**
+ * 记录一次 gate 执行结果
+ * @param {string} loopId - loop 标识
+ * @param {Object} gateResult - gate 执行结果
+ * @param {string} gateResult.gateName - gate 名称
+ * @param {boolean} gateResult.passed - 是否通过
+ * @param {string} gateResult.output - 输出摘要
+ * @param {number} [gateResult.cost] - 本次执行成本
+ * @param {Object} [options] - 状态目录选项
+ */
+function recordGateRun(loopId, gateResult, options = {}) {
+  const heartbeat = loadHeartbeat(loopId, options) || {};
+  if (!heartbeat.gateHistory) heartbeat.gateHistory = [];
+
+  heartbeat.gateHistory.push({
+    gateName: gateResult.gateName,
+    passed: gateResult.passed,
+    output: gateResult.output ? gateResult.output.slice(0, 500) : '',
+    cost: gateResult.cost || 0,
+    at: new Date().toISOString(),
+  });
+
+  // 保留最近 100 条记录
+  if (heartbeat.gateHistory.length > 100) {
+    heartbeat.gateHistory = heartbeat.gateHistory.slice(-100);
+  }
+
+  if (gateResult.cost) {
+    heartbeat.totalCost = (heartbeat.totalCost || 0) + gateResult.cost;
+  }
+
+  saveHeartbeat(loopId, heartbeat, options);
+}
+
+/**
+ * 列出所有 loop 的摘要信息
+ * @param {Object} [options] - 状态目录选项
+ * @returns {Array<{ loopId: string, lastRun: string|null, totalRuns: number, status: string }>}
+ */
+function listLoopSummaries(options = {}) {
+  const heartbeatDir = getNamespaceDir('heartbeat', options);
+  if (!fs.existsSync(heartbeatDir)) return [];
+
+  const files = fs.readdirSync(heartbeatDir)
+    .filter(f => f.endsWith('.json'))
+    .map(f => f.replace('.json', ''));
+
+  return files.map(loopId => {
+    const heartbeat = loadHeartbeat(loopId, options) || {};
+    return {
+      loopId,
+      lastRun: heartbeat.lastRunAt || null,
+      totalRuns: heartbeat.totalRuns || 0,
+      status: heartbeat.status || 'unknown',
+    };
+  });
+}
+
+/**
+ * 读取 triage inbox 中的条目
+ * @param {Object} [options] - 状态目录选项
+ * @returns {Array<Object>}
+ */
+function listTriageItems(options = {}) {
+  const inboxPath = getTriageInboxPath(options);
+  if (!fs.existsSync(inboxPath)) return [];
+
+  return fs.readFileSync(inboxPath, 'utf8')
+    .split('\n')
+    .filter(line => line.trim())
+    .map(line => {
+      try { return JSON.parse(line); }
+      catch { return null; }
+    })
+    .filter(Boolean);
+}
+
+/**
+ * 对 triage 条目执行操作（标记为已处理）
+ * @param {number} index - 条目索引
+ * @param {string} action - 'accept' | 'reject' | 'promote-to-goal'
+ * @param {Object} [options] - 状态目录选项
+ */
+function actOnTriageItem(index, action, options = {}) {
+  const items = listTriageItems(options);
+  if (index < 0 || index >= items.length) {
+    throw new Error(`Triage item index ${index} out of range (0-${items.length - 1})`);
+  }
+
+  items[index].action = action;
+  items[index].actedAt = new Date().toISOString();
+
+  // 重写整个 inbox
+  const inboxPath = getTriageInboxPath(options);
+  ensureDir(path.dirname(inboxPath));
+  const content = items.map(item => JSON.stringify(item)).join('\n') + '\n';
+  fs.writeFileSync(inboxPath, content, 'utf8');
+}
+
 module.exports = {
   TARGET_STATE_DIRS,
   getLoopStateDir,
@@ -218,4 +346,9 @@ module.exports = {
   saveLoopMarkdownState,
   targetDefaultStateDir,
   projectLocalStateDir,
+  getLoopMetrics,
+  recordGateRun,
+  listLoopSummaries,
+  listTriageItems,
+  actOnTriageItem,
 };

@@ -101,6 +101,42 @@
               "enum": ["human", "triage", "stop"]
             }
           }
+        },
+        "automation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "adapter": {
+              "type": "string",
+              "enum": ["session", "external", "event"]
+            },
+            "enabled": {
+              "type": "boolean",
+              "default": true
+            },
+            "onMissedRun": {
+              "type": "string",
+              "enum": ["skip", "catch-up", "triage"],
+              "default": "triage"
+            }
+          }
+        },
+        "metrics": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "acceptedChangeRateMin": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.5
+            },
+            "reviewWindowHours": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "default": 48
+            }
+          }
         }
       }
     }

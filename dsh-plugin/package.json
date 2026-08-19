@@ -1,0 +1,12 @@
+{
+  "name": "@colin4k1024/tsp-harness",
+  "version": "1.0.0",
+  "description": "Cordis plugin that bridges Team Skills Platform capabilities into DeepSeek Harness runtime.",
+  "type": "module",
+  "main": "./index.js",
+  "files": [
+    "index.js",
+    "cordis.yml"
+  ],
+  "license": "MIT"
+}

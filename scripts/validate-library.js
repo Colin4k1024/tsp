@@ -389,7 +389,7 @@ function main() {
   });
 
   const roles = loadRoles(root);
-  if (roles.length !== 8) {
+  if (roles.length !== 10) {
     emitPost({
       component: "script",
       action: "validate_library",

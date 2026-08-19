@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "totalCompactCount": 1,
+  "sessions": {
+    "01a018b2-4071-7421-adff-606c4b19c5ae": {
+      "sessionId": "01a018b2-4071-7421-adff-606c4b19c5ae",
+      "compactCount": 1,
+      "firstCompactedAt": "2026-08-19T06:41:54.390Z",
+      "lastCompactedAt": "2026-08-19T06:41:54.390Z",
+      "lastTrigger": "unknown",
+      "transcriptPath": "/Users/fanjia/.grok/sessions/%2FUsers%2Ffanjia%2FDesktop%2Fcode%2Ftsp/01a018b2-4071-7421-adff-606c4b19c5ae/updates.jsonl",
+      "cwd": "/Users/fanjia/Desktop/code/tsp"
+    }
+  },
+  "updatedAt": "2026-08-19T06:41:54.390Z"
+}

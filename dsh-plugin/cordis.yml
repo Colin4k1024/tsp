@@ -1,0 +1,22 @@
+# cordis.yml - TSP Harness Plugin Composition
+#
+# Lists the DSH services the TSP plugin depends on, then the plugin itself.
+# The loader mounts items concurrently; order is determined by `inject`
+# dependencies, not file position.
+
+# DSH core services that the TSP plugin injects (tools + systemPrompt).
+# These provide ctx.tools and ctx.systemPrompt respectively.
+# Comment out if DSH Desktop already loads these globally.
+- name: '@deepseek-ai/dsh-system-prompt'
+- name: '@deepseek-ai/dsh-tools'
+
+# TSP Harness plugin - bridges TSP skills/commands/rules/specialists into DSH.
+# Uses ./index.js (compiled CommonJS) for DSH Desktop compatibility.
+- name: './index.js'
+  config:
+    projectRoot: '../../'          # relative to this file; or use env TSP_PROJECT_ROOT
+    enableTools: true
+    enablePrompt: true
+    enableSpecialists: true
+    enableRules: true
+    maxPromptRules: 20              # 0 = inject all rules (may be large)
