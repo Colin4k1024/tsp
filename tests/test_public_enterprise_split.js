@@ -45,9 +45,9 @@ test('public repository no longer ships company skill directories', () => {
     'skills/front-builtin-components',
     'skills/front-platform-conformance',
     'skills/front-style-spec',
-    'skills/haier-data-permission',
-    'skills/haier-enterprise-sdk',
-    'skills/haier-scaffold-coding',
+    'skills/enterprise-data-permission',
+    'skills/enterprise-sdk',
+    'skills/enterprise-scaffold-coding',
     'skills/trigger-gitlab-pipeline',
   ]) {
     assert.ok(!fs.existsSync(path.join(ROOT, relativePath)), `${relativePath} should be removed from the public repo`);
